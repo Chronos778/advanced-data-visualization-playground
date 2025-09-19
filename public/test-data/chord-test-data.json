@@ -1,0 +1,12 @@
+[
+  { "source": "A", "target": "B", "value": 10 },
+  { "source": "A", "target": "C", "value": 15 },
+  { "source": "A", "target": "D", "value": 8 },
+  { "source": "B", "target": "C", "value": 12 },
+  { "source": "B", "target": "D", "value": 6 },
+  { "source": "B", "target": "E", "value": 9 },
+  { "source": "C", "target": "D", "value": 14 },
+  { "source": "C", "target": "E", "value": 7 },
+  { "source": "D", "target": "E", "value": 11 },
+  { "source": "E", "target": "A", "value": 5 }
+]
