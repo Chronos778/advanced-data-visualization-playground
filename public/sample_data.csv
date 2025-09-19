@@ -1,0 +1,21 @@
+Product,Category,Price,Sales_Volume,Rating,Release_Date,Country
+iPhone 14,Electronics,999,15000,4.5,2022-09-16,USA
+Samsung Galaxy S23,Electronics,899,12000,4.3,2023-02-01,South Korea
+MacBook Pro,Electronics,1999,8000,4.7,2021-10-18,USA
+Dell XPS 13,Electronics,1299,6000,4.2,2022-03-15,USA
+Nike Air Max,Footwear,120,25000,4.1,2022-01-10,USA
+Adidas Ultraboost,Footwear,180,18000,4.4,2021-11-20,Germany
+Levi's 501 Jeans,Clothing,59,30000,4.0,2020-05-12,USA
+Zara Jacket,Clothing,89,15000,3.8,2022-08-30,Spain
+Toyota Camry,Automotive,24000,50000,4.2,2022-06-01,Japan
+Honda Civic,Automotive,22000,45000,4.1,2021-09-15,Japan
+Tesla Model 3,Automotive,35000,75000,4.6,2021-03-01,USA
+BMW 3 Series,Automotive,41000,25000,4.3,2022-01-20,Germany
+Starbucks Coffee,Food & Beverage,4.5,500000,4.0,2020-01-01,USA
+Coca Cola,Food & Beverage,1.5,1000000,3.9,1886-05-08,USA
+Pepsi,Food & Beverage,1.4,800000,3.7,1893-08-28,USA
+Red Bull,Food & Beverage,2.5,200000,4.2,1987-04-01,Austria
+Netflix Subscription,Entertainment,15.99,220000000,4.1,2007-01-16,USA
+Spotify Premium,Entertainment,9.99,180000000,4.0,2008-10-07,Sweden
+Disney Plus,Entertainment,7.99,130000000,4.3,2019-11-12,USA
+Amazon Prime,Entertainment,12.99,200000000,4.2,2005-02-02,USA
