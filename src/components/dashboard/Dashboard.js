@@ -1,5 +1,4 @@
 import React, { useState, useCallback } from 'react';
-import RGL, { WidthProvider } from 'react-grid-layout';
 import {
   Box,
   Paper,
@@ -16,14 +15,15 @@ import {
   MenuItem,
   TextField,
   Alert,
-  Chip
+  Chip,
+  Tabs,
+  Tab
 } from '@mui/material';
 import {
   Add,
   Delete,
   Edit,
   Download,
-  DragIndicator,
   BarChart,
   ShowChart,
   PieChart,
@@ -32,14 +32,31 @@ import {
 } from '@mui/icons-material';
 import ChartComponent from '../charts/ChartComponent';
 import PlotlyChart from '../charts/PlotlyChart';
-import 'react-grid-layout/css/styles.css';
-import 'react-resizable/css/styles.css';
 
-const ResponsiveGridLayout = WidthProvider(RGL);
+// Custom TabPanel component
+function CustomTabPanel(props) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`simple-tabpanel-${index}`}
+      aria-labelledby={`simple-tab-${index}`}
+      {...other}
+    >
+      {value === index && (
+        <Box sx={{ p: 0, height: 'calc(100vh - 200px)' }}>
+          {children}
+        </Box>
+      )}
+    </div>
+  );
+}
 
 const Dashboard = ({ data, onExport }) => {
   const [widgets, setWidgets] = useState([]);
-  const [layout, setLayout] = useState([]);
+  const [activeTab, setActiveTab] = useState(0);
   const [addWidgetOpen, setAddWidgetOpen] = useState(false);
   const [editWidget, setEditWidget] = useState(null);
   const [newWidget, setNewWidget] = useState({
@@ -95,18 +112,11 @@ const Dashboard = ({ data, onExport }) => {
       config: {}
     };
 
-    const layoutItem = {
-      i: id,
-      x: (widgets.length * 2) % 12,
-      y: Math.floor(widgets.length / 6) * 6,
-      w: 6,
-      h: 6,
-      minW: 3,
-      minH: 3
-    };
-
-    setWidgets(prev => [...prev, widget]);
-    setLayout(prev => [...prev, layoutItem]);
+    setWidgets(prev => {
+      const newWidgets = [...prev, widget];
+      setActiveTab(newWidgets.length - 1); // Switch to the new tab
+      return newWidgets;
+    });
     setNewWidget({
       type: 'chart',
       chartType: 'line',
@@ -119,12 +129,25 @@ const Dashboard = ({ data, onExport }) => {
       sizeBy: ''
     });
     setAddWidgetOpen(false);
-  }, [newWidget, widgets.length]);
+  }, [newWidget]);
 
   const deleteWidget = useCallback((widgetId) => {
-    setWidgets(prev => prev.filter(w => w.id !== widgetId));
-    setLayout(prev => prev.filter(l => l.i !== widgetId));
-  }, []);
+    setWidgets(prev => {
+      const newWidgets = prev.filter(w => w.id !== widgetId);
+      const deletedIndex = prev.findIndex(w => w.id === widgetId);
+      
+      // Adjust active tab if necessary
+      if (deletedIndex === activeTab && activeTab > 0) {
+        setActiveTab(activeTab - 1);
+      } else if (deletedIndex < activeTab) {
+        setActiveTab(activeTab - 1);
+      } else if (newWidgets.length === 0) {
+        setActiveTab(0);
+      }
+      
+      return newWidgets;
+    });
+  }, [activeTab]);
 
   const updateWidget = useCallback((widgetId, updates) => {
     setWidgets(prev => prev.map(w => 
@@ -132,14 +155,13 @@ const Dashboard = ({ data, onExport }) => {
     ));
   }, []);
 
-  const handleLayoutChange = useCallback((newLayout) => {
-    setLayout(newLayout);
-  }, []);
+  const handleTabChange = (event, newValue) => {
+    setActiveTab(newValue);
+  };
 
   const exportDashboard = useCallback(() => {
     const dashboardConfig = {
       widgets,
-      layout,
       timestamp: new Date().toISOString(),
       dataInfo: data ? {
         fileName: data.fileName,
@@ -157,7 +179,7 @@ const Dashboard = ({ data, onExport }) => {
     a.download = `dashboard_${new Date().getTime()}.json`;
     a.click();
     URL.revokeObjectURL(url);
-  }, [widgets, layout, data]);
+  }, [widgets, data]);
 
   const renderWidget = (widget) => {
     const widgetData = data;
@@ -212,35 +234,6 @@ const Dashboard = ({ data, onExport }) => {
     }
   };
 
-  const getWidgetHeader = (widget) => (
-    <Box sx={{
-      position: 'absolute',
-      top: 8,
-      right: 8,
-      zIndex: 1000,
-      display: 'flex',
-      gap: 0.5,
-      opacity: 0.7,
-      '&:hover': { opacity: 1 }
-    }}>
-      <IconButton
-        size="small"
-        onClick={() => setEditWidget(widget)}
-        sx={{ bgcolor: 'background.paper', boxShadow: 1 }}
-      >
-        <Edit fontSize="small" />
-      </IconButton>
-      <IconButton
-        size="small"
-        onClick={() => deleteWidget(widget.id)}
-        sx={{ bgcolor: 'background.paper', boxShadow: 1 }}
-        color="error"
-      >
-        <Delete fontSize="small" />
-      </IconButton>
-    </Box>
-  );
-
   if (!data || !data.data) {
     return (
       <Box sx={{ p: 3, textAlign: 'center' }}>
@@ -253,9 +246,8 @@ const Dashboard = ({ data, onExport }) => {
         <Typography variant="body2" color="text.secondary">
           Once you upload a CSV, JSON, or Excel file, you'll be able to:
         </Typography>
-        <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center', gap: 2, flexWrap: 'wrap' }}>
+        <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, flexWrap: 'wrap' }}>
           <Chip icon={<Add />} label="Add Charts" variant="outlined" />
-          <Chip icon={<DragIndicator />} label="Drag & Drop" variant="outlined" />
           <Chip icon={<Download />} label="Export" variant="outlined" />
         </Box>
       </Box>
@@ -309,28 +301,94 @@ const Dashboard = ({ data, onExport }) => {
         </Box>
       </Box>
 
-      {/* Dashboard Grid */}
+      {/* Dashboard Tabs */}
       {widgets.length > 0 ? (
-        <ResponsiveGridLayout
-          className="layout"
-          layout={layout}
-          onLayoutChange={handleLayoutChange}
-          cols={12}
-          rowHeight={60}
-          margin={[16, 16]}
-          containerPadding={[0, 0]}
-          isDraggable={true}
-          isResizable={true}
-          compactType="vertical"
-          preventCollision={false}
-        >
-          {widgets.map((widget) => (
-            <Box key={widget.id} sx={{ position: 'relative' }}>
-              {getWidgetHeader(widget)}
-              {renderWidget(widget)}
-            </Box>
+        <Box sx={{ width: '100%' }}>
+          <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 2 }}>
+            <Tabs
+              value={activeTab}
+              onChange={handleTabChange}
+              variant="scrollable"
+              scrollButtons="auto"
+              allowScrollButtonsMobile
+              sx={{
+                '& .MuiTab-root': {
+                  textTransform: 'none',
+                  fontSize: '0.875rem',
+                  fontWeight: 500,
+                }
+              }}
+            >
+              {widgets.map((widget, index) => (
+                <Tab
+                  key={widget.id}
+                  label={
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <span>{widget.title}</span>
+                      <Box sx={{ display: 'flex', gap: 0.5, ml: 1 }}>
+                        <IconButton
+                          size="small"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setEditWidget(widget);
+                          }}
+                          sx={{ 
+                            p: 0.25, 
+                            opacity: 0.7,
+                            '&:hover': { opacity: 1 }
+                          }}
+                        >
+                          <Edit fontSize="inherit" />
+                        </IconButton>
+                        <IconButton
+                          size="small"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            deleteWidget(widget.id);
+                          }}
+                          color="error"
+                          sx={{ 
+                            p: 0.25, 
+                            opacity: 0.7,
+                            '&:hover': { opacity: 1 }
+                          }}
+                        >
+                          <Delete fontSize="inherit" />
+                        </IconButton>
+                      </Box>
+                    </Box>
+                  }
+                  id={`simple-tab-${index}`}
+                  aria-controls={`simple-tabpanel-${index}`}
+                />
+              ))}
+            </Tabs>
+          </Box>
+          
+          {widgets.map((widget, index) => (
+            <CustomTabPanel key={widget.id} value={activeTab} index={index}>
+              <Paper 
+                sx={{ 
+                  height: '100%', 
+                  width: '100%', 
+                  p: 2,
+                  display: 'flex',
+                  flexDirection: 'column'
+                }}
+              >
+                <Box sx={{ 
+                  flexGrow: 1, 
+                  height: '100%',
+                  '& > *': {
+                    height: '100%'
+                  }
+                }}>
+                  {renderWidget(widget)}
+                </Box>
+              </Paper>
+            </CustomTabPanel>
           ))}
-        </ResponsiveGridLayout>
+        </Box>
       ) : (
         <Paper sx={{ p: 6, textAlign: 'center', mt: 4 }}>
           <Typography variant="h6" color="text.secondary" gutterBottom>
