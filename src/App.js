@@ -128,7 +128,7 @@ function App() {
         <AppBar position="static" elevation={0}>
           <Toolbar>
             <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-              🎯 Advanced Data Visualization Playground
+              📊 c.it
             </Typography>
             
             {data && (
@@ -232,10 +232,10 @@ function App() {
           {!data && currentTab === 0 && (
             <Box sx={{ mt: 4, textAlign: 'center' }}>
               <Typography variant="h4" gutterBottom color="primary">
-                Welcome to the Data Visualization Playground
+                Welcome to c.it
               </Typography>
               <Typography variant="h6" color="text.secondary" sx={{ mb: 3 }}>
-                Advanced analytics and visualization platform for your data
+                Advanced data visualization platform with intelligent insights
               </Typography>
               <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, flexWrap: 'wrap' }}>
                 <Alert severity="info" sx={{ textAlign: 'left' }}>

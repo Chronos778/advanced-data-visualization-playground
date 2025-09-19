@@ -1,5 +1,5 @@
 {
-  "name": "data-visualization-playground",
+  "name": "c-it",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -15,6 +15,7 @@
     "@testing-library/user-event": "^13.5.0",
     "chart.js": "^4.5.0",
     "d3": "^7.9.0",
+    "d3-hierarchy": "^3.1.2",
     "html2canvas": "^1.4.1",
     "jspdf": "^3.0.3",
     "lodash": "^4.17.21",

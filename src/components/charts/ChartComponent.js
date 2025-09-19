@@ -43,8 +43,10 @@ import {
   BarChart as BarChartIcon,
   ScatterPlot,
   PieChart as PieChartIcon,
-  ShowChart
+  ShowChart,
+  AccountTree
 } from '@mui/icons-material';
+import TreemapChart from './TreemapChart';
 import { useState } from 'react';
 
 const COLORS = [
@@ -116,6 +118,7 @@ const ChartComponent = ({
       case 'scatter': return <ScatterPlot />;
       case 'pie': return <PieChartIcon />;
       case 'area': return <ShowChart />;
+      case 'treemap': return <AccountTree />;
       default: return <TrendingUp />;
     }
   };
@@ -262,6 +265,20 @@ const ChartComponent = ({
           </ResponsiveContainer>
         );
 
+      case 'treemap':
+        return (
+          <TreemapChart
+            data={data}
+            title={title}
+            valueColumn={yAxis}
+            labelColumn={xAxis}
+            categoryColumn={colorBy}
+            onExport={onExport}
+            onConfigChange={onConfigChange}
+            chartConfig={config}
+          />
+        );
+
       default:
         return null;
     }
@@ -315,6 +332,7 @@ const ChartComponent = ({
                   <MenuItem value="scatter">Scatter Plot</MenuItem>
                   <MenuItem value="pie">Pie Chart</MenuItem>
                   <MenuItem value="area">Area Chart</MenuItem>
+                  <MenuItem value="treemap">Treemap</MenuItem>
                 </Select>
               </FormControl>
             </Grid>

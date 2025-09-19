@@ -17,7 +17,9 @@ import {
   Alert,
   Chip,
   Tabs,
-  Tab
+  Tab,
+  Card,
+  CardContent
 } from '@mui/material';
 import {
   Add,
@@ -32,6 +34,7 @@ import {
 } from '@mui/icons-material';
 import ChartComponent from '../charts/ChartComponent';
 import PlotlyChart from '../charts/PlotlyChart';
+import ChartTypeGrid from '../charts/ChartTypeGrid';
 
 // Custom TabPanel component
 function CustomTabPanel(props) {
@@ -59,6 +62,7 @@ const Dashboard = ({ data, onExport }) => {
   const [activeTab, setActiveTab] = useState(0);
   const [addWidgetOpen, setAddWidgetOpen] = useState(false);
   const [editWidget, setEditWidget] = useState(null);
+  const [dialogStep, setDialogStep] = useState(0); // 0: Library selection, 1: Chart type, 2: Configuration
   const [newWidget, setNewWidget] = useState({
     type: 'chart',
     chartType: 'line',
@@ -128,6 +132,7 @@ const Dashboard = ({ data, onExport }) => {
       colorBy: '',
       sizeBy: ''
     });
+    setDialogStep(0);
     setAddWidgetOpen(false);
   }, [newWidget]);
 
@@ -180,6 +185,39 @@ const Dashboard = ({ data, onExport }) => {
     a.click();
     URL.revokeObjectURL(url);
   }, [widgets, data]);
+
+  const handleLibrarySelect = (library) => {
+    setNewWidget(prev => ({
+      ...prev,
+      library,
+      chartType: chartTypes[library][0].value
+    }));
+    setDialogStep(1);
+  };
+
+  const handleChartTypeSelect = (chartType) => {
+    setNewWidget(prev => ({
+      ...prev,
+      chartType: chartType.value
+    }));
+    setDialogStep(2);
+  };
+
+  const handleDialogClose = () => {
+    setAddWidgetOpen(false);
+    setDialogStep(0);
+    setNewWidget({
+      type: 'chart',
+      chartType: 'line',
+      library: 'recharts',
+      title: '',
+      xAxis: '',
+      yAxis: '',
+      zAxis: '',
+      colorBy: '',
+      sizeBy: ''
+    });
+  };
 
   const renderWidget = (widget) => {
     const widgetData = data;
@@ -411,142 +449,190 @@ const Dashboard = ({ data, onExport }) => {
       {/* Add Widget Dialog */}
       <Dialog 
         open={addWidgetOpen} 
-        onClose={() => setAddWidgetOpen(false)}
-        maxWidth="md"
+        onClose={handleDialogClose}
+        maxWidth="lg"
         fullWidth
       >
-        <DialogTitle>Add New Chart</DialogTitle>
+        <DialogTitle>
+          {dialogStep === 0 && 'Choose Chart Library'}
+          {dialogStep === 1 && `Select ${newWidget.library === 'recharts' ? 'Basic' : 'Advanced'} Chart Type`}
+          {dialogStep === 2 && 'Configure Chart'}
+        </DialogTitle>
         <DialogContent>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
-            <TextField
-              fullWidth
-              label="Chart Title"
-              value={newWidget.title}
-              onChange={(e) => setNewWidget(prev => ({ ...prev, title: e.target.value }))}
-              placeholder="Enter a descriptive title for your chart"
-            />
-            
-            <FormControl fullWidth>
-              <InputLabel>Chart Library</InputLabel>
-              <Select
-                value={newWidget.library}
-                label="Chart Library"
-                onChange={(e) => setNewWidget(prev => ({ 
-                  ...prev, 
-                  library: e.target.value,
-                  chartType: chartTypes[e.target.value][0].value 
-                }))}
-              >
-                <MenuItem value="recharts">Recharts (Basic Charts)</MenuItem>
-                <MenuItem value="plotly">Plotly (Advanced Charts)</MenuItem>
-              </Select>
-            </FormControl>
-
-            <FormControl fullWidth>
-              <InputLabel>Chart Type</InputLabel>
-              <Select
-                value={newWidget.chartType}
-                label="Chart Type"
-                onChange={(e) => setNewWidget(prev => ({ ...prev, chartType: e.target.value }))}
-              >
-                {chartTypes[newWidget.library].map(type => (
-                  <MenuItem key={type.value} value={type.value}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      {type.icon}
-                      {type.label}
-                    </Box>
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-
-            <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
-              <FormControl fullWidth>
-                <InputLabel>X-Axis</InputLabel>
-                <Select
-                  value={newWidget.xAxis}
-                  label="X-Axis"
-                  onChange={(e) => setNewWidget(prev => ({ ...prev, xAxis: e.target.value }))}
+          {/* Step 0: Library Selection */}
+          {dialogStep === 0 && (
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, mt: 2 }}>
+              <Typography variant="body1" color="text.secondary">
+                Select a charting library based on your visualization needs:
+              </Typography>
+              <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 3, maxWidth: 600 }}>
+                <Card
+                  sx={{
+                    cursor: 'pointer',
+                    transition: 'all 0.2s',
+                    border: '2px solid transparent',
+                    '&:hover': {
+                      borderColor: 'primary.main',
+                      transform: 'translateY(-2px)'
+                    }
+                  }}
+                  onClick={() => handleLibrarySelect('recharts')}
                 >
-                  {availableColumns.map(col => (
-                    <MenuItem key={col} value={col}>{col}</MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-
-              <FormControl fullWidth>
-                <InputLabel>Y-Axis</InputLabel>
-                <Select
-                  value={newWidget.yAxis}
-                  label="Y-Axis"
-                  onChange={(e) => setNewWidget(prev => ({ ...prev, yAxis: e.target.value }))}
+                  <CardContent sx={{ textAlign: 'center', p: 3 }}>
+                    <BarChart sx={{ fontSize: 48, color: 'primary.main', mb: 2 }} />
+                    <Typography variant="h6" gutterBottom>
+                      Recharts
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Basic charts - Line, Bar, Scatter, Pie, Area
+                    </Typography>
+                    <Typography variant="caption" display="block" sx={{ mt: 1 }}>
+                      Perfect for standard business visualizations
+                    </Typography>
+                  </CardContent>
+                </Card>
+                
+                <Card
+                  sx={{
+                    cursor: 'pointer',
+                    transition: 'all 0.2s',
+                    border: '2px solid transparent',
+                    '&:hover': {
+                      borderColor: 'primary.main',
+                      transform: 'translateY(-2px)'
+                    }
+                  }}
+                  onClick={() => handleLibrarySelect('plotly')}
                 >
-                  {newWidget.chartType === 'pie' ? availableColumns.map(col => (
-                    <MenuItem key={col} value={col}>{col}</MenuItem>
-                  )) : numericColumns.map(col => (
-                    <MenuItem key={col} value={col}>{col}</MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
+                  <CardContent sx={{ textAlign: 'center', p: 3 }}>
+                    <Insights sx={{ fontSize: 48, color: 'primary.main', mb: 2 }} />
+                    <Typography variant="h6" gutterBottom>
+                      Plotly
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Advanced charts - 3D, Heatmaps, Surfaces, Contours
+                    </Typography>
+                    <Typography variant="caption" display="block" sx={{ mt: 1 }}>
+                      Interactive scientific visualizations
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Box>
             </Box>
+          )}
 
-            {newWidget.library === 'plotly' && ['scatter3d', 'heatmap', 'contour', 'surface'].includes(newWidget.chartType) && (
-              <FormControl fullWidth>
-                <InputLabel>Z-Axis</InputLabel>
-                <Select
-                  value={newWidget.zAxis}
-                  label="Z-Axis"
-                  onChange={(e) => setNewWidget(prev => ({ ...prev, zAxis: e.target.value }))}
-                >
-                  {numericColumns.map(col => (
-                    <MenuItem key={col} value={col}>{col}</MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            )}
+          {/* Step 1: Chart Type Selection */}
+          {dialogStep === 1 && (
+            <ChartTypeGrid
+              selectedLibrary={newWidget.library}
+              onChartTypeSelect={handleChartTypeSelect}
+            />
+          )}
 
-            <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
-              <FormControl fullWidth>
-                <InputLabel>Color By (Optional)</InputLabel>
-                <Select
-                  value={newWidget.colorBy}
-                  label="Color By (Optional)"
-                  onChange={(e) => setNewWidget(prev => ({ ...prev, colorBy: e.target.value }))}
-                >
-                  <MenuItem value="">None</MenuItem>
-                  {availableColumns.map(col => (
-                    <MenuItem key={col} value={col}>{col}</MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-
-              {(newWidget.chartType === 'scatter' || newWidget.chartType === 'bubble') && (
+          {/* Step 2: Configuration */}
+          {dialogStep === 2 && (
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
+              <TextField
+                fullWidth
+                label="Chart Title"
+                value={newWidget.title}
+                onChange={(e) => setNewWidget(prev => ({ ...prev, title: e.target.value }))}
+                placeholder="Enter a descriptive title for your chart"
+              />
+              
+              <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
                 <FormControl fullWidth>
-                  <InputLabel>Size By (Optional)</InputLabel>
+                  <InputLabel>X-Axis</InputLabel>
                   <Select
-                    value={newWidget.sizeBy}
-                    label="Size By (Optional)"
-                    onChange={(e) => setNewWidget(prev => ({ ...prev, sizeBy: e.target.value }))}
+                    value={newWidget.xAxis}
+                    label="X-Axis"
+                    onChange={(e) => setNewWidget(prev => ({ ...prev, xAxis: e.target.value }))}
                   >
-                    <MenuItem value="">None</MenuItem>
+                    {availableColumns.map(col => (
+                      <MenuItem key={col} value={col}>{col}</MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+
+                <FormControl fullWidth>
+                  <InputLabel>Y-Axis</InputLabel>
+                  <Select
+                    value={newWidget.yAxis}
+                    label="Y-Axis"
+                    onChange={(e) => setNewWidget(prev => ({ ...prev, yAxis: e.target.value }))}
+                  >
+                    {newWidget.chartType === 'pie' ? availableColumns.map(col => (
+                      <MenuItem key={col} value={col}>{col}</MenuItem>
+                    )) : numericColumns.map(col => (
+                      <MenuItem key={col} value={col}>{col}</MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Box>
+
+              {newWidget.library === 'plotly' && ['scatter3d', 'heatmap', 'contour', 'surface'].includes(newWidget.chartType) && (
+                <FormControl fullWidth>
+                  <InputLabel>Z-Axis</InputLabel>
+                  <Select
+                    value={newWidget.zAxis}
+                    label="Z-Axis"
+                    onChange={(e) => setNewWidget(prev => ({ ...prev, zAxis: e.target.value }))}
+                  >
                     {numericColumns.map(col => (
                       <MenuItem key={col} value={col}>{col}</MenuItem>
                     ))}
                   </Select>
                 </FormControl>
               )}
+
+              <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
+                <FormControl fullWidth>
+                  <InputLabel>Color By (Optional)</InputLabel>
+                  <Select
+                    value={newWidget.colorBy}
+                    label="Color By (Optional)"
+                    onChange={(e) => setNewWidget(prev => ({ ...prev, colorBy: e.target.value }))}
+                  >
+                    <MenuItem value="">None</MenuItem>
+                    {availableColumns.map(col => (
+                      <MenuItem key={col} value={col}>{col}</MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+
+                {(newWidget.chartType === 'scatter' || newWidget.chartType === 'bubble') && (
+                  <FormControl fullWidth>
+                    <InputLabel>Size By (Optional)</InputLabel>
+                    <Select
+                      value={newWidget.sizeBy}
+                      label="Size By (Optional)"
+                      onChange={(e) => setNewWidget(prev => ({ ...prev, sizeBy: e.target.value }))}
+                    >
+                      <MenuItem value="">None</MenuItem>
+                      {numericColumns.map(col => (
+                        <MenuItem key={col} value={col}>{col}</MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                )}
+              </Box>
             </Box>
-          </Box>
+          )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setAddWidgetOpen(false)}>Cancel</Button>
-          <Button 
-            onClick={addWidget} 
-            variant="contained"
-            disabled={!newWidget.title || !newWidget.xAxis || !newWidget.yAxis}
-          >
-            Add Chart
-          </Button>
+          <Button onClick={handleDialogClose}>Cancel</Button>
+          {dialogStep > 0 && (
+            <Button onClick={() => setDialogStep(dialogStep - 1)}>Back</Button>
+          )}
+          {dialogStep === 2 && (
+            <Button 
+              onClick={addWidget} 
+              variant="contained"
+              disabled={!newWidget.title || !newWidget.xAxis || !newWidget.yAxis}
+            >
+              Add Chart
+            </Button>
+          )}
         </DialogActions>
       </Dialog>
 

@@ -24,8 +24,10 @@ import {
   Timeline,
   BubbleChart,
   Insights,
-  Map
+  Map,
+  AccountTree
 } from '@mui/icons-material';
+import TreemapChart from './TreemapChart';
 
 const PlotlyChart = ({ 
   data, 
@@ -286,6 +288,8 @@ const PlotlyChart = ({
       case 'heatmap':
       case 'contour':
         return <Map />;
+      case 'treemap':
+        return <AccountTree />;
       default:
         return <Timeline />;
     }
@@ -297,7 +301,8 @@ const PlotlyChart = ({
     { value: 'scatter3d', label: '3D Scatter', requiresZ: true },
     { value: 'heatmap', label: 'Heatmap', requiresZ: true },
     { value: 'contour', label: 'Contour Plot', requiresZ: true },
-    { value: 'surface', label: '3D Surface', requiresZ: true }
+    { value: 'surface', label: '3D Surface', requiresZ: true },
+    { value: 'treemap', label: 'Treemap', requiresZ: false }
   ];
 
   const colorScales = [
@@ -544,7 +549,21 @@ const PlotlyChart = ({
 
       {/* Chart */}
       <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-        {needsAllAxes ? (
+        {chartType === 'treemap' ? (
+          <TreemapChart
+            data={data}
+            title={title}
+            valueColumn={yAxis}
+            labelColumn={xAxis}
+            categoryColumn={colorBy}
+            onExport={onExport}
+            onConfigChange={(newConfig) => {
+              setConfig(prev => ({ ...prev, ...newConfig }));
+              if (onConfigChange) onConfigChange(newConfig);
+            }}
+            chartConfig={config}
+          />
+        ) : needsAllAxes ? (
           <Plot
             data={getPlotlyData()}
             layout={getLayout()}
