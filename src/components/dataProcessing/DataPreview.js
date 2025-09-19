@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import {
   Box,
   Paper,
@@ -30,38 +30,57 @@ import {
 } from '@mui/icons-material';
 import _ from 'lodash';
 
-const DataPreview = ({ data, title = "Data Preview" }) => {
+const DataPreview = React.memo(({ data, title = "Data Preview" }) => {
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [rowsPerPage, setRowsPerPage] = useState(25); // Increased from 10 for better performance
   const [searchTerm, setSearchTerm] = useState('');
 
-  const { filteredData, stats } = useMemo(() => {
+  // Limit data processing for very large datasets to improve performance
+  const processedData = useMemo(() => {
     if (!data || !data.data || data.data.length === 0) {
+      return { data: [], columns: [] };
+    }
+
+    // For large datasets, limit initial processing
+    const isLargeDataset = data.data.length > 1000;
+    const sampleSize = isLargeDataset ? 1000 : data.data.length;
+    const sampleData = data.data.slice(0, sampleSize);
+
+    return {
+      data: sampleData,
+      columns: data.columns || Object.keys(data.data[0]),
+      isLimited: isLargeDataset,
+      totalRows: data.data.length
+    };
+  }, [data]);
+
+  const { filteredData, stats } = useMemo(() => {
+    if (!processedData.data || processedData.data.length === 0) {
       return { filteredData: [], stats: {} };
     }
 
     // Filter data based on search term
-    let filtered = data.data;
+    let filtered = processedData.data;
     if (searchTerm.trim()) {
-      filtered = data.data.filter(row =>
+      filtered = processedData.data.filter(row =>
         Object.values(row).some(value =>
           String(value).toLowerCase().includes(searchTerm.toLowerCase())
         )
       );
     }
 
-    // Calculate statistics
-    const columns = data.columns || Object.keys(data.data[0]);
+    // Calculate statistics using the processed data
+    const columns = processedData.columns;
     const statistics = {};
 
     columns.forEach(column => {
-      const values = data.data.map(row => row[column]).filter(val => val !== null && val !== undefined && val !== '');
+      const values = processedData.data.map(row => row[column]).filter(val => val !== null && val !== undefined && val !== '');
       const numericValues = values.map(val => parseFloat(val)).filter(val => !isNaN(val));
       
       statistics[column] = {
-        totalCount: data.data.length,
+        totalCount: processedData.data.length,
         nonNullCount: values.length,
-        nullCount: data.data.length - values.length,
+        nullCount: processedData.data.length - values.length,
         uniqueCount: new Set(values).size,
         isNumeric: numericValues.length > values.length * 0.8, // Consider numeric if 80%+ are numbers
         ...(numericValues.length > 0 && {
@@ -78,18 +97,23 @@ const DataPreview = ({ data, title = "Data Preview" }) => {
       filteredData: filtered,
       stats: statistics
     };
-  }, [data, searchTerm]);
+  }, [processedData, searchTerm]);
 
-  const handleChangePage = (event, newPage) => {
+  const handleChangePage = useCallback((event, newPage) => {
     setPage(newPage);
-  };
+  }, []);
 
-  const handleChangeRowsPerPage = (event) => {
+  const handleChangeRowsPerPage = useCallback((event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
-  };
+  }, []);
 
-  const formatCellValue = (value, column) => {
+  const handleSearchChange = useCallback((event) => {
+    setSearchTerm(event.target.value);
+    setPage(0);
+  }, []);
+
+  const formatCellValue = useCallback((value, column) => {
     if (value === null || value === undefined) {
       return <Chip label="NULL" size="small" variant="outlined" color="default" />;
     }
@@ -119,19 +143,19 @@ const DataPreview = ({ data, title = "Data Preview" }) => {
     }
 
     return stringValue;
-  };
+  }, [stats]);
 
-  const getColumnIcon = (column) => {
+  const getColumnIcon = useCallback((column) => {
     if (stats[column]?.isNumeric) {
       return <Assessment sx={{ fontSize: 16, color: 'primary.main' }} />;
     }
     return <TableChart sx={{ fontSize: 16, color: 'secondary.main' }} />;
-  };
+  }, [stats]);
 
-  const getTrendIcon = (column) => {
+  const getTrendIcon = useCallback((column) => {
     if (!stats[column]?.isNumeric) return null;
     
-    const values = data.data.slice(-10).map(row => parseFloat(row[column])).filter(v => !isNaN(v));
+    const values = processedData.data.slice(-10).map(row => parseFloat(row[column])).filter(v => !isNaN(v));
     if (values.length < 2) return null;
     
     const trend = values[values.length - 1] - values[0];
@@ -139,7 +163,7 @@ const DataPreview = ({ data, title = "Data Preview" }) => {
     return trend > 0 
       ? <TrendingUp sx={{ fontSize: 14, color: 'success.main' }} />
       : <TrendingDown sx={{ fontSize: 14, color: 'error.main' }} />;
-  };
+  }, [processedData, stats]);
 
   if (!data || !data.data) {
     return (
@@ -154,21 +178,34 @@ const DataPreview = ({ data, title = "Data Preview" }) => {
     );
   }
 
-  const columns = data.columns || Object.keys(data.data[0]);
+  const columns = processedData.columns;
   const paginatedData = filteredData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
   return (
     <Box>
+      {/* Performance Warning for Large Datasets */}
+      {processedData.isLimited && (
+        <Box sx={{ mb: 2 }}>
+          <Chip 
+            label={`Showing first ${processedData.data.length.toLocaleString()} of ${processedData.totalRows.toLocaleString()} rows (optimized for performance)`}
+            color="warning" 
+            variant="outlined"
+            icon={<Info />}
+            sx={{ mb: 1 }}
+          />
+        </Box>
+      )}
+      
       {/* Data Summary Cards */}
       <Grid container spacing={2} sx={{ mb: 3 }}>
         <Grid item xs={12} sm={6} md={3}>
           <Card>
             <CardContent sx={{ textAlign: 'center' }}>
               <Typography variant="h4" color="primary">
-                {data.data.length.toLocaleString()}
+                {processedData.totalRows.toLocaleString()}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Total Rows
+                Total Rows {processedData.isLimited && `(${processedData.data.length.toLocaleString()} shown)`}
               </Typography>
             </CardContent>
           </Card>
@@ -335,6 +372,6 @@ const DataPreview = ({ data, title = "Data Preview" }) => {
       </Paper>
     </Box>
   );
-};
+});
 
 export default DataPreview;

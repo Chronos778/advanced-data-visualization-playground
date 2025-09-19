@@ -1,38 +1,320 @@
+/* ===== OPTIMIZED CLEAN DASHBOARD THEME ===== */
+:root {
+  /* Clean color palette inspired by the dashboard */
+  --bg-primary: #f8fafc;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #f1f5f9;
+  
+  /* Text colors */
+  --text-primary: #0f172a;
+  --text-secondary: #64748b;
+  --text-muted: #94a3b8;
+  
+  /* Border and divider colors */
+  --border-light: #e2e8f0;
+  --border-medium: #cbd5e1;
+  --border-dark: #94a3b8;
+  
+  /* Accent colors */
+  --accent-primary: #3b82f6;
+  --accent-success: #10b981;
+  --accent-warning: #f59e0b;
+  --accent-danger: #ef4444;
+  
+  /* Optimized shadows - reduced complexity */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 8px 10px -2px rgba(0, 0, 0, 0.1);
+}
+
+/* Main app background */
 .App {
-  text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
+  background: var(--bg-primary);
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
 }
 
-.App-link {
-  color: #61dafb;
+/* Optimized card base - reduced transitions */
+.clean-card {
+  background: var(--bg-secondary) !important;
+  border: 1px solid var(--border-light) !important;
+  border-radius: 12px !important;
+  box-shadow: var(--shadow-sm) !important;
+  transition: box-shadow 0.15s ease !important; /* Faster, only shadow */
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
+.clean-card:hover {
+  box-shadow: var(--shadow-md) !important;
+}
+
+/* Dashboard card with optimized performance */
+.dashboard-card {
+  background: var(--bg-secondary) !important;
+  border: 1px solid var(--border-light) !important;
+  border-radius: 16px !important;
+  box-shadow: var(--shadow-lg) !important;
+  transition: box-shadow 0.15s ease !important; /* Simplified transition */
+}
+
+.dashboard-card:hover {
+  box-shadow: var(--shadow-xl) !important;
+}
+
+/* Text styles - no shadows for performance */
+.text-primary {
+  color: var(--text-primary) !important;
+  font-weight: 600 !important;
+}
+
+.text-secondary {
+  color: var(--text-secondary) !important;
+  font-weight: 500 !important;
+}
+
+.text-muted {
+  color: var(--text-muted) !important;
+  font-weight: 400 !important;
+}
+
+/* Optimized button styles */
+.btn-primary {
+  background: var(--accent-primary) !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 8px !important;
+  font-weight: 500 !important;
+  transition: background 0.15s ease !important; /* Only background transition */
+}
+
+.btn-primary:hover {
+  background: #2563eb !important;
+}
+
+.btn-secondary {
+  background: var(--bg-secondary) !important;
+  color: var(--text-secondary) !important;
+  border: 1px solid var(--border-medium) !important;
+  border-radius: 8px !important;
+  font-weight: 500 !important;
+  transition: background 0.15s ease !important;
+}
+
+.btn-secondary:hover {
+  background: var(--bg-tertiary) !important;
+  border-color: var(--border-dark) !important;
+}
+
+/* Navigation styling - minimal effects */
+.MuiAppBar-root {
+  background: var(--bg-secondary) !important;
+  border-bottom: 1px solid var(--border-light) !important;
+  box-shadow: var(--shadow-sm) !important;
+  color: var(--text-primary) !important;
+}
+
+.MuiTab-root {
+  color: var(--text-secondary) !important;
+  font-weight: 500 !important;
+  text-transform: none !important;
+  transition: color 0.15s ease !important; /* Only color transition */
+}
+
+.MuiTab-root.Mui-selected {
+  color: var(--accent-primary) !important;
+  font-weight: 600 !important;
+}
+
+.MuiTabs-indicator {
+  background: var(--accent-primary) !important;
+  height: 3px !important;
+  border-radius: 2px !important;
+}
+
+/* Simplified form inputs */
+.MuiTextField-root .MuiOutlinedInput-root {
+  background: var(--bg-secondary) !important;
+  border-radius: 8px !important;
+}
+
+.MuiTextField-root .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline {
+  border-color: var(--border-medium) !important;
+}
+
+.MuiTextField-root .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
+  border-color: var(--border-dark) !important;
+}
+
+.MuiTextField-root .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+  border-color: var(--accent-primary) !important;
+}
+
+.MuiTextField-root .MuiInputLabel-root {
+  color: var(--text-secondary) !important;
+  font-weight: 500 !important;
+}
+
+.MuiTextField-root .MuiOutlinedInput-input {
+  color: var(--text-primary) !important;
+}
+
+/* Metric display styles */
+.metric-large {
+  font-size: 2.5rem !important;
+  font-weight: 700 !important;
+  color: var(--text-primary) !important;
+  line-height: 1.2 !important;
+}
+
+.metric-medium {
+  font-size: 1.5rem !important;
+  font-weight: 600 !important;
+  color: var(--text-primary) !important;
+}
+
+.metric-label {
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  color: var(--text-secondary) !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+}
+
+/* Status indicators */
+.status-success {
+  color: var(--accent-success) !important;
+  background: rgba(16, 185, 129, 0.1) !important;
+  padding: 4px 8px !important;
+  border-radius: 6px !important;
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+}
+
+.status-warning {
+  color: var(--accent-warning) !important;
+  background: rgba(245, 158, 11, 0.1) !important;
+  padding: 4px 8px !important;
+  border-radius: 6px !important;
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+}
+
+.status-danger {
+  color: var(--accent-danger) !important;
+  background: rgba(239, 68, 68, 0.1) !important;
+  padding: 4px 8px !important;
+  border-radius: 6px !important;
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+}
+
+/* Simplified progress bars */
+.progress-bar {
+  height: 8px !important;
+  border-radius: 4px !important;
+  background: var(--bg-tertiary) !important;
+  overflow: hidden !important;
+}
+
+.progress-fill {
+  height: 100% !important;
+  background: var(--accent-primary) !important; /* Simplified gradient */
+  border-radius: 4px !important;
+  transition: width 0.3s ease !important;
+}
+
+/* Simplified scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-tertiary);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-dark);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
+}
+
+/* Optimized chart tabs styling */
+.chart-tabs {
+  background: var(--bg-tertiary) !important;
+  border-radius: 12px !important;
+  padding: 4px !important;
+}
+
+.chart-tab {
+  border-radius: 8px !important;
+  margin: 0 2px !important;
+  transition: background 0.15s ease !important; /* Only background */
+  color: var(--text-secondary) !important;
+  font-weight: 500 !important;
+  text-transform: none !important;
+  min-height: 40px !important;
+}
+
+.chart-tab.Mui-selected {
+  background: var(--bg-secondary) !important;
+  color: var(--accent-primary) !important;
+  font-weight: 600 !important;
+  box-shadow: var(--shadow-sm) !important;
+}
+
+/* Chart workspace styling */
+.chart-workspace {
+  background: var(--bg-secondary) !important;
+  border: 1px solid var(--border-light) !important;
+  border-radius: 16px !important;
+  box-shadow: var(--shadow-lg) !important;
+  overflow: hidden !important;
+}
+
+.chart-workspace-header {
+  background: var(--bg-tertiary) !important;
+  border-bottom: 1px solid var(--border-light) !important;
+  padding: 16px 24px !important;
+}
+
+.chart-content {
+  padding: 24px !important;
+  min-height: 400px !important;
+}
+
+/* Performance optimizations */
+* {
+  box-sizing: border-box;
+}
+
+/* Disable expensive effects on mobile */
+@media (max-width: 768px) {
+  .metric-large {
+    font-size: 2rem !important;
   }
-  to {
-    transform: rotate(360deg);
+  
+  .dashboard-card:hover,
+  .clean-card:hover,
+  .btn-primary:hover,
+  .btn-secondary:hover {
+    transform: none !important; /* Disable transforms on mobile */
+  }
+  
+  /* Disable transitions on mobile for better performance */
+  * {
+    transition: none !important;
+  }
+}
+
+/* Reduce motion for accessibility and performance */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

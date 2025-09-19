@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import Plot from 'react-plotly.js';
 import {
   Box,
@@ -27,7 +27,7 @@ import {
   Map
 } from '@mui/icons-material';
 
-const PlotlyChart = ({ 
+const PlotlyChart = React.memo(({ 
   data, 
   chartType = 'scatter',
   title = 'Advanced Chart',
@@ -50,10 +50,59 @@ const PlotlyChart = ({
     colorScale: 'Viridis',
     opacity: 0.7,
     markerSize: 8,
-    animated: true,
+    animated: false, // Disabled for better performance
     theme: 'plotly_white',
     ...chartConfig
   });
+
+  // Separate chart renderer with error boundary
+  const ChartRenderer = () => {
+    try {
+      const plotData = getPlotlyData();
+      const layout = getLayout();
+      
+      return (
+        <Plot
+          data={plotData}
+          layout={layout}
+          config={{
+            responsive: true,
+            displayModeBar: true,
+            modeBarButtonsToRemove: ['pan2d', 'lasso2d'],
+            displaylogo: false
+          }}
+        />
+      );
+    } catch (error) {
+      console.error('Chart rendering error:', error);
+      return (
+        <Box 
+          sx={{ 
+            height: config.height, 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center',
+            flexDirection: 'column',
+            color: 'error.main',
+            border: '1px dashed',
+            borderColor: 'error.light',
+            borderRadius: 1,
+            p: 2
+          }}
+        >
+          <Typography variant="h6" gutterBottom>
+            Chart Error
+          </Typography>
+          <Typography variant="body2" sx={{ mb: 2, textAlign: 'center' }}>
+            Unable to render this chart with the current data configuration.
+          </Typography>
+          <Typography variant="caption" color="text.secondary">
+            Try selecting different axes or chart type
+          </Typography>
+        </Box>
+      );
+    }
+  };
 
   const availableColumns = useMemo(() => {
     if (!data || !data.columns) return [];
@@ -68,18 +117,38 @@ const PlotlyChart = ({
     });
   }, [availableColumns, data]);
 
-  const handleConfigChange = (key, value) => {
+  const handleConfigChange = useCallback((key, value) => {
     const newConfig = { ...config, [key]: value };
     setConfig(newConfig);
     if (onConfigChange) {
       onConfigChange(newConfig);
     }
-  };
+  }, [config, onConfigChange]);
+
+  const handleMenuClick = useCallback((event) => {
+    setAnchorEl(event.currentTarget);
+  }, []);
+
+  const handleMenuClose = useCallback(() => {
+    setAnchorEl(null);
+  }, []);
+
+  const handleExport = useCallback(() => {
+    if (onExport) {
+      onExport();
+    }
+    setAnchorEl(null);
+  }, [onExport]);
+
+  const toggleSettings = useCallback(() => {
+    setShowSettings(!showSettings);
+  }, [showSettings]);
 
   const getPlotlyData = () => {
     if (!data || !data.data || data.data.length === 0) return [];
 
-    const plotData = data.data;
+    try {
+      const plotData = data.data;
     
     switch (chartType) {
       case 'scatter':
@@ -148,48 +217,80 @@ const PlotlyChart = ({
         }];
 
       case 'surface':
-        // Create surface plot data
-        const xVals = plotData.map(row => parseFloat(row[xAxis])).filter(v => !isNaN(v));
-        const yVals = plotData.map(row => parseFloat(row[yAxis])).filter(v => !isNaN(v));
-        
-        // Create a grid for surface plot
-        const xMin = Math.min(...xVals);
-        const xMax = Math.max(...xVals);
-        const yMin = Math.min(...yVals);
-        const yMax = Math.max(...yVals);
-        
-        const gridSize = 20;
-        const xGrid = Array.from({length: gridSize}, (_, i) => xMin + (xMax - xMin) * i / (gridSize - 1));
-        const yGrid = Array.from({length: gridSize}, (_, i) => yMin + (yMax - yMin) * i / (gridSize - 1));
-        
-        const zGrid = yGrid.map(y => 
-          xGrid.map(x => {
-            // Simple interpolation - find closest point
-            let minDist = Infinity;
-            let closestZ = 0;
-            plotData.forEach(row => {
-              const dist = Math.sqrt(
-                Math.pow(parseFloat(row[xAxis]) - x, 2) + 
-                Math.pow(parseFloat(row[yAxis]) - y, 2)
-              );
-              if (dist < minDist) {
-                minDist = dist;
-                closestZ = parseFloat(row[zAxis]) || 0;
-              }
-            });
-            return closestZ;
-          })
-        );
+        // Surface plots need Z-axis data
+        if (!zAxis) {
+          console.warn('Surface plot requires Z-axis data');
+          return [{
+            x: plotData.map(row => row[xAxis]),
+            y: plotData.map(row => row[yAxis]),
+            type: 'scatter3d',
+            mode: 'markers',
+            marker: { color: '#1f77b4', size: 5 },
+            name: 'Surface (fallback to 3D scatter)'
+          }];
+        }
 
-        return [{
-          z: zGrid,
-          x: xGrid,
-          y: yGrid,
-          type: 'surface',
-          colorscale: config.colorScale,
-          showscale: true,
-          colorbar: { title: zAxis }
-        }];
+        try {
+          // Create surface plot data
+          const xVals = plotData.map(row => parseFloat(row[xAxis])).filter(v => !isNaN(v));
+          const yVals = plotData.map(row => parseFloat(row[yAxis])).filter(v => !isNaN(v));
+          
+          if (xVals.length === 0 || yVals.length === 0) {
+            throw new Error('No valid numeric data for surface plot');
+          }
+          
+          // Create a grid for surface plot
+          const xMin = Math.min(...xVals);
+          const xMax = Math.max(...xVals);
+          const yMin = Math.min(...yVals);
+          const yMax = Math.max(...yVals);
+          
+          const gridSize = 15; // Reduced for better performance
+          const xGrid = Array.from({length: gridSize}, (_, i) => xMin + (xMax - xMin) * i / (gridSize - 1));
+          const yGrid = Array.from({length: gridSize}, (_, i) => yMin + (yMax - yMin) * i / (gridSize - 1));
+          
+          const zGrid = yGrid.map(y => 
+            xGrid.map(x => {
+              // Simple interpolation - find closest point
+              let minDist = Infinity;
+              let closestZ = 0;
+              plotData.forEach(row => {
+                const rowX = parseFloat(row[xAxis]);
+                const rowY = parseFloat(row[yAxis]);
+                const rowZ = parseFloat(row[zAxis]);
+                
+                if (!isNaN(rowX) && !isNaN(rowY) && !isNaN(rowZ)) {
+                  const dist = Math.sqrt(Math.pow(rowX - x, 2) + Math.pow(rowY - y, 2));
+                  if (dist < minDist) {
+                    minDist = dist;
+                    closestZ = rowZ;
+                  }
+                }
+              });
+              return closestZ;
+            })
+          );
+
+          return [{
+            z: zGrid,
+            x: xGrid,
+            y: yGrid,
+            type: 'surface',
+            colorscale: config.colorScale,
+            showscale: true,
+            colorbar: { title: zAxis || 'Values' }
+          }];
+        } catch (error) {
+          console.error('Surface plot error:', error);
+          return [{
+            x: plotData.map(row => row[xAxis]),
+            y: plotData.map(row => row[yAxis]),
+            type: 'scatter',
+            mode: 'markers',
+            marker: { color: '#1f77b4' },
+            name: 'Surface (error fallback)'
+          }];
+        }
 
       case 'bubble':
         return [{
@@ -216,32 +317,200 @@ const PlotlyChart = ({
         }];
 
       case 'contour':
-        // Similar to heatmap but with contour lines
-        const contourX = [...new Set(plotData.map(row => row[xAxis]))].sort();
-        const contourY = [...new Set(plotData.map(row => row[yAxis]))].sort();
-        const contourZ = contourY.map(y => 
-          contourX.map(x => {
-            const point = plotData.find(row => row[xAxis] === x && row[yAxis] === y);
-            return point ? parseFloat(point[zAxis]) || 0 : 0;
-          })
-        );
+        // Contour plots need Z-axis data
+        if (!zAxis) {
+          console.warn('Contour plot requires Z-axis data');
+          return [{
+            x: plotData.map(row => row[xAxis]),
+            y: plotData.map(row => row[yAxis]),
+            type: 'scatter',
+            mode: 'markers',
+            marker: { color: '#1f77b4' },
+            name: 'Contour (fallback to scatter)'
+          }];
+        }
 
+        try {
+          const contourX = [...new Set(plotData.map(row => row[xAxis]))].sort();
+          const contourY = [...new Set(plotData.map(row => row[yAxis]))].sort();
+          
+          // Create a proper 2D grid for contour
+          const contourZ = contourY.map(y => 
+            contourX.map(x => {
+              const point = plotData.find(row => 
+                String(row[xAxis]) === String(x) && String(row[yAxis]) === String(y)
+              );
+              return point ? (parseFloat(point[zAxis]) || 0) : 0;
+            })
+          );
+
+          return [{
+            z: contourZ,
+            x: contourX,
+            y: contourY,
+            type: 'contour',
+            colorscale: config.colorScale,
+            showscale: true,
+            colorbar: { title: zAxis || 'Values' },
+            contours: {
+              showlabels: true,
+              labelfont: { size: 10, color: 'black' }
+            }
+          }];
+        } catch (error) {
+          console.error('Contour plot error:', error);
+          return [{
+            x: plotData.map(row => row[xAxis]),
+            y: plotData.map(row => row[yAxis]),
+            type: 'scatter',
+            mode: 'markers',
+            marker: { color: '#1f77b4' },
+            name: 'Contour (error fallback)'
+          }];
+        }
+
+      case 'line':
         return [{
-          z: contourZ,
-          x: contourX,
-          y: contourY,
-          type: 'contour',
-          colorscale: config.colorScale,
-          showscale: true,
-          colorbar: { title: zAxis },
-          contours: {
-            showlabels: true,
-            labelfont: { size: 12, color: 'white' }
-          }
+          x: plotData.map(row => row[xAxis]),
+          y: plotData.map(row => row[yAxis]),
+          type: 'scatter',
+          mode: 'lines+markers',
+          line: {
+            color: colorBy ? undefined : '#1f77b4',
+            width: 2
+          },
+          marker: {
+            size: 6,
+            color: colorBy ? plotData.map(row => row[colorBy]) : '#1f77b4',
+            colorscale: config.colorScale,
+            showscale: !!colorBy,
+            colorbar: colorBy ? { title: colorBy } : undefined
+          },
+          name: 'Line Chart'
         }];
+
+      case 'bar':
+        return [{
+          x: plotData.map(row => row[xAxis]),
+          y: plotData.map(row => row[yAxis]),
+          type: 'bar',
+          marker: {
+            color: colorBy ? plotData.map(row => row[colorBy]) : '#1f77b4',
+            colorscale: config.colorScale,
+            showscale: !!colorBy,
+            colorbar: colorBy ? { title: colorBy } : undefined,
+            opacity: config.opacity
+          },
+          name: 'Bar Chart'
+        }];
+
+      case 'violin':
+        return [{
+          y: plotData.map(row => row[yAxis]),
+          type: 'violin',
+          box: {
+            visible: true
+          },
+          meanline: {
+            visible: true
+          },
+          name: 'Violin Plot'
+        }];
+
+      case 'box':
+        return [{
+          y: plotData.map(row => row[yAxis]),
+          type: 'box',
+          name: 'Box Plot',
+          boxpoints: 'outliers'
+        }];
+
+      case 'histogram':
+        return [{
+          x: plotData.map(row => row[xAxis]),
+          type: 'histogram',
+          marker: {
+            color: '#1f77b4',
+            opacity: config.opacity
+          },
+          name: 'Histogram'
+        }];
+
+      case 'parallel':
+        try {
+          // Get only numeric columns for parallel coordinates
+          const validNumericCols = availableColumns.filter(col => {
+            const sampleValues = plotData.slice(0, 10).map(row => parseFloat(row[col]));
+            return sampleValues.some(val => !isNaN(val));
+          });
+
+          if (validNumericCols.length < 2) {
+            console.warn('Parallel coordinates requires at least 2 numeric columns');
+            return [{
+              x: plotData.map(row => row[xAxis]),
+              y: plotData.map(row => row[yAxis]),
+              type: 'scatter',
+              mode: 'markers',
+              marker: { color: '#1f77b4' },
+              name: 'Parallel (fallback to scatter)'
+            }];
+          }
+
+          const dimensions = validNumericCols.map(col => {
+            const values = plotData.map(row => {
+              const val = parseFloat(row[col]);
+              return isNaN(val) ? 0 : val;
+            });
+            
+            const validValues = values.filter(v => v !== 0 || plotData.some(row => row[col] === 0));
+            
+            return {
+              label: col,
+              values: values,
+              range: validValues.length > 0 ? [Math.min(...validValues), Math.max(...validValues)] : [0, 1]
+            };
+          });
+
+          return [{
+            type: 'parcoords',
+            line: {
+              color: colorBy ? plotData.map(row => {
+                const val = parseFloat(row[colorBy]);
+                return isNaN(val) ? 0 : val;
+              }) : plotData.map((_, i) => i),
+              colorscale: config.colorScale,
+              showscale: !!colorBy,
+              colorbar: colorBy ? { title: colorBy } : undefined
+            },
+            dimensions: dimensions,
+            name: 'Parallel Coordinates'
+          }];
+        } catch (error) {
+          console.error('Parallel coordinates error:', error);
+          return [{
+            x: plotData.map(row => row[xAxis]),
+            y: plotData.map(row => row[yAxis]),
+            type: 'scatter',
+            mode: 'markers',
+            marker: { color: '#1f77b4' },
+            name: 'Parallel (error fallback)'
+          }];
+        }
 
       default:
         return [];
+    }
+    } catch (error) {
+      console.error('PlotlyChart data processing error:', error);
+      // Return a simple fallback chart
+      return [{
+        x: data.data.slice(0, Math.min(100, data.data.length)).map((_, i) => i),
+        y: data.data.slice(0, Math.min(100, data.data.length)).map(row => 1),
+        type: 'scatter',
+        mode: 'markers',
+        marker: { color: '#1f77b4' },
+        name: 'Error Fallback'
+      }];
     }
   };
 
@@ -545,16 +814,7 @@ const PlotlyChart = ({
       {/* Chart */}
       <Box sx={{ display: 'flex', justifyContent: 'center' }}>
         {needsAllAxes ? (
-          <Plot
-            data={getPlotlyData()}
-            layout={getLayout()}
-            config={{
-              responsive: true,
-              displayModeBar: true,
-              modeBarButtonsToRemove: ['pan2d', 'lasso2d'],
-              displaylogo: false
-            }}
-          />
+          <ChartRenderer />
         ) : (
           <Box 
             sx={{ 
@@ -612,6 +872,6 @@ const PlotlyChart = ({
       </Menu>
     </Paper>
   );
-};
+});
 
 export default PlotlyChart;

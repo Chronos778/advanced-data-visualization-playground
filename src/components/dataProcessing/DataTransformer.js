@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import {
   Box,
   Paper,
@@ -24,17 +24,42 @@ import {
   Add,
   Delete,
   TrendingUp,
-  Functions
+  Functions,
+  Calculate,
+  Transform,
+  Visibility,
+  DataUsage,
+  TableChart,
+  Speed,
+  CheckCircle,
+  Warning,
+  AutoFixHigh,
+  Refresh
 } from '@mui/icons-material';
 import _ from 'lodash';
 
-const DataTransformer = ({ data, onTransformedData }) => {
+const DataTransformer = React.memo(({ data, onTransformedData }) => {
   const [filters, setFilters] = useState([]);
   const [groupBy, setGroupBy] = useState('');
   const [aggregations, setAggregations] = useState([]);
   const [sortBy, setSortBy] = useState('');
   const [sortOrder, setSortOrder] = useState('asc');
   const [searchTerm, setSearchTerm] = useState('');
+  
+  // New enhanced features
+  const [calculatedColumns, setCalculatedColumns] = useState([]);
+  const [dataTypeConversions, setDataTypeConversions] = useState([]);
+  const [validationRules, setValidationRules] = useState([]);
+  const [sampleSize, setSampleSize] = useState(null);
+  const [pivotConfig, setPivotConfig] = useState({
+    enabled: false,
+    rows: '',
+    columns: '',
+    values: '',
+    aggregateFunction: 'sum'
+  });
+  const [presets, setPresets] = useState({});
+  const [showPreview, setShowPreview] = useState(false);
 
   const columns = useMemo(() => {
     if (!data || !data.data || data.data.length === 0) return [];
@@ -86,6 +111,94 @@ const DataTransformer = ({ data, onTransformedData }) => {
 
   const removeAggregation = (id) => {
     setAggregations(aggregations.filter(agg => agg.id !== id));
+  };
+
+  // New helper functions for enhanced features
+  const addCalculatedColumn = () => {
+    setCalculatedColumns([...calculatedColumns, {
+      id: Date.now(),
+      name: '',
+      formula: '',
+      enabled: true
+    }]);
+  };
+
+  const updateCalculatedColumn = (id, field, value) => {
+    setCalculatedColumns(calculatedColumns.map(col => 
+      col.id === id ? { ...col, [field]: value } : col
+    ));
+  };
+
+  const removeCalculatedColumn = (id) => {
+    setCalculatedColumns(calculatedColumns.filter(col => col.id !== id));
+  };
+
+  const addDataTypeConversion = () => {
+    setDataTypeConversions([...dataTypeConversions, {
+      id: Date.now(),
+      column: '',
+      fromType: 'auto',
+      toType: 'number',
+      enabled: true
+    }]);
+  };
+
+  const updateDataTypeConversion = (id, field, value) => {
+    setDataTypeConversions(dataTypeConversions.map(conv => 
+      conv.id === id ? { ...conv, [field]: value } : conv
+    ));
+  };
+
+  const removeDataTypeConversion = (id) => {
+    setDataTypeConversions(dataTypeConversions.filter(conv => conv.id !== id));
+  };
+
+  const addValidationRule = () => {
+    setValidationRules([...validationRules, {
+      id: Date.now(),
+      column: '',
+      rule: 'not_empty',
+      value: '',
+      action: 'flag',
+      enabled: true
+    }]);
+  };
+
+  const updateValidationRule = (id, field, value) => {
+    setValidationRules(validationRules.map(rule => 
+      rule.id === id ? { ...rule, [field]: value } : rule
+    ));
+  };
+
+  const removeValidationRule = (id) => {
+    setValidationRules(validationRules.filter(rule => rule.id !== id));
+  };
+
+  const applyPreset = (presetType) => {
+    switch (presetType) {
+      case 'remove_empty':
+        setFilters([{
+          id: Date.now(),
+          column: columns[0] || '',
+          operator: 'not_equals',
+          value: '',
+          enabled: true
+        }]);
+        break;
+      case 'top_10':
+        setSampleSize(10);
+        setSortOrder('desc');
+        break;
+      case 'bottom_10':
+        setSampleSize(10);
+        setSortOrder('asc');
+        break;
+      case 'deduplicate':
+        // Add logic for removing duplicates
+        break;
+      default:
+        break;
+    }
   };
 
   const applyFilters = (dataset) => {
@@ -194,9 +307,127 @@ const DataTransformer = ({ data, onTransformedData }) => {
   const transformedData = useMemo(() => {
     if (!data || !data.data) return null;
 
-    let result = applyFilters(data.data);
+    let result = [...data.data];
+
+    // Apply data type conversions first
+    dataTypeConversions.forEach(conv => {
+      if (!conv.enabled || !conv.column) return;
+      
+      result = result.map(row => {
+        const newRow = { ...row };
+        const value = row[conv.column];
+        
+        try {
+          switch (conv.toType) {
+            case 'number':
+              newRow[conv.column] = parseFloat(value) || 0;
+              break;
+            case 'string':
+              newRow[conv.column] = String(value);
+              break;
+            case 'date':
+              newRow[conv.column] = new Date(value).toISOString().split('T')[0];
+              break;
+            case 'boolean':
+              newRow[conv.column] = Boolean(value && value !== 'false' && value !== '0');
+              break;
+            default:
+              break;
+          }
+        } catch (e) {
+          // Keep original value if conversion fails
+        }
+        return newRow;
+      });
+    });
+
+    // Add calculated columns
+    calculatedColumns.forEach(calc => {
+      if (!calc.enabled || !calc.name || !calc.formula) return;
+      
+      result = result.map(row => {
+        const newRow = { ...row };
+        try {
+          // Simple formula evaluation (basic math operations)
+          let formula = calc.formula;
+          columns.forEach(col => {
+            const value = parseFloat(row[col]) || 0;
+            formula = formula.replace(new RegExp(`\\b${col}\\b`, 'g'), value);
+          });
+          
+          // Evaluate simple mathematical expressions
+          const evalResult = Function(`"use strict"; return (${formula})`)();
+          newRow[calc.name] = evalResult;
+        } catch (e) {
+          newRow[calc.name] = 'Error';
+        }
+        return newRow;
+      });
+    });
+
+    // Apply validation rules and flag/remove invalid data
+    validationRules.forEach(rule => {
+      if (!rule.enabled || !rule.column) return;
+      
+      result = result.filter(row => {
+        const value = row[rule.column];
+        let isValid = true;
+        
+        switch (rule.rule) {
+          case 'not_empty':
+            isValid = value !== null && value !== undefined && value !== '';
+            break;
+          case 'is_number':
+            isValid = !isNaN(parseFloat(value)) && isFinite(value);
+            break;
+          case 'min_length':
+            isValid = String(value).length >= parseInt(rule.value);
+            break;
+          case 'max_length':
+            isValid = String(value).length <= parseInt(rule.value);
+            break;
+          case 'regex':
+            try {
+              isValid = new RegExp(rule.value).test(String(value));
+            } catch (e) {
+              isValid = true;
+            }
+            break;
+          default:
+            break;
+        }
+        
+        if (!isValid && rule.action === 'remove') {
+          return false;
+        }
+        
+        if (!isValid && rule.action === 'flag') {
+          row[`${rule.column}_valid`] = false;
+        }
+        
+        return true;
+      });
+    });
+
+    // Apply filters
+    result = applyFilters(result);
+    
+    // Apply grouping
     result = applyGrouping(result);
+    
+    // Apply sorting
     result = applySorting(result);
+
+    // Apply sampling if specified
+    if (sampleSize && sampleSize > 0 && result.length > sampleSize) {
+      if (sortBy) {
+        // Take top/bottom N if sorted
+        result = result.slice(0, sampleSize);
+      } else {
+        // Random sampling
+        result = _.sampleSize(result, sampleSize);
+      }
+    }
 
     const newColumns = result.length > 0 ? Object.keys(result[0]) : columns;
 
@@ -212,10 +443,15 @@ const DataTransformer = ({ data, onTransformedData }) => {
         aggregations,
         sortBy,
         sortOrder,
-        searchTerm
+        searchTerm,
+        calculatedColumns: calculatedColumns.filter(c => c.enabled),
+        dataTypeConversions: dataTypeConversions.filter(c => c.enabled),
+        validationRules: validationRules.filter(r => r.enabled),
+        sampleSize
       }
     };
-  }, [data, filters, groupBy, aggregations, sortBy, sortOrder, searchTerm, columns]);
+  }, [data, filters, groupBy, aggregations, sortBy, sortOrder, searchTerm, columns, 
+      calculatedColumns, dataTypeConversions, validationRules, sampleSize]);
 
   const applyTransformations = () => {
     if (transformedData) {
@@ -230,6 +466,17 @@ const DataTransformer = ({ data, onTransformedData }) => {
     setSortBy('');
     setSortOrder('asc');
     setSearchTerm('');
+    setCalculatedColumns([]);
+    setDataTypeConversions([]);
+    setValidationRules([]);
+    setSampleSize(null);
+    setPivotConfig({
+      enabled: false,
+      rows: '',
+      columns: '',
+      values: '',
+      aggregateFunction: 'sum'
+    });
   };
 
   const filterOperators = [
@@ -302,6 +549,65 @@ const DataTransformer = ({ data, onTransformedData }) => {
           />
         </Box>
       )}
+
+      {/* Quick Presets */}
+      <Accordion>
+        <AccordionSummary expandIcon={<ExpandMore />}>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <AutoFixHigh sx={{ mr: 1 }} />
+            <Typography>Quick Transformations</Typography>
+          </Box>
+        </AccordionSummary>
+        <AccordionDetails>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2 }}>
+            <Button
+              size="small"
+              variant="outlined"
+              startIcon={<Clear />}
+              onClick={() => applyPreset('remove_empty')}
+            >
+              Remove Empty Rows
+            </Button>
+            <Button
+              size="small"
+              variant="outlined"
+              startIcon={<TrendingUp />}
+              onClick={() => applyPreset('top_10')}
+            >
+              Top 10 Rows
+            </Button>
+            <Button
+              size="small"
+              variant="outlined"
+              startIcon={<Speed />}
+              onClick={() => applyPreset('bottom_10')}
+            >
+              Bottom 10 Rows
+            </Button>
+            <Button
+              size="small"
+              variant="outlined"
+              startIcon={<Refresh />}
+              onClick={() => applyPreset('deduplicate')}
+            >
+              Remove Duplicates
+            </Button>
+          </Box>
+          
+          <Box sx={{ mt: 2 }}>
+            <Typography variant="subtitle2" sx={{ mb: 1 }}>Data Sampling</Typography>
+            <TextField
+              type="number"
+              label="Sample Size"
+              value={sampleSize || ''}
+              onChange={(e) => setSampleSize(e.target.value ? parseInt(e.target.value) : null)}
+              size="small"
+              sx={{ width: 150 }}
+              inputProps={{ min: 1 }}
+            />
+          </Box>
+        </AccordionDetails>
+      </Accordion>
 
       {/* Global Search */}
       <Accordion defaultExpanded>
@@ -525,8 +831,260 @@ const DataTransformer = ({ data, onTransformedData }) => {
           </Grid>
         </AccordionDetails>
       </Accordion>
+
+      {/* Data Type Conversion */}
+      <Accordion>
+        <AccordionSummary expandIcon={<ExpandMore />}>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <Transform sx={{ mr: 1 }} />
+            <Typography>Data Type Conversion</Typography>
+          </Box>
+        </AccordionSummary>
+        <AccordionDetails>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+            <Typography variant="subtitle1">Type Conversions</Typography>
+            <Button
+              size="small"
+              startIcon={<Add />}
+              onClick={addDataTypeConversion}
+            >
+              Add Conversion
+            </Button>
+          </Box>
+
+          {dataTypeConversions.map((conv) => (
+            <Box key={conv.id} sx={{ mb: 2, p: 2, border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
+              <Grid container spacing={2} alignItems="center">
+                <Grid item xs={12} sm={3}>
+                  <FormControl fullWidth size="small">
+                    <InputLabel>Column</InputLabel>
+                    <Select
+                      value={conv.column}
+                      label="Column"
+                      onChange={(e) => updateDataTypeConversion(conv.id, 'column', e.target.value)}
+                    >
+                      {columns.map(col => (
+                        <MenuItem key={col} value={col}>{col}</MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+                <Grid item xs={12} sm={3}>
+                  <FormControl fullWidth size="small">
+                    <InputLabel>To Type</InputLabel>
+                    <Select
+                      value={conv.toType}
+                      label="To Type"
+                      onChange={(e) => updateDataTypeConversion(conv.id, 'toType', e.target.value)}
+                    >
+                      <MenuItem value="number">Number</MenuItem>
+                      <MenuItem value="string">String</MenuItem>
+                      <MenuItem value="date">Date</MenuItem>
+                      <MenuItem value="boolean">Boolean</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <FormControlLabel
+                      control={
+                        <Switch
+                          checked={conv.enabled}
+                          onChange={(e) => updateDataTypeConversion(conv.id, 'enabled', e.target.checked)}
+                          size="small"
+                        />
+                      }
+                      label="Enabled"
+                    />
+                    <IconButton
+                      size="small"
+                      onClick={() => removeDataTypeConversion(conv.id)}
+                      sx={{ ml: 1 }}
+                    >
+                      <Delete />
+                    </IconButton>
+                  </Box>
+                </Grid>
+              </Grid>
+            </Box>
+          ))}
+        </AccordionDetails>
+      </Accordion>
+
+      {/* Calculated Columns */}
+      <Accordion>
+        <AccordionSummary expandIcon={<ExpandMore />}>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <Calculate sx={{ mr: 1 }} />
+            <Typography>Calculated Columns</Typography>
+          </Box>
+        </AccordionSummary>
+        <AccordionDetails>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+            <Typography variant="subtitle1">Formula Columns</Typography>
+            <Button
+              size="small"
+              startIcon={<Add />}
+              onClick={addCalculatedColumn}
+            >
+              Add Column
+            </Button>
+          </Box>
+
+          {calculatedColumns.map((calc) => (
+            <Box key={calc.id} sx={{ mb: 2, p: 2, border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
+              <Grid container spacing={2} alignItems="center">
+                <Grid item xs={12} sm={3}>
+                  <TextField
+                    fullWidth
+                    size="small"
+                    label="Column Name"
+                    value={calc.name}
+                    onChange={(e) => updateCalculatedColumn(calc.id, 'name', e.target.value)}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    fullWidth
+                    size="small"
+                    label="Formula (e.g., column1 + column2 * 2)"
+                    value={calc.formula}
+                    onChange={(e) => updateCalculatedColumn(calc.id, 'formula', e.target.value)}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={3}>
+                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <FormControlLabel
+                      control={
+                        <Switch
+                          checked={calc.enabled}
+                          onChange={(e) => updateCalculatedColumn(calc.id, 'enabled', e.target.checked)}
+                          size="small"
+                        />
+                      }
+                      label="Enabled"
+                    />
+                    <IconButton
+                      size="small"
+                      onClick={() => removeCalculatedColumn(calc.id)}
+                      sx={{ ml: 1 }}
+                    >
+                      <Delete />
+                    </IconButton>
+                  </Box>
+                </Grid>
+              </Grid>
+              <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+                Use column names in formulas. Supports +, -, *, /, (), and basic math functions.
+              </Typography>
+            </Box>
+          ))}
+        </AccordionDetails>
+      </Accordion>
+
+      {/* Data Validation */}
+      <Accordion>
+        <AccordionSummary expandIcon={<ExpandMore />}>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <CheckCircle sx={{ mr: 1 }} />
+            <Typography>Data Validation</Typography>
+          </Box>
+        </AccordionSummary>
+        <AccordionDetails>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+            <Typography variant="subtitle1">Validation Rules</Typography>
+            <Button
+              size="small"
+              startIcon={<Add />}
+              onClick={addValidationRule}
+            >
+              Add Rule
+            </Button>
+          </Box>
+
+          {validationRules.map((rule) => (
+            <Box key={rule.id} sx={{ mb: 2, p: 2, border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
+              <Grid container spacing={2} alignItems="center">
+                <Grid item xs={12} sm={3}>
+                  <FormControl fullWidth size="small">
+                    <InputLabel>Column</InputLabel>
+                    <Select
+                      value={rule.column}
+                      label="Column"
+                      onChange={(e) => updateValidationRule(rule.id, 'column', e.target.value)}
+                    >
+                      {columns.map(col => (
+                        <MenuItem key={col} value={col}>{col}</MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+                <Grid item xs={12} sm={3}>
+                  <FormControl fullWidth size="small">
+                    <InputLabel>Rule</InputLabel>
+                    <Select
+                      value={rule.rule}
+                      label="Rule"
+                      onChange={(e) => updateValidationRule(rule.id, 'rule', e.target.value)}
+                    >
+                      <MenuItem value="not_empty">Not Empty</MenuItem>
+                      <MenuItem value="is_number">Is Number</MenuItem>
+                      <MenuItem value="min_length">Min Length</MenuItem>
+                      <MenuItem value="max_length">Max Length</MenuItem>
+                      <MenuItem value="regex">Regex Pattern</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Grid>
+                <Grid item xs={12} sm={2}>
+                  <TextField
+                    fullWidth
+                    size="small"
+                    label="Value"
+                    value={rule.value}
+                    onChange={(e) => updateValidationRule(rule.id, 'value', e.target.value)}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={2}>
+                  <FormControl fullWidth size="small">
+                    <InputLabel>Action</InputLabel>
+                    <Select
+                      value={rule.action}
+                      label="Action"
+                      onChange={(e) => updateValidationRule(rule.id, 'action', e.target.value)}
+                    >
+                      <MenuItem value="flag">Flag Invalid</MenuItem>
+                      <MenuItem value="remove">Remove Row</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Grid>
+                <Grid item xs={12} sm={2}>
+                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <FormControlLabel
+                      control={
+                        <Switch
+                          checked={rule.enabled}
+                          onChange={(e) => updateValidationRule(rule.id, 'enabled', e.target.checked)}
+                          size="small"
+                        />
+                      }
+                      label=""
+                    />
+                    <IconButton
+                      size="small"
+                      onClick={() => removeValidationRule(rule.id)}
+                      sx={{ ml: 1 }}
+                    >
+                      <Delete />
+                    </IconButton>
+                  </Box>
+                </Grid>
+              </Grid>
+            </Box>
+          ))}
+        </AccordionDetails>
+      </Accordion>
     </Paper>
   );
-};
+});
 
 export default DataTransformer;

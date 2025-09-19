@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import ReactMarkdown from 'react-markdown';
 import {
   Box,
   Paper,
@@ -18,7 +19,11 @@ import {
   LinearProgress,
   Alert,
   Button,
-  Tooltip
+  Tooltip,
+  CircularProgress,
+  Divider,
+  Stack,
+  useTheme
 } from '@mui/material';
 import {
   Psychology,
@@ -29,7 +34,9 @@ import {
   BubbleChart,
   Timeline,
   Assessment,
-  Refresh
+  Refresh,
+  AutoAwesome,
+  SmartToy
 } from '@mui/icons-material';
 import { 
   variance, 
@@ -44,9 +51,16 @@ import {
   quantile
 } from 'simple-statistics';
 
+// Gemini API Configuration
+const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent";
+const API_KEY = "AIzaSyACloMraQUd2plyqOVpsGTc4QeMRb54-nw";
+
 const AIInsights = ({ data }) => {
   const [analyzing, setAnalyzing] = useState(false);
   const [insights, setInsights] = useState(null);
+  const [aiInsights, setAiInsights] = useState(null);
+  const [loadingAI, setLoadingAI] = useState(false);
+  const [aiError, setAiError] = useState(null);
 
   const numericData = useMemo(() => {
     if (!data || !data.data || data.data.length === 0) return {};
@@ -98,6 +112,167 @@ const AIInsights = ({ data }) => {
     
     setInsights(generatedInsights);
     setAnalyzing(false);
+  };
+
+  const generateAIInsights = async () => {
+    setLoadingAI(true);
+    setAiError(null);
+    
+    try {
+      // Prepare data summary for Gemini API
+      const dataSummary = prepareDataSummary();
+      
+      const prompt = `Analyze this dataset and provide comprehensive insights in a well-structured markdown format. Dataset summary:
+${dataSummary}
+
+Please structure your analysis using the following markdown sections:
+
+## Dataset Overview
+Brief summary of the dataset structure and scope.
+
+## Key Patterns and Trends
+Identify 3-5 most significant patterns in the data.
+
+## Business Insights and Recommendations  
+Provide actionable business recommendations based on the analysis.
+
+## Data Quality Assessment
+Evaluate data quality issues and suggest improvements.
+
+## Suggested Visualizations
+Recommend specific chart types and analysis approaches.
+
+## Notable Correlations and Anomalies
+Highlight interesting relationships and outliers.
+
+Use proper markdown formatting with:
+- **Bold text** for emphasis
+- *Italic text* for secondary points
+- • Bullet points for lists
+- > Blockquotes for key insights
+
+Format your response in clear, actionable insights that would be valuable for data analysis.`;
+
+      const response = await fetch(`${API_URL}?key=${API_KEY}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          contents: [{
+            parts: [{
+              text: prompt
+            }]
+          }]
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`API request failed: ${response.status}`);
+      }
+
+      const result = await response.json();
+      const aiText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+      
+      if (!aiText) {
+        throw new Error('No response from AI model');
+      }
+
+      // Parse AI response into structured insights
+      const structuredInsights = parseAIResponse(aiText);
+      setAiInsights(structuredInsights);
+      
+    } catch (error) {
+      console.error('AI Insights error:', error);
+      setAiError(error.message);
+    } finally {
+      setLoadingAI(false);
+    }
+  };
+
+  const prepareDataSummary = () => {
+    if (!data || !data.data) return "No data available";
+    
+    const summary = {
+      totalRows: data.data.length,
+      totalColumns: data.columns.length,
+      numericColumns: Object.keys(numericData),
+      categoricalColumns: Object.keys(categoricalData),
+      sampleData: data.data.slice(0, 3), // First 3 rows as sample
+      columnStats: {}
+    };
+
+    // Add basic stats for numeric columns
+    Object.entries(numericData).forEach(([column, values]) => {
+      if (values.length > 0) {
+        summary.columnStats[column] = {
+          type: 'numeric',
+          mean: mean(values).toFixed(2),
+          min: min(values),
+          max: max(values),
+          count: values.length
+        };
+      }
+    });
+
+    // Add info for categorical columns
+    Object.entries(categoricalData).forEach(([column, values]) => {
+      const uniqueValues = [...new Set(values)];
+      summary.columnStats[column] = {
+        type: 'categorical',
+        uniqueCount: uniqueValues.length,
+        sampleValues: uniqueValues.slice(0, 5),
+        count: values.length
+      };
+    });
+
+    return JSON.stringify(summary, null, 2);
+  };
+
+  const parseAIResponse = (aiText) => {
+    // Clean up the text by removing redundant confidence tags and fixing markdown
+    let cleanedText = aiText
+      .replace(/\*\*\s*Confidence: \d+%\s*Gemini AI\s*\*\*/g, '') // Remove redundant confidence tags
+      .replace(/Confidence: \d+%\s*Gemini AI/g, '') // Remove plain confidence tags
+      .replace(/\n\s*\n\s*\n/g, '\n\n') // Clean up excessive line breaks
+      .trim();
+
+    // Split by main sections (marked with ##)
+    const sections = cleanedText.split(/(?=##\s)/).filter(section => section.trim());
+    
+    if (sections.length === 0) {
+      // Fallback: split by numbered sections if no ## headers found
+      const fallbackSections = cleanedText.split(/\d+\.\s+/).filter(section => section.trim());
+      return {
+        rawText: cleanedText,
+        insights: fallbackSections.map((section, index) => ({
+          id: index,
+          type: 'ai',
+          title: `Insight ${index + 1}`,
+          content: section.trim(),
+          confidence: 0.85,
+          source: 'Gemini AI'
+        }))
+      };
+    }
+
+    return {
+      rawText: cleanedText,
+      insights: sections.map((section, index) => {
+        const lines = section.trim().split('\n');
+        const title = lines[0].replace(/^##\s*/, '').trim() || `Analysis Section ${index + 1}`;
+        const content = lines.slice(1).join('\n').trim();
+        
+        return {
+          id: index,
+          type: 'ai',
+          title: title,
+          content: content,
+          confidence: 0.85,
+          source: 'Gemini AI'
+        };
+      })
+    };
   };
 
   const generateSummaryInsights = () => {
@@ -449,6 +624,226 @@ const AIInsights = ({ data }) => {
             Click "Generate Insights" to automatically analyze your data and discover patterns, correlations, and recommendations.
           </Alert>
         )}
+
+        {/* AI-Powered Insights Section */}
+        <Paper sx={{ 
+          p: 3, 
+          mb: 3, 
+          background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+          border: '2px solid',
+          borderColor: 'secondary.light',
+          borderRadius: 2
+        }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <Box sx={{ 
+                p: 1, 
+                borderRadius: '50%', 
+                backgroundColor: 'secondary.main',
+                color: 'white'
+              }}>
+                <AutoAwesome />
+              </Box>
+              <Box>
+                <Typography variant="h5" color="secondary" sx={{ fontWeight: 700 }}>
+                  Gemini AI Analysis
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Advanced insights powered by Google AI
+                </Typography>
+              </Box>
+              <Chip 
+                label="Powered by Google AI" 
+                size="small" 
+                color="secondary" 
+                variant="filled"
+                sx={{ fontWeight: 600 }}
+              />
+            </Box>
+            <Button
+              variant="contained"
+              color="secondary"
+              size="large"
+              startIcon={loadingAI ? <CircularProgress size={20} color="inherit" /> : <SmartToy />}
+              onClick={generateAIInsights}
+              disabled={loadingAI}
+              sx={{ 
+                minWidth: 180,
+                fontWeight: 600,
+                borderRadius: 2,
+                boxShadow: 3,
+                '&:hover': {
+                  boxShadow: 6
+                }
+              }}
+            >
+              {loadingAI ? 'Analyzing...' : aiInsights ? 'Refresh Analysis' : 'Generate AI Insights'}
+            </Button>
+          </Box>
+
+          {loadingAI && (
+            <Box sx={{ textAlign: 'center', py: 2 }}>
+              <CircularProgress />
+              <Typography variant="body2" sx={{ mt: 1 }}>
+                AI is analyzing your data patterns...
+              </Typography>
+            </Box>
+          )}
+
+          {aiError && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              <Typography variant="body2">
+                <strong>AI Analysis Error:</strong> {aiError}
+              </Typography>
+              <Typography variant="caption" display="block" sx={{ mt: 1 }}>
+                Please check your API key and internet connection.
+              </Typography>
+            </Alert>
+          )}
+
+          {aiInsights && !loadingAI && (
+            <Box>
+              <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 3 }}>
+                <AutoAwesome color="secondary" />
+                <Typography variant="h6" color="secondary" sx={{ fontWeight: 600 }}>
+                  AI-Generated Analysis
+                </Typography>
+                <Chip 
+                  label={`${aiInsights.insights.length} Insights`} 
+                  size="small" 
+                  color="secondary" 
+                  variant="filled" 
+                />
+              </Stack>
+              
+              <Stack spacing={3}>
+                {aiInsights.insights.map((insight, index) => (
+                  <Card 
+                    key={index} 
+                    sx={{ 
+                      border: '2px solid',
+                      borderColor: 'secondary.light',
+                      borderRadius: 2,
+                      overflow: 'hidden',
+                      transition: 'all 0.3s ease',
+                      '&:hover': {
+                        borderColor: 'secondary.main',
+                        transform: 'translateY(-2px)',
+                        boxShadow: 4
+                      }
+                    }}
+                  >
+                    <Box sx={{ 
+                      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                      color: 'white',
+                      p: 2
+                    }}>
+                      <Stack direction="row" spacing={2} alignItems="center">
+                        <SmartToy />
+                        <Typography variant="h6" sx={{ fontWeight: 600, flex: 1 }}>
+                          {insight.title}
+                        </Typography>
+                        <Stack direction="row" spacing={1}>
+                          <Chip 
+                            label={`${(insight.confidence * 100).toFixed(0)}%`} 
+                            size="small" 
+                            sx={{ 
+                              backgroundColor: 'rgba(255,255,255,0.2)',
+                              color: 'white',
+                              fontWeight: 600
+                            }}
+                          />
+                          <Chip 
+                            label={insight.source} 
+                            size="small" 
+                            sx={{ 
+                              backgroundColor: 'rgba(255,255,255,0.1)',
+                              color: 'white'
+                            }}
+                          />
+                        </Stack>
+                      </Stack>
+                    </Box>
+                    
+                    <CardContent sx={{ p: 3 }}>
+                      <Box sx={{ 
+                        '& h1, & h2, & h3': { 
+                          color: 'primary.main',
+                          fontWeight: 600,
+                          mb: 2
+                        },
+                        '& h2': { 
+                          fontSize: '1.25rem',
+                          borderBottom: '2px solid',
+                          borderColor: 'divider',
+                          pb: 1
+                        },
+                        '& p': { 
+                          mb: 2,
+                          lineHeight: 1.7
+                        },
+                        '& ul, & ol': { 
+                          mb: 2,
+                          pl: 3
+                        },
+                        '& li': {
+                          mb: 1,
+                          lineHeight: 1.6
+                        },
+                        '& strong': { 
+                          color: 'primary.dark',
+                          fontWeight: 700
+                        },
+                        '& em': {
+                          color: 'text.secondary',
+                          fontStyle: 'italic'
+                        },
+                        '& blockquote': {
+                          borderLeft: '4px solid',
+                          borderColor: 'secondary.main',
+                          backgroundColor: 'grey.50',
+                          p: 2,
+                          m: 2,
+                          fontStyle: 'italic',
+                          '& p': { mb: 0 }
+                        },
+                        '& code': {
+                          backgroundColor: 'grey.100',
+                          padding: '2px 6px',
+                          borderRadius: 1,
+                          fontFamily: 'monospace'
+                        }
+                      }}>
+                        <ReactMarkdown>
+                          {insight.content}
+                        </ReactMarkdown>
+                      </Box>
+                    </CardContent>
+                  </Card>
+                ))}
+              </Stack>
+              
+              <Box sx={{ mt: 3, p: 2, bgcolor: 'grey.50', borderRadius: 1 }}>
+                <Typography variant="caption" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Info fontSize="small" />
+                  AI analysis is generated by Google's Gemini AI and should be validated with domain expertise.
+                </Typography>
+              </Box>
+            </Box>
+          )}
+
+          {!aiInsights && !loadingAI && !aiError && (
+            <Box sx={{ textAlign: 'center', py: 3 }}>
+              <SmartToy sx={{ fontSize: 48, color: 'text.secondary', mb: 2 }} />
+              <Typography variant="body1" color="text.secondary">
+                Get advanced AI-powered insights about your data
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                Our AI will analyze patterns, suggest improvements, and provide actionable recommendations
+              </Typography>
+            </Box>
+          )}
+        </Paper>
 
         {insights && (
           <Box>
