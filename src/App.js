@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   ThemeProvider,
   createTheme,
@@ -13,7 +13,11 @@ import {
   IconButton,
   Tooltip,
   Alert,
-  Snackbar
+  Snackbar,
+  CircularProgress,
+  Menu,
+  MenuItem,
+  Divider
 } from '@mui/material';
 import {
   Dashboard as DashboardIcon,
@@ -23,7 +27,10 @@ import {
   Transform,
   Brightness4,
   Brightness7,
-  GitHub
+  GitHub,
+  MoreVert,
+  Delete,
+  Storage
 } from '@mui/icons-material';
 
 // Import our components
@@ -32,6 +39,7 @@ import DataPreviewWithTransform from './components/dataProcessing/DataPreviewWit
 import Dashboard from './components/dashboard/Dashboard';
 import AIInsights from './components/insights/AIInsights';
 import ExportManager from './utils/ExportManager';
+import PersistenceManager from './utils/persistence';
 
 function TabPanel({ children, value, index, ...other }) {
   return (
@@ -48,13 +56,68 @@ function TabPanel({ children, value, index, ...other }) {
 }
 
 function App() {
+  // Initialize state from localStorage
+  const [isLoading, setIsLoading] = useState(true);
   const [darkMode, setDarkMode] = useState(false);
   const [currentTab, setCurrentTab] = useState(0);
   const [data, setData] = useState(null);
   const [transformedData, setTransformedData] = useState(null);
+  const [dashboardState, setDashboardState] = useState(null);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [menuAnchor, setMenuAnchor] = useState(null);
   const dashboardRef = useRef(null);
+
+  // Load persisted state on app startup
+  useEffect(() => {
+    const loadPersistedState = async () => {
+      try {
+        const persistedState = PersistenceManager.loadAppState();
+        
+        if (persistedState.data) {
+          setData(persistedState.data);
+          setSuccess(`Restored previous session with ${persistedState.data.fileName || 'your data'}`);
+        }
+        
+        if (persistedState.transformedData) {
+          setTransformedData(persistedState.transformedData);
+        }
+        
+        if (persistedState.dashboardState) {
+          setDashboardState(persistedState.dashboardState);
+        }
+        
+        setCurrentTab(persistedState.currentTab);
+        setDarkMode(persistedState.darkMode);
+      } catch (error) {
+        console.error('Error loading persisted state:', error);
+        setError('Failed to restore previous session');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadPersistedState();
+  }, []);
+
+  // Save state changes to localStorage
+  useEffect(() => {
+    if (!isLoading) {
+      const saveState = () => {
+        PersistenceManager.saveAppState({
+          data,
+          transformedData,
+          currentTab,
+          darkMode,
+          dashboardState
+        });
+      };
+
+      // Debounce saves to avoid excessive localStorage writes
+      const timeoutId = setTimeout(saveState, 1000);
+      return () => clearTimeout(timeoutId);
+    }
+  }, [data, transformedData, currentTab, darkMode, dashboardState, isLoading]);
 
   const theme = createTheme({
     palette: {
@@ -88,6 +151,7 @@ function App() {
   const handleDataLoaded = (newData) => {
     setData(newData);
     setTransformedData(null); // Reset transformed data when new data is loaded
+    setDashboardState(null); // Reset dashboard when new data is loaded
     setSuccess(`Successfully loaded ${newData.fileName} with ${newData.rowCount} rows`);
     
     // Stay on the same tab - user can navigate manually
@@ -95,7 +159,26 @@ function App() {
 
   const handleDataTransformed = (newTransformedData) => {
     setTransformedData(newTransformedData);
+    setDashboardState(null); // Reset dashboard when data is transformed
     setSuccess(`Data transformed: ${newTransformedData.filteredRowCount} of ${newTransformedData.originalRowCount} rows`);
+  };
+
+  const handleDashboardStateChange = (widgets, layout) => {
+    setDashboardState({ widgets, layout });
+  };
+
+  const handleClearAllData = () => {
+    PersistenceManager.clearAllData();
+    setData(null);
+    setTransformedData(null);
+    setDashboardState(null);
+    setCurrentTab(0);
+    setMenuAnchor(null);
+    setSuccess('All data cleared successfully');
+  };
+
+  const getStorageInfo = () => {
+    return PersistenceManager.getStorageInfo();
   };
 
   const handleError = (errorMessage) => {
@@ -116,6 +199,28 @@ function App() {
     { label: 'Dashboard', icon: <DashboardIcon />, disabled: !data },
     { label: 'AI Insights', icon: <Analytics />, disabled: !data },
   ];
+
+  // Show loading screen during initial load
+  if (isLoading) {
+    return (
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <Box sx={{ 
+          display: 'flex', 
+          flexDirection: 'column',
+          justifyContent: 'center', 
+          alignItems: 'center', 
+          height: '100vh',
+          bgcolor: 'background.default'
+        }}>
+          <CircularProgress size={60} sx={{ mb: 2 }} />
+          <Typography variant="h6" color="text.secondary">
+            Loading your data...
+          </Typography>
+        </Box>
+      </ThemeProvider>
+    );
+  }
 
   return (
     <ThemeProvider theme={theme}>
@@ -138,6 +243,16 @@ function App() {
                 />
               </Box>
             )}
+            
+            <Tooltip title="Data Management">
+              <IconButton 
+                color="inherit" 
+                onClick={(e) => setMenuAnchor(e.currentTarget)}
+                sx={{ mr: 1 }}
+              >
+                <MoreVert />
+              </IconButton>
+            </Tooltip>
             
             <Tooltip title="Toggle dark mode">
               <IconButton 
@@ -207,6 +322,8 @@ function App() {
             <div ref={dashboardRef}>
               <Dashboard
                 data={getCurrentData()}
+                initialState={dashboardState}
+                onStateChange={handleDashboardStateChange}
                 onExport={(widgetId, format) => {
                   // Handle individual widget export
                   console.log(`Exporting widget ${widgetId} as ${format}`);
@@ -239,6 +356,7 @@ function App() {
                     • Advanced filtering and data transformation<br/>
                     • AI-powered insights and pattern recognition<br/>
                     • Multiple chart types (basic and advanced)<br/>
+                    • Auto-save: Your data persists across sessions<br/>
                     • Export capabilities (PNG, PDF, JSON, CSV)
                   </Typography>
                 </Alert>
@@ -246,6 +364,30 @@ function App() {
             </Box>
           )}
         </Container>
+
+        {/* Data Management Menu */}
+        <Menu
+          anchorEl={menuAnchor}
+          open={Boolean(menuAnchor)}
+          onClose={() => setMenuAnchor(null)}
+        >
+          <MenuItem onClick={() => {
+            const info = getStorageInfo();
+            setSuccess(`Storage used: ${info.totalSizeMB} MB`);
+            setMenuAnchor(null);
+          }}>
+            <Storage sx={{ mr: 1 }} />
+            Storage Info
+          </MenuItem>
+          <Divider />
+          <MenuItem 
+            onClick={handleClearAllData}
+            sx={{ color: 'error.main' }}
+          >
+            <Delete sx={{ mr: 1 }} />
+            Clear All Data
+          </MenuItem>
+        </Menu>
 
         {/* Snackbar for notifications */}
         <Snackbar

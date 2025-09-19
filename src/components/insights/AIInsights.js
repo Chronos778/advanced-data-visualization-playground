@@ -29,8 +29,11 @@ import {
   BubbleChart,
   Timeline,
   Assessment,
-  Refresh
+  Refresh,
+  AutoFixHigh,
+  ShowChart
 } from '@mui/icons-material';
+import { GeminiService } from '../../services/geminiService';
 import { 
   variance, 
   standardDeviation, 
@@ -47,6 +50,9 @@ import {
 const AIInsights = ({ data }) => {
   const [analyzing, setAnalyzing] = useState(false);
   const [insights, setInsights] = useState(null);
+  const [geminiInsights, setGeminiInsights] = useState(null);
+  const [geminiLoading, setGeminiLoading] = useState(false);
+  const [geminiError, setGeminiError] = useState(null);
 
   const numericData = useMemo(() => {
     if (!data || !data.data || data.data.length === 0) return {};
@@ -80,6 +86,29 @@ const AIInsights = ({ data }) => {
     
     return categorical;
   }, [data, numericData]);
+
+  const generateGeminiInsights = async () => {
+    const apiKey = process.env.REACT_APP_GEMINI_API_KEY;
+    
+    if (!apiKey || apiKey === 'your_gemini_api_key_here') {
+      setGeminiError('Please configure your Gemini API key in the .env file');
+      return;
+    }
+
+    setGeminiLoading(true);
+    setGeminiError(null);
+    
+    try {
+      const geminiService = new GeminiService(apiKey);
+      const result = await geminiService.generateInsights(data);
+      setGeminiInsights(result);
+    } catch (error) {
+      console.error('Gemini AI Error:', error);
+      setGeminiError(error.message);
+    } finally {
+      setGeminiLoading(false);
+    }
+  };
 
   const generateInsights = async () => {
     setAnalyzing(true);
@@ -425,29 +454,160 @@ const AIInsights = ({ data }) => {
             <Psychology color="primary" />
             <Typography variant="h6">AI-Powered Insights</Typography>
           </Box>
-          <Button
-            variant={insights ? 'outlined' : 'contained'}
-            startIcon={analyzing ? null : <Refresh />}
-            onClick={generateInsights}
-            disabled={analyzing}
-          >
-            {analyzing ? 'Analyzing...' : insights ? 'Refresh Insights' : 'Generate Insights'}
-          </Button>
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            <Button
+              variant="contained"
+              startIcon={geminiLoading ? null : <AutoFixHigh />}
+              onClick={generateGeminiInsights}
+              disabled={geminiLoading}
+              color="secondary"
+            >
+              {geminiLoading ? 'AI Analyzing...' : 'Generate AI Insights'}
+            </Button>
+            <Button
+              variant={insights ? 'outlined' : 'contained'}
+              startIcon={analyzing ? null : <Refresh />}
+              onClick={generateInsights}
+              disabled={analyzing}
+            >
+              {analyzing ? 'Analyzing...' : insights ? 'Statistical Analysis' : 'Statistical Insights'}
+            </Button>
+          </Box>
         </Box>
+
+        {geminiLoading && (
+          <Box sx={{ mb: 3 }}>
+            <LinearProgress color="secondary" />
+            <Typography variant="body2" sx={{ mt: 1, textAlign: 'center' }}>
+              Gemini AI is analyzing your data and generating insights...
+            </Typography>
+          </Box>
+        )}
 
         {analyzing && (
           <Box sx={{ mb: 3 }}>
             <LinearProgress />
             <Typography variant="body2" sx={{ mt: 1, textAlign: 'center' }}>
-              Analyzing data patterns and generating insights...
+              Generating statistical analysis and insights...
             </Typography>
           </Box>
         )}
 
-        {!insights && !analyzing && (
-          <Alert severity="info" sx={{ mb: 3 }}>
-            Click "Generate Insights" to automatically analyze your data and discover patterns, correlations, and recommendations.
+        {geminiError && (
+          <Alert severity="error" sx={{ mb: 3 }}>
+            <Typography variant="subtitle2">AI Analysis Failed</Typography>
+            {geminiError}
           </Alert>
+        )}
+
+        {!insights && !analyzing && !geminiInsights && !geminiLoading && (
+          <Alert severity="info" sx={{ mb: 3 }}>
+            Click "Generate AI Insights" for AI-powered analysis with chart recommendations, or "Statistical Insights" for traditional statistical analysis.
+          </Alert>
+        )}
+
+        {/* Gemini AI Insights Section */}
+        {geminiInsights && (
+          <Box sx={{ mb: 3 }}>
+            <Accordion defaultExpanded>
+              <AccordionSummary expandIcon={<ExpandMore />}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <AutoFixHigh color="secondary" />
+                  <Typography variant="h6">AI Data Insights</Typography>
+                  <Chip 
+                    label={`${geminiInsights.insights.length} insights`} 
+                    size="small" 
+                    color="secondary"
+                    sx={{ ml: 2 }} 
+                  />
+                </Box>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Grid container spacing={2}>
+                  {geminiInsights.insights.map((insight, index) => (
+                    <Grid item xs={12} key={index}>
+                      <Card variant="outlined" sx={{ border: '2px solid', borderColor: 'secondary.main', borderRadius: 2 }}>
+                        <CardContent>
+                          <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
+                            {getInsightIcon(insight.type)}
+                            <Box sx={{ flex: 1 }}>
+                              <Typography variant="h6" gutterBottom>
+                                {insight.title}
+                              </Typography>
+                              <Typography variant="body1" color="text.secondary">
+                                {insight.description}
+                              </Typography>
+                            </Box>
+                            <Tooltip title={`AI Confidence: ${(insight.confidence * 100).toFixed(0)}%`}>
+                              <Chip 
+                                label={`${(insight.confidence * 100).toFixed(0)}%`} 
+                                size="small" 
+                                color="secondary"
+                                variant="outlined"
+                              />
+                            </Tooltip>
+                          </Box>
+                        </CardContent>
+                      </Card>
+                    </Grid>
+                  ))}
+                </Grid>
+              </AccordionDetails>
+            </Accordion>
+
+            <Accordion>
+              <AccordionSummary expandIcon={<ExpandMore />}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <ShowChart color="secondary" />
+                  <Typography variant="h6">Chart Recommendations</Typography>
+                  <Chip 
+                    label={`${geminiInsights.chartRecommendations.length} charts`} 
+                    size="small" 
+                    color="secondary"
+                    sx={{ ml: 2 }} 
+                  />
+                </Box>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Grid container spacing={2}>
+                  {geminiInsights.chartRecommendations.map((rec, index) => (
+                    <Grid item xs={12} md={6} key={index}>
+                      <Card variant="outlined" sx={{ height: '100%' }}>
+                        <CardContent>
+                          <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1, mb: 2 }}>
+                            <ShowChart color="primary" />
+                            <Box sx={{ flex: 1 }}>
+                              <Typography variant="h6" gutterBottom>
+                                {rec.chartType}
+                              </Typography>
+                              <Typography variant="body2" color="text.secondary" paragraph>
+                                {rec.reason}
+                              </Typography>
+                              {rec.columns && rec.columns.length > 0 && (
+                                <Box sx={{ mb: 1 }}>
+                                  <Typography variant="caption" color="text.secondary">
+                                    Suggested columns: {rec.columns.join(', ')}
+                                  </Typography>
+                                </Box>
+                              )}
+                            </Box>
+                            <Chip 
+                              label={rec.priority} 
+                              size="small" 
+                              color={getPriorityColor(rec.priority)}
+                            />
+                          </Box>
+                          <Button size="small" variant="contained" color="secondary" fullWidth>
+                            Create {rec.chartType}
+                          </Button>
+                        </CardContent>
+                      </Card>
+                    </Grid>
+                  ))}
+                </Grid>
+              </AccordionDetails>
+            </Accordion>
+          </Box>
         )}
 
         {insights && (

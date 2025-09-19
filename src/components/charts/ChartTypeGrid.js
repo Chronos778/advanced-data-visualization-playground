@@ -201,160 +201,13 @@ const ChartTypeGrid = ({ onChartTypeSelect }) => {
     }
   ];
 
-  // RAWGraphs chart types
+  // RAWGraphs chart types (only implemented ones)
   const rawChartTypes = [
-    { 
-      value: 'raw_alluvial', 
-      label: 'Alluvial Diagram', 
-      icon: <AlluvialIcon />,
-      description: 'Show flow between categories',
-      library: 'rawgraphs'
-    },
-    { 
-      value: 'raw_arc', 
-      label: 'Arc Diagram', 
-      icon: <ArcIcon />,
-      description: 'Visualize network connections',
-      library: 'rawgraphs'
-    },
-    { 
-      value: 'raw_bar', 
-      label: 'Stacked Bar Chart', 
-      icon: <StackedBarIcon />,
-      description: 'Show parts of a whole',
-      library: 'rawgraphs'
-    },
-    { 
-      value: 'raw_multiset_bar', 
-      label: 'Multiset Bar Chart', 
-      icon: <MultisetBarIcon />,
-      description: 'Compare multiple sets',
-      library: 'rawgraphs'
-    },
-    { 
-      value: 'raw_beeswarm', 
-      label: 'Beeswarm Plot', 
-      icon: <BeeswarmIcon />,
-      description: 'Non-overlapping scatter',
-      library: 'rawgraphs'
-    },
-    { 
-      value: 'raw_boxplot', 
-      label: 'Box Plot', 
-      icon: <BoxPlotIcon />,
-      description: 'Show data distribution',
-      library: 'rawgraphs'
-    },
-    { 
-      value: 'raw_bump', 
-      label: 'Bump Chart', 
-      icon: <BumpIcon />,
-      description: 'Track ranking changes',
-      library: 'rawgraphs'
-    },
-    { 
-      value: 'raw_calendar', 
-      label: 'Calendar Chart', 
-      icon: <CalendarIcon />,
-      description: 'Temporal heatmap',
-      library: 'rawgraphs'
-    },
-    { 
-      value: 'raw_chord', 
-      label: 'Chord Diagram', 
-      icon: <ChordIcon />,
-      description: 'Show relationships',
-      library: 'rawgraphs'
-    },
-    { 
-      value: 'raw_circlepacking', 
-      label: 'Circle Packing', 
-      icon: <CirclePackingIcon />,
-      description: 'Hierarchical data',
-      library: 'rawgraphs'
-    },
-    { 
-      value: 'raw_dendrogram', 
-      label: 'Dendrogram', 
-      icon: <DendrogramIcon />,
-      description: 'Tree structure visualization',
-      library: 'rawgraphs'
-    },
-    { 
-      value: 'raw_convexhull', 
-      label: 'Convex Hull', 
-      icon: <ConvexHullIcon />,
-      description: 'Group data points',
-      library: 'rawgraphs'
-    },
-    { 
-      value: 'raw_gantt', 
-      label: 'Gantt Chart', 
-      icon: <GanttIcon />,
-      description: 'Project timeline',
-      library: 'rawgraphs'
-    },
-    { 
-      value: 'raw_hexbin', 
-      label: 'Hexbin', 
-      icon: <HexbinIcon />,
-      description: 'Density visualization',
-      library: 'rawgraphs'
-    },
-    { 
-      value: 'raw_horizon', 
-      label: 'Horizon Graph', 
-      icon: <HorizonIcon />,
-      description: 'Condensed time series',
-      library: 'rawgraphs'
-    },
-    { 
-      value: 'raw_matrix', 
-      label: 'Matrix Plot', 
-      icon: <MatrixIcon />,
-      description: 'Show relationship matrix',
-      library: 'rawgraphs'
-    },
-    { 
-      value: 'raw_parallel', 
-      label: 'Parallel Coordinates', 
-      icon: <ParallelIcon />,
-      description: 'Multi-dimensional data',
-      library: 'rawgraphs'
-    },
-    { 
-      value: 'raw_radar', 
-      label: 'Radar Chart', 
-      icon: <RadarIcon />,
-      description: 'Multi-variable comparison',
-      library: 'rawgraphs'
-    },
     { 
       value: 'raw_sankey', 
       label: 'Sankey Diagram', 
       icon: <SankeyIcon />,
       description: 'Show flows and transfers',
-      library: 'rawgraphs'
-    },
-    { 
-      value: 'raw_slope', 
-      label: 'Slope Graph', 
-      icon: <SlopeIcon />,
-      description: 'Before/after comparison',
-      library: 'rawgraphs'
-    },
-    { 
-      value: 'raw_streamgraph', 
-      label: 'Stream Graph', 
-      icon: <StreamIcon />,
-      description: 'Flowing time series',
-      library: 'rawgraphs'
-    },
-    { 
-      value: 'raw_sunburst', 
-      label: 'Sunburst Diagram', 
-      icon: <SunburstIcon />,
-      description: 'Hierarchical proportions',
       library: 'rawgraphs'
     },
     { 
@@ -365,24 +218,10 @@ const ChartTypeGrid = ({ onChartTypeSelect }) => {
       library: 'rawgraphs'
     },
     { 
-      value: 'raw_violin', 
-      label: 'Violin Plot', 
-      icon: <ViolinIcon />,
-      description: 'Distribution visualization',
-      library: 'rawgraphs'
-    },
-    { 
-      value: 'raw_voronoi', 
-      label: 'Voronoi Tessellation', 
-      icon: <VoronoiIcon />,
-      description: 'Space partitioning',
-      library: 'rawgraphs'
-    },
-    { 
-      value: 'raw_voronoitreemap', 
-      label: 'Voronoi Treemap', 
-      icon: <VoronoiTreemapIcon />,
-      description: 'Hierarchical proportions',
+      value: 'raw_chord', 
+      label: 'Chord Diagram', 
+      icon: <ChordIcon />,
+      description: 'Show relationships',
       library: 'rawgraphs'
     }
   ];

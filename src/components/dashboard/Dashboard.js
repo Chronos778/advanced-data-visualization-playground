@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import RGL, { WidthProvider } from 'react-grid-layout';
 import {
   Box,
@@ -16,7 +16,12 @@ import {
   MenuItem,
   TextField,
   Alert,
-  Chip
+  Chip,
+  Card,
+  CardContent,
+  CardActionArea,
+  Grid,
+  Divider
 } from '@mui/material';
 import {
   Add,
@@ -28,56 +33,65 @@ import {
   ShowChart,
   PieChart,
   ScatterPlot,
-  Insights
+  Insights,
+  Timeline,
+  BubbleChart,
+  DonutLarge,
+  AccountTree,
+  GridOn,
+  ThreeDRotation,
+  ThermostatAuto,
+  Landscape,
+  Hub,
+  PanoramaFishEye,
+  AccountBalance
 } from '@mui/icons-material';
 import ChartComponent from '../charts/ChartComponent';
 import PlotlyChart from '../charts/PlotlyChart';
 import CustomRawChart from '../charts/CustomRawChart';
+import ChartTypeGrid from '../charts/ChartTypeGrid';
+import { chartConfigurations } from '../charts/ChartConfigurations';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 
 const ResponsiveGridLayout = WidthProvider(RGL);
 
-const Dashboard = ({ data, onExport }) => {
-  const [widgets, setWidgets] = useState([]);
-  const [layout, setLayout] = useState([]);
+const Dashboard = ({ data, onExport, initialState, onStateChange }) => {
+  const [widgets, setWidgets] = useState(initialState?.widgets || []);
+  const [layout, setLayout] = useState(initialState?.layout || []);
+
+  // Update state when initialState changes (from localStorage)
+  useEffect(() => {
+    if (initialState) {
+      setWidgets(initialState.widgets || []);
+      setLayout(initialState.layout || []);
+    }
+  }, [initialState]);
+
+  // Notify parent component when state changes
+  useEffect(() => {
+    if (onStateChange) {
+      onStateChange(widgets, layout);
+    }
+  }, [widgets, layout, onStateChange]);
   const [addWidgetOpen, setAddWidgetOpen] = useState(false);
   const [editWidget, setEditWidget] = useState(null);
   const [newWidget, setNewWidget] = useState({
     type: 'chart',
-    chartType: 'line',
-    library: 'recharts',
+    chartType: '',
+    library: '',
     title: '',
     xAxis: '',
     yAxis: '',
     zAxis: '',
     colorBy: '',
     sizeBy: '',
-    hierarchy: []
+    hierarchy: [],
+    series: '',
+    dimensions: []
   });
+  const [chartSelectionStep, setChartSelectionStep] = useState('select'); // 'select' or 'configure'
 
-  const chartTypes = {
-    recharts: [
-      { value: 'line', label: 'Line Chart', icon: <ShowChart /> },
-      { value: 'bar', label: 'Bar Chart', icon: <BarChart /> },
-      { value: 'scatter', label: 'Scatter Plot', icon: <ScatterPlot /> },
-      { value: 'pie', label: 'Pie Chart', icon: <PieChart /> },
-      { value: 'area', label: 'Area Chart', icon: <ShowChart /> }
-    ],
-    plotly: [
-      { value: 'scatter', label: 'Scatter Plot', icon: <ScatterPlot /> },
-      { value: 'bubble', label: 'Bubble Chart', icon: <ScatterPlot /> },
-      { value: 'scatter3d', label: '3D Scatter', icon: <Insights /> },
-      { value: 'heatmap', label: 'Heatmap', icon: <Insights /> },
-      { value: 'contour', label: 'Contour Plot', icon: <Insights /> },
-      { value: 'surface', label: '3D Surface', icon: <Insights /> }
-    ],
-    rawgraphs: [
-      { value: 'raw_sankey', label: 'Sankey Diagram', icon: <Insights /> },
-      { value: 'raw_treemap', label: 'Treemap', icon: <Insights /> },
-      { value: 'raw_chord', label: 'Chord Diagram', icon: <Insights /> }
-    ]
-  };
 
   const availableColumns = data && data.columns ? data.columns : [];
   const numericColumns = React.useMemo(() => {
@@ -90,22 +104,69 @@ const Dashboard = ({ data, onExport }) => {
 
   const generateId = () => `widget_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
+  // Get chart configuration for the current chart type
+  const getCurrentChartConfig = () => {
+    return chartConfigurations[newWidget.chartType] || {};
+  };
+
+  const handleChartTypeSelection = (chartType) => {
+    setNewWidget(prev => ({
+      ...prev,
+      chartType: chartType.value,
+      library: chartType.library,
+      title: chartType.label // Pre-fill title with chart type name
+    }));
+    setChartSelectionStep('configure');
+  };
+
+  const handleDialogClose = () => {
+    setAddWidgetOpen(false);
+    setChartSelectionStep('select');
+    setNewWidget({
+      type: 'chart',
+      chartType: '',
+      library: '',
+      title: '',
+      xAxis: '',
+      yAxis: '',
+      zAxis: '',
+      colorBy: '',
+      sizeBy: '',
+      hierarchy: [],
+      series: '',
+      dimensions: []
+    });
+  };
+
   const addWidget = useCallback(() => {
     if (!newWidget.title) return;
     
-    // Validate based on chart library and type
-    if (newWidget.library === 'rawgraphs') {
-      if (newWidget.chartType === 'raw_sankey') {
-        if (!newWidget.xAxis || !newWidget.yAxis || !newWidget.sizeBy) return;
-      } else if (newWidget.chartType === 'raw_treemap') {
-        if (!newWidget.yAxis || !newWidget.hierarchy || newWidget.hierarchy.length === 0) return;
-      } else if (newWidget.chartType === 'raw_chord') {
-        if (!newWidget.xAxis || !newWidget.yAxis || !newWidget.sizeBy) return;
-      } else {
-        if (!newWidget.xAxis || !newWidget.yAxis) return;
+    // Validate based on chart configuration
+    if (!newWidget.chartType) return;
+    
+    const config = getCurrentChartConfig();
+    
+    // Check required axes
+    if (config.requiresXAxis && !newWidget.xAxis) return;
+    if (config.requiresYAxis && !newWidget.yAxis) return;
+    if (config.supportsZAxis && config.requiresZAxis && !newWidget.zAxis) return;
+    
+    // Check required additional fields
+    if (config.additionalFields) {
+      for (const field of config.additionalFields) {
+        if (field.required) {
+          if (field.name === 'hierarchy' && (!newWidget.hierarchy || newWidget.hierarchy.length === 0)) return;
+          if (field.name === 'series' && !newWidget.series) return;
+          if (field.name === 'dimensions' && (!newWidget.dimensions || newWidget.dimensions.length === 0)) return;
+        }
       }
-    } else {
-      if (!newWidget.xAxis || !newWidget.yAxis) return;
+    }
+    
+    // Check size by requirement for specific charts
+    if (config.supportsSizeBy && 
+        (newWidget.chartType === 'raw_sankey' || newWidget.chartType === 'raw_chord') && 
+        !newWidget.sizeBy) {
+      return;
     }
 
     const id = generateId();
@@ -129,16 +190,19 @@ const Dashboard = ({ data, onExport }) => {
     setLayout(prev => [...prev, layoutItem]);
     setNewWidget({
       type: 'chart',
-      chartType: 'line',
-      library: 'recharts',
+      chartType: '',
+      library: '',
       title: '',
       xAxis: '',
       yAxis: '',
       zAxis: '',
       colorBy: '',
       sizeBy: '',
-      hierarchy: []
+      hierarchy: [],
+      series: '',
+      dimensions: []
     });
+    setChartSelectionStep('select');
     setAddWidgetOpen(false);
   }, [newWidget, widgets.length]);
 
@@ -393,166 +457,254 @@ const Dashboard = ({ data, onExport }) => {
       {/* Add Widget Dialog */}
       <Dialog 
         open={addWidgetOpen} 
-        onClose={() => setAddWidgetOpen(false)}
+        onClose={handleDialogClose}
         maxWidth="md"
         fullWidth
       >
-        <DialogTitle>Add New Chart</DialogTitle>
-        <DialogContent>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
-            <TextField
-              fullWidth
-              label="Chart Title"
-              value={newWidget.title}
-              onChange={(e) => setNewWidget(prev => ({ ...prev, title: e.target.value }))}
-              placeholder="Enter a descriptive title for your chart"
+        <DialogTitle>
+          {chartSelectionStep === 'select' ? 'Select Chart Type' : 'Configure Chart'}
+        </DialogTitle>
+        <DialogContent sx={{ minHeight: chartSelectionStep === 'select' ? '500px' : 'auto' }}>
+          {chartSelectionStep === 'select' ? (
+            <ChartTypeGrid
+              onChartTypeSelect={handleChartTypeSelection}
             />
-            
-            <FormControl fullWidth>
-              <InputLabel>Chart Library</InputLabel>
-              <Select
-                value={newWidget.library}
-                label="Chart Library"
-                onChange={(e) => setNewWidget(prev => ({ 
-                  ...prev, 
-                  library: e.target.value,
-                  chartType: chartTypes[e.target.value][0].value 
-                }))}
-              >
-                <MenuItem value="recharts">Recharts (Basic Charts)</MenuItem>
-                <MenuItem value="plotly">Plotly (Advanced Charts)</MenuItem>
-                <MenuItem value="rawgraphs">RAWGraphs (Specialized Charts)</MenuItem>
-              </Select>
-            </FormControl>
+          ) : (
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2, p: 2, bgcolor: 'grey.50', borderRadius: 1 }}>
+                <Typography variant="subtitle2" color="primary">
+                  Selected: {newWidget.title}
+                </Typography>
+                <Chip size="small" label={newWidget.library} variant="outlined" />
+              </Box>
+              
+              <TextField
+                fullWidth
+                label="Chart Title"
+                value={newWidget.title}
+                onChange={(e) => setNewWidget(prev => ({ ...prev, title: e.target.value }))}
+                placeholder="Enter a descriptive title for your chart"
+              />
 
-            <FormControl fullWidth>
-              <InputLabel>Chart Type</InputLabel>
-              <Select
-                value={newWidget.chartType}
-                label="Chart Type"
-                onChange={(e) => setNewWidget(prev => ({ ...prev, chartType: e.target.value }))}
-              >
-                {chartTypes[newWidget.library].map(type => (
-                  <MenuItem key={type.value} value={type.value}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      {type.icon}
-                      {type.label}
+              {/* Dynamic configuration fields based on chart requirements */}
+              {(() => {
+                const config = getCurrentChartConfig();
+                const fields = [];
+
+                // X-Axis and Y-Axis fields
+                const axisFields = [];
+                if (config.requiresXAxis) {
+                  axisFields.push(
+                    <FormControl key="xAxis" fullWidth>
+                      <InputLabel>{config.xAxisLabel || 'X-Axis'}</InputLabel>
+                      <Select
+                        value={newWidget.xAxis}
+                        label={config.xAxisLabel || 'X-Axis'}
+                        onChange={(e) => setNewWidget(prev => ({ ...prev, xAxis: e.target.value }))}
+                      >
+                        {(config.xAxisType === 'numeric' ? numericColumns : availableColumns).map(col => (
+                          <MenuItem key={col} value={col}>{col}</MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  );
+                }
+
+                if (config.requiresYAxis) {
+                  axisFields.push(
+                    <FormControl key="yAxis" fullWidth>
+                      <InputLabel>{config.yAxisLabel || 'Y-Axis'}</InputLabel>
+                      <Select
+                        value={newWidget.yAxis}
+                        label={config.yAxisLabel || 'Y-Axis'}
+                        onChange={(e) => setNewWidget(prev => ({ ...prev, yAxis: e.target.value }))}
+                      >
+                        {(config.yAxisType === 'numeric' ? numericColumns : availableColumns).map(col => (
+                          <MenuItem key={col} value={col}>{col}</MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  );
+                }
+
+                if (axisFields.length > 0) {
+                  fields.push(
+                    <Box key="axes" sx={{ display: 'grid', gridTemplateColumns: axisFields.length === 1 ? '1fr' : '1fr 1fr', gap: 2 }}>
+                      {axisFields}
                     </Box>
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+                  );
+                }
 
-            <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
-              <FormControl fullWidth>
-                <InputLabel>X-Axis</InputLabel>
-                <Select
-                  value={newWidget.xAxis}
-                  label="X-Axis"
-                  onChange={(e) => setNewWidget(prev => ({ ...prev, xAxis: e.target.value }))}
-                >
-                  {availableColumns.map(col => (
-                    <MenuItem key={col} value={col}>{col}</MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
+                // Z-Axis field
+                if (config.supportsZAxis) {
+                  fields.push(
+                    <FormControl key="zAxis" fullWidth>
+                      <InputLabel>{config.zAxisLabel || 'Z-Axis'}</InputLabel>
+                      <Select
+                        value={newWidget.zAxis}
+                        label={config.zAxisLabel || 'Z-Axis'}
+                        onChange={(e) => setNewWidget(prev => ({ ...prev, zAxis: e.target.value }))}
+                      >
+                        {numericColumns.map(col => (
+                          <MenuItem key={col} value={col}>{col}</MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  );
+                }
 
-              <FormControl fullWidth>
-                <InputLabel>Y-Axis</InputLabel>
-                <Select
-                  value={newWidget.yAxis}
-                  label="Y-Axis"
-                  onChange={(e) => setNewWidget(prev => ({ ...prev, yAxis: e.target.value }))}
-                >
-                  {newWidget.chartType === 'pie' ? availableColumns.map(col => (
-                    <MenuItem key={col} value={col}>{col}</MenuItem>
-                  )) : numericColumns.map(col => (
-                    <MenuItem key={col} value={col}>{col}</MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
+                // Additional fields (hierarchy, series, dimensions, etc.)
+                if (config.additionalFields) {
+                  config.additionalFields.forEach(field => {
+                    if (field.name === 'hierarchy') {
+                      fields.push(
+                        <FormControl key={field.name} fullWidth>
+                          <InputLabel>{field.label}{field.required ? ' *' : ' (Optional)'}</InputLabel>
+                          <Select
+                            multiple
+                            value={newWidget.hierarchy || []}
+                            label={field.label}
+                            onChange={(e) => setNewWidget(prev => ({ ...prev, hierarchy: e.target.value }))}
+                          >
+                            {availableColumns.map(col => (
+                              <MenuItem key={col} value={col}>{col}</MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+                      );
+                    } else if (field.name === 'series') {
+                      fields.push(
+                        <FormControl key={field.name} fullWidth>
+                          <InputLabel>{field.label}{field.required ? ' *' : ' (Optional)'}</InputLabel>
+                          <Select
+                            multiple={field.type === 'multiselect'}
+                            value={field.type === 'multiselect' ? (newWidget.series || []) : (newWidget.series || '')}
+                            label={field.label}
+                            onChange={(e) => setNewWidget(prev => ({ ...prev, series: e.target.value }))}
+                          >
+                            {availableColumns.map(col => (
+                              <MenuItem key={col} value={col}>{col}</MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+                      );
+                    } else if (field.name === 'dimensions') {
+                      fields.push(
+                        <FormControl key={field.name} fullWidth>
+                          <InputLabel>{field.label}{field.required ? ' *' : ' (Optional)'}</InputLabel>
+                          <Select
+                            multiple
+                            value={newWidget.dimensions || []}
+                            label={field.label}
+                            onChange={(e) => setNewWidget(prev => ({ ...prev, dimensions: e.target.value }))}
+                          >
+                            {(field.label.includes('Numeric') ? numericColumns : availableColumns).map(col => (
+                              <MenuItem key={col} value={col}>{col}</MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+                      );
+                    }
+                  });
+                }
+
+                // Color By and Size By fields
+                const optionalFields = [];
+                if (config.supportsColorBy) {
+                  optionalFields.push(
+                    <FormControl key="colorBy" fullWidth>
+                      <InputLabel>Color By (Optional)</InputLabel>
+                      <Select
+                        value={newWidget.colorBy}
+                        label="Color By (Optional)"
+                        onChange={(e) => setNewWidget(prev => ({ ...prev, colorBy: e.target.value }))}
+                      >
+                        <MenuItem value="">None</MenuItem>
+                        {availableColumns.map(col => (
+                          <MenuItem key={col} value={col}>{col}</MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  );
+                }
+
+                if (config.supportsSizeBy) {
+                  const isRequired = newWidget.chartType === 'raw_sankey' || newWidget.chartType === 'raw_chord';
+                  optionalFields.push(
+                    <FormControl key="sizeBy" fullWidth>
+                      <InputLabel>{config.sizeByLabel || `Size By ${isRequired ? '*' : '(Optional)'}`}</InputLabel>
+                      <Select
+                        value={newWidget.sizeBy}
+                        label={config.sizeByLabel || `Size By ${isRequired ? '*' : '(Optional)'}`}
+                        onChange={(e) => setNewWidget(prev => ({ ...prev, sizeBy: e.target.value }))}
+                      >
+                        {!isRequired && <MenuItem value="">None</MenuItem>}
+                        {numericColumns.map(col => (
+                          <MenuItem key={col} value={col}>{col}</MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  );
+                }
+
+                if (optionalFields.length > 0) {
+                  fields.push(
+                    <Box key="optional" sx={{ display: 'grid', gridTemplateColumns: optionalFields.length === 1 ? '1fr' : '1fr 1fr', gap: 2 }}>
+                      {optionalFields}
+                    </Box>
+                  );
+                }
+
+                return fields;
+              })()}
             </Box>
-
-            {newWidget.library === 'plotly' && ['scatter3d', 'heatmap', 'contour', 'surface'].includes(newWidget.chartType) && (
-              <FormControl fullWidth>
-                <InputLabel>Z-Axis</InputLabel>
-                <Select
-                  value={newWidget.zAxis}
-                  label="Z-Axis"
-                  onChange={(e) => setNewWidget(prev => ({ ...prev, zAxis: e.target.value }))}
-                >
-                  {numericColumns.map(col => (
-                    <MenuItem key={col} value={col}>{col}</MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            )}
-
-            {newWidget.library === 'rawgraphs' && newWidget.chartType === 'raw_treemap' && (
-              <FormControl fullWidth>
-                <InputLabel>Hierarchy Fields</InputLabel>
-                <Select
-                  multiple
-                  value={newWidget.hierarchy || []}
-                  label="Hierarchy Fields"
-                  onChange={(e) => setNewWidget(prev => ({ ...prev, hierarchy: e.target.value }))}
-                >
-                  {availableColumns.map(col => (
-                    <MenuItem key={col} value={col}>{col}</MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            )}
-
-            <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
-              <FormControl fullWidth>
-                <InputLabel>Color By (Optional)</InputLabel>
-                <Select
-                  value={newWidget.colorBy}
-                  label="Color By (Optional)"
-                  onChange={(e) => setNewWidget(prev => ({ ...prev, colorBy: e.target.value }))}
-                >
-                  <MenuItem value="">None</MenuItem>
-                  {availableColumns.map(col => (
-                    <MenuItem key={col} value={col}>{col}</MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-
-              {(newWidget.chartType === 'scatter' || newWidget.chartType === 'bubble' || 
-                 (newWidget.library === 'rawgraphs' && (newWidget.chartType === 'raw_sankey' || newWidget.chartType === 'raw_chord'))) && (
-                <FormControl fullWidth>
-                  <InputLabel>Size By (Optional)</InputLabel>
-                  <Select
-                    value={newWidget.sizeBy}
-                    label="Size By (Optional)"
-                    onChange={(e) => setNewWidget(prev => ({ ...prev, sizeBy: e.target.value }))}
-                  >
-                    <MenuItem value="">None</MenuItem>
-                    {numericColumns.map(col => (
-                      <MenuItem key={col} value={col}>{col}</MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              )}
-            </Box>
-          </Box>
+          )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setAddWidgetOpen(false)}>Cancel</Button>
-          <Button 
-            onClick={addWidget} 
-            variant="contained"
-            disabled={!newWidget.title || (
-              newWidget.library !== 'rawgraphs' ? (!newWidget.xAxis || !newWidget.yAxis) : 
-              (newWidget.chartType === 'raw_sankey' ? (!newWidget.xAxis || !newWidget.yAxis || !newWidget.sizeBy) :
-               newWidget.chartType === 'raw_treemap' ? (!newWidget.yAxis || !newWidget.hierarchy || newWidget.hierarchy.length === 0) :
-               newWidget.chartType === 'raw_chord' ? (!newWidget.xAxis || !newWidget.yAxis || !newWidget.sizeBy) :
-               (!newWidget.xAxis || !newWidget.yAxis))
-            )}
-          >
-            Add Chart
-          </Button>
+          {chartSelectionStep === 'select' ? (
+            <Button onClick={handleDialogClose}>Cancel</Button>
+          ) : (
+            <>
+              <Button onClick={() => setChartSelectionStep('select')}>Back</Button>
+              <Button onClick={handleDialogClose}>Cancel</Button>
+              <Button 
+                onClick={addWidget} 
+                variant="contained"
+                disabled={(() => {
+                  if (!newWidget.title || !newWidget.chartType) return true;
+                  
+                  const config = getCurrentChartConfig();
+                  
+                  // Check required axes
+                  if (config.requiresXAxis && !newWidget.xAxis) return true;
+                  if (config.requiresYAxis && !newWidget.yAxis) return true;
+                  if (config.supportsZAxis && config.requiresZAxis && !newWidget.zAxis) return true;
+                  
+                  // Check required additional fields
+                  if (config.additionalFields) {
+                    for (const field of config.additionalFields) {
+                      if (field.required) {
+                        if (field.name === 'hierarchy' && (!newWidget.hierarchy || newWidget.hierarchy.length === 0)) return true;
+                        if (field.name === 'series' && !newWidget.series) return true;
+                        if (field.name === 'dimensions' && (!newWidget.dimensions || newWidget.dimensions.length === 0)) return true;
+                      }
+                    }
+                  }
+                  
+                  // Check size by requirement for specific charts
+                  if (config.supportsSizeBy && 
+                      (newWidget.chartType === 'raw_sankey' || newWidget.chartType === 'raw_chord') && 
+                      !newWidget.sizeBy) {
+                    return true;
+                  }
+                  
+                  return false;
+                })()}
+              >
+                Add Chart
+              </Button>
+            </>
+          )}
         </DialogActions>
       </Dialog>
 
