@@ -72,87 +72,85 @@ const AreaChartIcon = () => (
   </svg>
 );
 
-const ChartTypeGrid = ({ onChartTypeSelect, selectedLibrary = 'recharts' }) => {
+const ChartTypeGrid = ({ onChartTypeSelect }) => {
   const theme = useTheme();
 
-  const chartTypes = {
-    recharts: [
-      { 
-        value: 'line', 
-        label: 'Line Chart', 
-        icon: <ShowChart />,
-        description: 'Show trends over time'
-      },
-      { 
-        value: 'bar', 
-        label: 'Bar Chart', 
-        icon: <BarChart />,
-        description: 'Compare categories'
-      },
-      { 
-        value: 'scatter', 
-        label: 'Scatter Plot', 
-        icon: <ScatterPlot />,
-        description: 'Show correlations'
-      },
-      { 
-        value: 'pie', 
-        label: 'Pie Chart', 
-        icon: <PieChart />,
-        description: 'Show proportions'
-      },
-      { 
-        value: 'area', 
-        label: 'Area Chart', 
-        icon: <AreaChartIcon />,
-        description: 'Show cumulative data'
-      }
-    ],
-    plotly: [
-      { 
-        value: 'scatter', 
-        label: 'Scatter Plot', 
-        icon: <ScatterPlot />,
-        description: 'Basic scatter plot'
-      },
-      { 
-        value: 'bubble', 
-        label: 'Bubble Chart', 
-        icon: <BubbleChart />,
-        description: 'Size-encoded scatter'
-      },
-      { 
-        value: 'scatter3d', 
-        label: '3D Scatter', 
-        icon: <Insights />,
-        description: '3D data visualization'
-      },
-      { 
-        value: 'heatmap', 
-        label: 'Heatmap', 
-        icon: <HeatmapIcon />,
-        description: 'Color-coded matrix'
-      },
-      { 
-        value: 'contour', 
-        label: 'Contour Plot', 
-        icon: <ContourIcon />,
-        description: 'Contour lines'
-      },
-      { 
-        value: 'surface', 
-        label: '3D Surface', 
-        icon: <SurfaceIcon />,
-        description: '3D surface plot'
-      }
-    ]
-  };
+  const chartTypes = [
+    { 
+      value: 'line', 
+      label: 'Line Chart', 
+      icon: <ShowChart />,
+      description: 'Show trends over time',
+      library: 'recharts'
+    },
+    { 
+      value: 'bar', 
+      label: 'Bar Chart', 
+      icon: <BarChart />,
+      description: 'Compare categories',
+      library: 'recharts'
+    },
+    { 
+      value: 'scatter', 
+      label: 'Scatter Plot', 
+      icon: <ScatterPlot />,
+      description: 'Show correlations',
+      library: 'recharts'
+    },
+    { 
+      value: 'pie', 
+      label: 'Pie Chart', 
+      icon: <PieChart />,
+      description: 'Show proportions',
+      library: 'recharts'
+    },
+    { 
+      value: 'area', 
+      label: 'Area Chart', 
+      icon: <AreaChartIcon />,
+      description: 'Show cumulative data',
+      library: 'recharts'
+    },
+    { 
+      value: 'bubble', 
+      label: 'Bubble Chart', 
+      icon: <BubbleChart />,
+      description: 'Size-encoded scatter',
+      library: 'plotly'
+    },
+    { 
+      value: 'scatter3d', 
+      label: '3D Scatter', 
+      icon: <Insights />,
+      description: '3D data visualization',
+      library: 'plotly'
+    },
+    { 
+      value: 'heatmap', 
+      label: 'Heatmap', 
+      icon: <HeatmapIcon />,
+      description: 'Color-coded matrix',
+      library: 'plotly'
+    },
+    { 
+      value: 'contour', 
+      label: 'Contour Plot', 
+      icon: <ContourIcon />,
+      description: 'Contour lines',
+      library: 'plotly'
+    },
+    { 
+      value: 'surface', 
+      label: '3D Surface', 
+      icon: <SurfaceIcon />,
+      description: '3D surface plot',
+      library: 'plotly'
+    }
+  ];
 
   const handleChartSelect = (chartType) => {
     onChartTypeSelect(chartType);
   };
-
-  const currentChartTypes = chartTypes[selectedLibrary] || chartTypes.recharts;
 
   return (
     <Box sx={{ p: 2 }}>
@@ -175,7 +173,7 @@ const ChartTypeGrid = ({ onChartTypeSelect, selectedLibrary = 'recharts' }) => {
           maxWidth: '800px'
         }}
       >
-        {currentChartTypes.map((chartType) => (
+        {chartTypes.map((chartType) => (
           <Card
             key={chartType.value}
             sx={{

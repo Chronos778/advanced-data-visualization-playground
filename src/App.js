@@ -28,8 +28,7 @@ import {
 
 // Import our components
 import FileUploader from './components/dataProcessing/FileUploader';
-import DataPreview from './components/dataProcessing/DataPreview';
-import DataTransformer from './components/dataProcessing/DataTransformer';
+import DataPreviewWithTransform from './components/dataProcessing/DataPreviewWithTransform';
 import Dashboard from './components/dashboard/Dashboard';
 import AIInsights from './components/insights/AIInsights';
 import ExportManager from './utils/ExportManager';
@@ -91,8 +90,7 @@ function App() {
     setTransformedData(null); // Reset transformed data when new data is loaded
     setSuccess(`Successfully loaded ${newData.fileName} with ${newData.rowCount} rows`);
     
-    // Auto-switch to data preview tab
-    setCurrentTab(1);
+    // Stay on the same tab - user can navigate manually
   };
 
   const handleDataTransformed = (newTransformedData) => {
@@ -114,8 +112,7 @@ function App() {
 
   const tabs = [
     { label: 'Upload Data', icon: <Upload />, disabled: false },
-    { label: 'Preview Data', icon: <TableView />, disabled: !data },
-    { label: 'Transform Data', icon: <Transform />, disabled: !data },
+    { label: 'Data Preview', icon: <TableView />, disabled: !data },
     { label: 'Dashboard', icon: <DashboardIcon />, disabled: !data },
     { label: 'AI Insights', icon: <Analytics />, disabled: !data },
   ];
@@ -199,20 +196,14 @@ function App() {
           </TabPanel>
 
           <TabPanel value={currentTab} index={1}>
-            <DataPreview
+            <DataPreviewWithTransform
               data={getCurrentData()}
               title={transformedData ? "Transformed Data Preview" : "Data Preview"}
-            />
-          </TabPanel>
-
-          <TabPanel value={currentTab} index={2}>
-            <DataTransformer
-              data={data}
               onTransformedData={handleDataTransformed}
             />
           </TabPanel>
 
-          <TabPanel value={currentTab} index={3}>
+          <TabPanel value={currentTab} index={2}>
             <div ref={dashboardRef}>
               <Dashboard
                 data={getCurrentData()}
@@ -224,7 +215,7 @@ function App() {
             </div>
           </TabPanel>
 
-          <TabPanel value={currentTab} index={4}>
+          <TabPanel value={currentTab} index={3}>
             <AIInsights data={getCurrentData()} />
           </TabPanel>
 

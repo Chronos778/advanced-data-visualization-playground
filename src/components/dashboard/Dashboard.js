@@ -62,7 +62,7 @@ const Dashboard = ({ data, onExport }) => {
   const [activeTab, setActiveTab] = useState(0);
   const [addWidgetOpen, setAddWidgetOpen] = useState(false);
   const [editWidget, setEditWidget] = useState(null);
-  const [dialogStep, setDialogStep] = useState(0); // 0: Library selection, 1: Chart type, 2: Configuration
+  const [dialogStep, setDialogStep] = useState(0); // 0: Chart type, 1: Configuration
   const [newWidget, setNewWidget] = useState({
     type: 'chart',
     chartType: 'line',
@@ -186,21 +186,14 @@ const Dashboard = ({ data, onExport }) => {
     URL.revokeObjectURL(url);
   }, [widgets, data]);
 
-  const handleLibrarySelect = (library) => {
-    setNewWidget(prev => ({
-      ...prev,
-      library,
-      chartType: chartTypes[library][0].value
-    }));
-    setDialogStep(1);
-  };
-
   const handleChartTypeSelect = (chartType) => {
     setNewWidget(prev => ({
       ...prev,
-      chartType: chartType.value
+      chartType: chartType.value,
+      library: chartType.library,
+      title: chartType.label
     }));
-    setDialogStep(2);
+    setDialogStep(1);
   };
 
   const handleDialogClose = () => {
@@ -454,83 +447,19 @@ const Dashboard = ({ data, onExport }) => {
         fullWidth
       >
         <DialogTitle>
-          {dialogStep === 0 && 'Choose Chart Library'}
-          {dialogStep === 1 && `Select ${newWidget.library === 'recharts' ? 'Basic' : 'Advanced'} Chart Type`}
-          {dialogStep === 2 && 'Configure Chart'}
+          {dialogStep === 0 && 'Select Chart Type'}
+          {dialogStep === 1 && 'Configure Chart'}
         </DialogTitle>
         <DialogContent>
-          {/* Step 0: Library Selection */}
+          {/* Step 0: Chart Type Selection */}
           {dialogStep === 0 && (
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, mt: 2 }}>
-              <Typography variant="body1" color="text.secondary">
-                Select a charting library based on your visualization needs:
-              </Typography>
-              <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 3, maxWidth: 600 }}>
-                <Card
-                  sx={{
-                    cursor: 'pointer',
-                    transition: 'all 0.2s',
-                    border: '2px solid transparent',
-                    '&:hover': {
-                      borderColor: 'primary.main',
-                      transform: 'translateY(-2px)'
-                    }
-                  }}
-                  onClick={() => handleLibrarySelect('recharts')}
-                >
-                  <CardContent sx={{ textAlign: 'center', p: 3 }}>
-                    <BarChart sx={{ fontSize: 48, color: 'primary.main', mb: 2 }} />
-                    <Typography variant="h6" gutterBottom>
-                      Recharts
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      Basic charts - Line, Bar, Scatter, Pie, Area
-                    </Typography>
-                    <Typography variant="caption" display="block" sx={{ mt: 1 }}>
-                      Perfect for standard business visualizations
-                    </Typography>
-                  </CardContent>
-                </Card>
-                
-                <Card
-                  sx={{
-                    cursor: 'pointer',
-                    transition: 'all 0.2s',
-                    border: '2px solid transparent',
-                    '&:hover': {
-                      borderColor: 'primary.main',
-                      transform: 'translateY(-2px)'
-                    }
-                  }}
-                  onClick={() => handleLibrarySelect('plotly')}
-                >
-                  <CardContent sx={{ textAlign: 'center', p: 3 }}>
-                    <Insights sx={{ fontSize: 48, color: 'primary.main', mb: 2 }} />
-                    <Typography variant="h6" gutterBottom>
-                      Plotly
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      Advanced charts - 3D, Heatmaps, Surfaces, Contours
-                    </Typography>
-                    <Typography variant="caption" display="block" sx={{ mt: 1 }}>
-                      Interactive scientific visualizations
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Box>
-            </Box>
-          )}
-
-          {/* Step 1: Chart Type Selection */}
-          {dialogStep === 1 && (
             <ChartTypeGrid
-              selectedLibrary={newWidget.library}
               onChartTypeSelect={handleChartTypeSelect}
             />
           )}
 
-          {/* Step 2: Configuration */}
-          {dialogStep === 2 && (
+          {/* Step 1: Configuration */}
+          {dialogStep === 1 && (
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
               <TextField
                 fullWidth
@@ -624,7 +553,7 @@ const Dashboard = ({ data, onExport }) => {
           {dialogStep > 0 && (
             <Button onClick={() => setDialogStep(dialogStep - 1)}>Back</Button>
           )}
-          {dialogStep === 2 && (
+          {dialogStep === 1 && (
             <Button 
               onClick={addWidget} 
               variant="contained"
