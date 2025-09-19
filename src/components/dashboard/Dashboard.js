@@ -263,51 +263,149 @@ const Dashboard = ({ data, onExport }) => {
   }
 
   return (
-    <Box sx={{ p: 2, height: '100vh', overflow: 'auto' }}>
-      {/* Header */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-        <Box>
-          <Typography variant="h5" gutterBottom>
-            Visualization Dashboard
-          </Typography>
-          <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-            <Chip 
-              label={`${widgets.length} widgets`} 
-              size="small" 
-              color="primary" 
-            />
-            {data.fileName && (
-              <Chip 
-                label={data.fileName} 
-                size="small" 
-                variant="outlined" 
-              />
-            )}
-            <Chip 
-              label={`${data.data.length} rows`} 
-              size="small" 
-              variant="outlined" 
-            />
+    <Box sx={{ p: 3 }}>
+      {/* Enhanced Dashboard Header */}
+      <Paper className="modern-card" sx={{ 
+        p: 4, 
+        mb: 4,
+        background: '#ffffff',
+        border: '1px solid #e0e0e0'
+      }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+          <Box>
+            <Typography variant="h3" sx={{ 
+              fontWeight: 800,
+              color: '#000000',
+              WebkitTextFillColor: 'transparent',
+              mb: 1
+            }}>
+              Visualization Dashboard
+            </Typography>
+            <Typography variant="h6" color="text.secondary" sx={{ fontWeight: 400 }}>
+              Create and customize visual insights from your data
+            </Typography>
+          </Box>
+          <Box sx={{ display: 'flex', gap: 2 }}>
+            <Button
+              variant="outlined"
+              startIcon={<Download />}
+              onClick={exportDashboard}
+              disabled={widgets.length === 0}
+              sx={{
+                px: 3,
+                py: 1.5,
+                borderRadius: 2,
+                border: '2px solid #667eea',
+                color: '#667eea',
+                fontWeight: 600,
+                textTransform: 'none',
+                '&:hover': {
+                  background: 'rgba(102, 126, 234, 0.1)',
+                  border: '2px solid #5a6acf',
+                  transform: 'translateY(-2px)'
+                },
+                '&:disabled': {
+                  border: '2px solid #e2e8f0',
+                  color: '#a0aec0'
+                }
+              }}
+            >
+              Export Dashboard
+            </Button>
+            <Button
+              variant="contained"
+              startIcon={<Add />}
+              onClick={() => setAddWidgetOpen(true)}
+              sx={{
+                px: 3,
+                py: 1.5,
+                borderRadius: 2,
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                boxShadow: '0 4px 16px rgba(102, 126, 234, 0.4)',
+                fontSize: '1rem',
+                fontWeight: 600,
+                textTransform: 'none',
+                '&:hover': {
+                  background: 'linear-gradient(135deg, #5a6acf 0%, #6b4489 100%)',
+                  transform: 'translateY(-2px)',
+                  boxShadow: '0 6px 20px rgba(102, 126, 234, 0.6)'
+                }
+              }}
+            >
+              Add Chart
+            </Button>
           </Box>
         </Box>
-        <Box sx={{ display: 'flex', gap: 1 }}>
-          <Button
-            variant="outlined"
-            startIcon={<Download />}
-            onClick={exportDashboard}
-            disabled={widgets.length === 0}
-          >
-            Export Dashboard
-          </Button>
-          <Button
-            variant="contained"
-            startIcon={<Add />}
-            onClick={() => setAddWidgetOpen(true)}
-          >
-            Add Chart
-          </Button>
+        
+        {/* Dashboard Stats */}
+        <Box sx={{ display: 'flex', gap: 3 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+            <Box sx={{
+              width: 40,
+              height: 40,
+              borderRadius: 2,
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <BarChart sx={{ color: 'white', fontSize: 20 }} />
+            </Box>
+            <Box>
+              <Typography variant="h6" sx={{ fontWeight: 700, color: 'primary.main' }}>
+                {widgets.length}
+              </Typography>
+              <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
+                Widgets
+              </Typography>
+            </Box>
+          </Box>
+          {data.fileName && (
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+              <Box sx={{
+                width: 40,
+                height: 40,
+                borderRadius: 2,
+                background: 'linear-gradient(135deg, #48bb78 0%, #38a169 100%)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                <Insights sx={{ color: 'white', fontSize: 20 }} />
+              </Box>
+              <Box>
+                <Typography variant="h6" sx={{ fontWeight: 700, color: 'success.main' }}>
+                  {data.fileName}
+                </Typography>
+                <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
+                  Data Source
+                </Typography>
+              </Box>
+            </Box>
+          )}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+            <Box sx={{
+              width: 40,
+              height: 40,
+              borderRadius: 2,
+              background: 'linear-gradient(135deg, #4299e1 0%, #3182ce 100%)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <ShowChart sx={{ color: 'white', fontSize: 20 }} />
+            </Box>
+            <Box>
+              <Typography variant="h6" sx={{ fontWeight: 700, color: 'info.main' }}>
+                {data.data.length.toLocaleString()}
+              </Typography>
+              <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
+                Data Points
+              </Typography>
+            </Box>
+          </Box>
         </Box>
-      </Box>
+      </Paper>
 
       {/* Dashboard Grid */}
       {widgets.length > 0 ? (
@@ -332,18 +430,53 @@ const Dashboard = ({ data, onExport }) => {
           ))}
         </ResponsiveGridLayout>
       ) : (
-        <Paper sx={{ p: 6, textAlign: 'center', mt: 4 }}>
-          <Typography variant="h6" color="text.secondary" gutterBottom>
-            Your dashboard is empty
+        <Paper className="modern-card" sx={{ p: 8, textAlign: 'center', mt: 4 }}>
+          <Box sx={{
+            width: 120,
+            height: 120,
+            borderRadius: '50%',
+            background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            mx: 'auto',
+            mb: 4
+          }}>
+            <BarChart sx={{ fontSize: 60, color: '#667eea' }} />
+          </Box>
+          <Typography variant="h3" sx={{ 
+            fontWeight: 800,
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            backgroundClip: 'text',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            mb: 2
+          }}>
+            Create Your First Dashboard
           </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-            Add your first chart to start visualizing your data
+          <Typography variant="h6" color="text.secondary" sx={{ mb: 4, maxWidth: 500, mx: 'auto' }}>
+            Transform your data into beautiful, interactive visualizations. Start by adding your first chart to see insights come to life.
           </Typography>
           <Button
             variant="contained"
             size="large"
             startIcon={<Add />}
             onClick={() => setAddWidgetOpen(true)}
+            sx={{
+              px: 4,
+              py: 2,
+              borderRadius: 3,
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              boxShadow: '0 8px 32px rgba(102, 126, 234, 0.4)',
+              fontSize: '1.1rem',
+              fontWeight: 700,
+              textTransform: 'none',
+              '&:hover': {
+                background: 'linear-gradient(135deg, #5a6acf 0%, #6b4489 100%)',
+                transform: 'translateY(-4px)',
+                boxShadow: '0 12px 40px rgba(102, 126, 234, 0.6)'
+              }
+            }}
           >
             Create First Chart
           </Button>

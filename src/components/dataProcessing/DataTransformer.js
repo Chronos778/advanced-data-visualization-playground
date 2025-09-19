@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   Box,
   Paper,
@@ -27,12 +27,8 @@ import {
   Functions,
   Calculate,
   Transform,
-  Visibility,
-  DataUsage,
-  TableChart,
   Speed,
   CheckCircle,
-  Warning,
   AutoFixHigh,
   Refresh
 } from '@mui/icons-material';
@@ -58,8 +54,6 @@ const DataTransformer = React.memo(({ data, onTransformedData }) => {
     values: '',
     aggregateFunction: 'sum'
   });
-  const [presets, setPresets] = useState({});
-  const [showPreview, setShowPreview] = useState(false);
 
   const columns = useMemo(() => {
     if (!data || !data.data || data.data.length === 0) return [];
@@ -356,6 +350,7 @@ const DataTransformer = React.memo(({ data, onTransformedData }) => {
           });
           
           // Evaluate simple mathematical expressions
+          // eslint-disable-next-line no-new-func
           const evalResult = Function(`"use strict"; return (${formula})`)();
           newRow[calc.name] = evalResult;
         } catch (e) {

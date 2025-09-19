@@ -21,10 +21,10 @@ import {
   Upload,
   TableView,
   Transform,
-  Brightness4,
-  Brightness7,
   GitHub,
-  AutoAwesome
+  AutoAwesome,
+  Assessment,
+  Timeline
 } from '@mui/icons-material';
 import './App.css';
 
@@ -57,66 +57,180 @@ function App() {
   const [transformedData, setTransformedData] = useState(null);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const [darkMode, setDarkMode] = useState(false);
   const dashboardRef = useRef(null);
 
-  // Memoize theme to prevent recreation on every render
+  // Minimalistic black and white theme
   const theme = useMemo(() => createTheme({
     palette: {
-      mode: darkMode ? 'dark' : 'light',
+      mode: 'light',
       primary: {
-        main: '#3b82f6',
-        light: '#60a5fa',
-        dark: '#2563eb',
+        main: '#000000',
+        light: '#333333',
+        dark: '#000000',
+        contrastText: '#ffffff',
       },
       secondary: {
-        main: '#64748b',
-        light: '#94a3b8',
-        dark: '#475569',
+        main: '#666666',
+        light: '#999999',
+        dark: '#333333',
+        contrastText: '#ffffff',
       },
       background: {
-        default: darkMode ? '#0f172a' : '#f8fafc',
-        paper: darkMode ? '#1e293b' : '#ffffff',
+        default: '#ffffff',
+        paper: '#ffffff',
       },
       text: {
-        primary: darkMode ? '#f1f5f9' : '#0f172a',
-        secondary: darkMode ? '#94a3b8' : '#64748b',
+        primary: '#000000',
+        secondary: '#666666',
       },
-      divider: darkMode ? '#334155' : '#e2e8f0',
+      divider: '#e0e0e0',
+      error: {
+        main: '#000000',
+        contrastText: '#ffffff',
+      },
+      warning: {
+        main: '#666666',
+        contrastText: '#ffffff',
+      },
+      info: {
+        main: '#333333',
+        contrastText: '#ffffff',
+      },
+      success: {
+        main: '#000000',
+        contrastText: '#ffffff',
+      },
+    },
+    components: {
+      // Override Material-UI component defaults
+      MuiButton: {
+        styleOverrides: {
+          root: {
+            backgroundColor: '#000000',
+            color: '#ffffff',
+            '&:hover': {
+              backgroundColor: '#333333',
+            },
+          },
+          contained: {
+            backgroundColor: '#000000',
+            color: '#ffffff',
+            '&:hover': {
+              backgroundColor: '#333333',
+            },
+          },
+          outlined: {
+            borderColor: '#000000',
+            color: '#000000',
+            '&:hover': {
+              backgroundColor: '#f5f5f5',
+              borderColor: '#333333',
+            },
+          },
+        },
+      },
+      MuiTabs: {
+        styleOverrides: {
+          root: {
+            '& .MuiTab-root': {
+              color: '#666666',
+              '&.Mui-selected': {
+                color: '#000000',
+              },
+            },
+            '& .MuiTabs-indicator': {
+              backgroundColor: '#000000',
+            },
+          },
+        },
+      },
+      MuiTab: {
+        styleOverrides: {
+          root: {
+            color: '#666666',
+            '&.Mui-selected': {
+              color: '#000000',
+            },
+          },
+        },
+      },
+      MuiChip: {
+        styleOverrides: {
+          root: {
+            backgroundColor: '#f5f5f5',
+            color: '#000000',
+            '& .MuiChip-deleteIcon': {
+              color: '#666666',
+            },
+          },
+          filled: {
+            backgroundColor: '#000000',
+            color: '#ffffff',
+          },
+        },
+      },
+      MuiIconButton: {
+        styleOverrides: {
+          root: {
+            color: '#000000',
+            '&:hover': {
+              backgroundColor: '#f5f5f5',
+            },
+          },
+        },
+      },
+      MuiAppBar: {
+        styleOverrides: {
+          root: {
+            backgroundColor: '#ffffff',
+            color: '#000000',
+            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+          },
+        },
+      },
+      MuiPaper: {
+        styleOverrides: {
+          root: {
+            backgroundColor: '#ffffff',
+            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+          },
+        },
+      },
     },
     typography: {
       fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif',
       h4: {
         fontWeight: 700,
-        color: '#0f172a',
+        color: '#000000',
       },
       h5: {
         fontWeight: 600,
-        color: '#0f172a',
+        color: '#000000',
       },
       h6: {
         fontWeight: 600,
-        color: '#0f172a',
+        color: '#000000',
       },
       body1: {
-        color: '#64748b',
+        color: '#333333',
         fontWeight: 500,
       },
       body2: {
-        color: '#94a3b8',
+        color: '#666666',
         fontWeight: 400,
       },
     },
     shape: {
-      borderRadius: 12,
+      borderRadius: 4,
     },
     components: {
       MuiCard: {
         styleOverrides: {
           root: {
-            boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
-            borderRadius: 12,
-            border: '1px solid #e2e8f0',
+            boxShadow: 'none',
+            borderRadius: 4,
+            border: '1px solid #cccccc',
+            backgroundColor: '#ffffff',
           },
         },
       },
@@ -125,7 +239,11 @@ function App() {
           root: {
             textTransform: 'none',
             fontWeight: 500,
-            borderRadius: 8,
+            borderRadius: 4,
+            boxShadow: 'none',
+            '&:hover': {
+              boxShadow: 'none',
+            },
           },
         },
       },
@@ -133,9 +251,9 @@ function App() {
         styleOverrides: {
           root: {
             background: '#ffffff',
-            borderBottom: '1px solid #e2e8f0',
-            boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
-            color: '#0f172a',
+            borderBottom: '1px solid #cccccc',
+            boxShadow: 'none',
+            color: '#000000',
           },
         },
       },
@@ -144,16 +262,16 @@ function App() {
           root: {
             textTransform: 'none',
             fontWeight: 500,
-            color: '#64748b',
+            color: '#666666',
             '&.Mui-selected': {
-              color: '#3b82f6',
+              color: '#000000',
               fontWeight: 600,
             },
           },
         },
       },
     },
-  }), [darkMode]); // Add darkMode as dependency
+  }), []); // Removed darkMode dependency since we only have light theme
 
   // Memoize event handlers to prevent unnecessary re-renders
   const handleDataLoaded = useCallback((newData) => {
@@ -195,101 +313,125 @@ function App() {
       <CssBaseline />
       <div className="App">
         <Box className="app-content">
-          {/* Enhanced App Bar */}
-          <AppBar position="static" elevation={0} className="app-header-glass">
-            <Toolbar sx={{ py: 1 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', flexGrow: 1 }}>
-                <AutoAwesome sx={{ mr: 2, color: 'white', fontSize: 28 }} />
+        {/* Simple App Bar with minimalistic design */}
+        <AppBar 
+          position="sticky" 
+          elevation={0}
+          sx={{ 
+            background: '#ffffff',
+            borderBottom: '1px solid #cccccc',
+            color: '#000000'
+          }}
+        >
+          <Toolbar sx={{ justifyContent: 'space-between', py: 1 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <Box sx={{ 
+                p: 1.5, 
+                borderRadius: '4px', 
+                background: '#000000',
+                color: 'white'
+              }}>
+                <Assessment sx={{ fontSize: 28 }} />
+              </Box>
+              <Box>
                 <Typography 
-                  variant="h6" 
-                  component="div" 
-                  className="glass-text"
+                  variant="h5" 
                   sx={{ 
-                    fontWeight: 700,
-                    fontSize: '1.3rem',
-                    background: 'linear-gradient(45deg, #fff, #e3f2fd)',
-                    backgroundClip: 'text',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
+                    fontWeight: 700, 
+                    color: '#000000'
                   }}
                 >
-                  Advanced Data Visualization Playground
+                  DataViz Pro
+                </Typography>
+                <Typography variant="caption" color="#666666" sx={{ fontWeight: 500 }}>
+                  Advanced Analytics Platform
                 </Typography>
               </Box>
-              
-              {data && (
-                <Box sx={{ mr: 2 }}>
-                  <ExportManager
-                    dashboardRef={dashboardRef}
-                    widgets={[]}
-                    data={getCurrentData()}
-                    layout={[]}
-                  />
-                </Box>
-              )}
-              
-              <Tooltip title={`Switch to ${darkMode ? 'light' : 'dark'} mode`}>
-                <IconButton 
-                  className="glass-button"
-                  onClick={() => setDarkMode(!darkMode)}
-                  sx={{ mr: 1 }}
-                >
-                  {darkMode ? <Brightness7 /> : <Brightness4 />}
-                </IconButton>
-              </Tooltip>
-              
+            </Box>
+            
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <Tooltip title="View on GitHub">
                 <IconButton 
-                  className="glass-button"
-                  component="a"
-                  href="https://github.com/Chronos778/advanced-data-visualization-playground"
+                  component="a" 
+                  href="https://github.com/your-repo" 
                   target="_blank"
-                  rel="noopener noreferrer"
+                  sx={{ 
+                    color: '#000000',
+                    border: '1px solid #cccccc',
+                    '&:hover': { 
+                      backgroundColor: '#f5f5f5'
+                    }
+                  }}
                 >
                   <GitHub />
                 </IconButton>
               </Tooltip>
-            </Toolbar>
-          </AppBar>
-
-          {/* Enhanced Tab Navigation */}
-          <Container maxWidth="xl" sx={{ mt: 2 }}>
-            <Paper className="modern-tabs slide-in-up" elevation={0}>
-              <Tabs
-                value={currentTab}
-                onChange={handleTabChange}
-                variant="fullWidth"
-                sx={{
-                  '& .MuiTabs-indicator': {
-                    background: 'linear-gradient(45deg, #667eea, #764ba2)',
-                    height: 3,
-                    borderRadius: '3px 3px 0 0',
+            </Box>
+          </Toolbar>
+          
+          {/* Simple Tabs */}
+          <Box sx={{ 
+            background: '#ffffff',
+            borderTop: '1px solid #cccccc'
+          }}>
+            <Tabs
+              value={currentTab}
+              onChange={handleTabChange}
+              variant="scrollable"
+              scrollButtons="auto"
+              sx={{
+                '& .MuiTab-root': {
+                  minHeight: 64,
+                  fontWeight: 500,
+                  textTransform: 'none',
+                  borderRadius: '4px 4px 0 0',
+                  margin: '0 2px',
+                  transition: 'all 0.2s ease',
+                  color: '#666666',
+                  '&.Mui-selected': {
+                    background: '#ffffff',
+                    color: '#000000',
+                    fontWeight: 600,
+                    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'
                   },
-                }}
-              >
-                {tabs.map((tab, index) => (
-                  <Tab
-                    key={index}
-                    icon={tab.icon}
-                    label={tab.label}
-                    disabled={tab.disabled}
-                    className={`modern-tab ${currentTab === index ? 'Mui-selected' : ''}`}
-                    sx={{
-                      '&.Mui-disabled': {
-                        color: 'rgba(255, 255, 255, 0.3) !important',
-                      },
-                    }}
-                  />
-                ))}
-              </Tabs>
-            </Paper>
-          </Container>
+                  '&:hover:not(.Mui-selected)': {
+                    background: '#f8f8f8',
+                    color: '#333333'
+                  }
+                },
+                '& .MuiTabs-indicator': {
+                  background: '#000000',
+                  height: 2
+                }
+              }}
+            >
+              {tabs.map((tab, index) => (
+                <Tab
+                  key={index}
+                  label={
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      {tab.icon}
+                      <Typography variant="body2" sx={{ fontWeight: 'inherit' }}>
+                        {tab.label}
+                      </Typography>
+                    </Box>
+                  }
+                  disabled={tab.disabled}
+                  sx={{ 
+                    opacity: tab.disabled ? 0.5 : 1,
+                    minWidth: 160
+                  }}
+                />
+              ))}
+            </Tabs>
+          </Box>
+        </AppBar>
 
-          {/* Enhanced Tab Content */}
-          <Container maxWidth="xl" sx={{ mt: 2, mb: 4 }}>
-            {/* Tab Panels */}
+          {/* Enhanced Tab Content with animations */}
+          <Container maxWidth="xl" sx={{ mt: 3, mb: 4 }}>
+            {/* Tab Panels with minimalist styling */}
             <TabPanel value={currentTab} index={0}>
-              <Paper className="glass-panel slide-in-up">
+              <Paper className="card">
                 <FileUploader
                   onDataLoaded={handleDataLoaded}
                   onError={handleError}
@@ -298,7 +440,7 @@ function App() {
             </TabPanel>
 
             <TabPanel value={currentTab} index={1}>
-              <Paper className="glass-panel slide-in-up">
+              <Paper className="card">
                 <DataPreview
                   data={getCurrentData()}
                   title={transformedData ? "Transformed Data Preview" : "Data Preview"}
@@ -307,7 +449,7 @@ function App() {
             </TabPanel>
 
             <TabPanel value={currentTab} index={2}>
-              <Paper className="glass-panel slide-in-up">
+              <Paper className="card">
                 <DataTransformer
                   data={data}
                   onTransformedData={handleDataTransformed}
@@ -316,7 +458,7 @@ function App() {
             </TabPanel>
 
             <TabPanel value={currentTab} index={3}>
-              <div ref={dashboardRef}>
+              <div className="card">
                 <Dashboard
                   data={getCurrentData()}
                   onExport={(widgetId, format) => {
@@ -327,80 +469,150 @@ function App() {
             </TabPanel>
 
             <TabPanel value={currentTab} index={4}>
-              <Paper className="glass-panel slide-in-up">
+              <Paper className="card">
                 <AIInsights data={getCurrentData()} />
               </Paper>
             </TabPanel>
 
-            {/* Enhanced Welcome Message */}
+            {/* Enhanced Welcome Message with modern design */}
             {!data && currentTab === 0 && (
-              <Box sx={{ mt: 6, textAlign: 'center' }}>
-                <Box className="pulse-animation" sx={{ mb: 4 }}>
-                  <AutoAwesome sx={{ fontSize: 64, color: 'rgba(255, 255, 255, 0.8)' }} />
+              <Box sx={{ mt: 8, textAlign: 'center' }}>
+                <Box className="float-animation" sx={{ mb: 6 }}>
+                  <Box sx={{ 
+                    display: 'inline-block',
+                    p: 3,
+                    borderRadius: '50%',
+                    background: '#000000',
+                    boxShadow: '0 4px 16px rgba(0, 0, 0, 0.1)'
+                  }}>
+                    <AutoAwesome sx={{ fontSize: 64, color: 'white' }} />
+                  </Box>
                 </Box>
+                
                 <Typography 
-                  variant="h3" 
-                  className="glass-text"
+                  variant="h2" 
+                  className="glass-text text-gradient"
                   sx={{ 
-                    mb: 2,
-                    fontWeight: 800,
-                    background: 'linear-gradient(45deg, #fff, #e3f2fd, #f3e5f5)',
-                    backgroundClip: 'text',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
+                    mb: 3,
+                    fontWeight: 900,
+                    letterSpacing: '-0.025em',
+                    color: '#000000',
+                    textShadow: 'none'
                   }}
                 >
-                  Welcome to the Future of Data
-                </Typography>
-                <Typography 
-                  variant="h6" 
-                  className="glass-text-secondary"
-                  sx={{ mb: 4, maxWidth: 600, mx: 'auto' }}
-                >
-                  Transform your data into stunning visualizations with AI-powered insights
+                  Welcome to DataViz Pro
                 </Typography>
                 
-                <Paper className="glass-card" sx={{ p: 4, maxWidth: 800, mx: 'auto' }}>
-                  <Typography variant="h6" className="glass-text" sx={{ mb: 3 }}>
-                    ✨ What You Can Do
+                <Typography 
+                  variant="h5" 
+                  className="glass-text-secondary"
+                  sx={{ 
+                    mb: 6, 
+                    maxWidth: 700, 
+                    mx: 'auto',
+                    fontWeight: 400,
+                    lineHeight: 1.6,
+                    color: 'text.secondary'
+                  }}
+                >
+                  Transform your data into stunning visualizations with AI-powered insights and advanced analytics
+                </Typography>
+                
+                <Paper 
+                  className="glass-card modern-card" 
+                  sx={{ 
+                    p: 6, 
+                    maxWidth: 900, 
+                    mx: 'auto',
+                    background: 'rgba(255, 255, 255, 0.95)',
+                    backdropFilter: 'blur(20px)',
+                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                    borderRadius: 4
+                  }}
+                >
+                  <Typography 
+                    variant="h5" 
+                    sx={{ 
+                      mb: 4,
+                      fontWeight: 700,
+                      color: 'primary.main',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: 2
+                    }}
+                  >
+                    <AutoAwesome />
+                    Platform Features
                   </Typography>
+                  
                   <Box sx={{ 
                     display: 'grid', 
                     gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, 
-                    gap: 3,
+                    gap: 4,
                     textAlign: 'left'
                   }}>
-                    <Box>
-                      <Typography variant="subtitle1" className="glass-text" sx={{ fontWeight: 600, mb: 1 }}>
-                        📊 Advanced Visualizations
+                    <Box className="modern-card" sx={{ p: 3, background: '#000000', color: 'white' }}>
+                      <Typography variant="h6" sx={{ fontWeight: 700, mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Assessment />
+                        Advanced Visualizations
                       </Typography>
-                      <Typography variant="body2" className="glass-text-secondary">
-                        Create stunning charts with Plotly.js and Recharts in one unified dashboard
-                      </Typography>
-                    </Box>
-                    <Box>
-                      <Typography variant="subtitle1" className="glass-text" sx={{ fontWeight: 600, mb: 1 }}>
-                        🤖 AI-Powered Insights
-                      </Typography>
-                      <Typography variant="body2" className="glass-text-secondary">
-                        Discover patterns and correlations automatically
+                      <Typography variant="body1" sx={{ lineHeight: 1.6 }}>
+                        Create stunning charts with Plotly.js and Recharts in one unified dashboard with drag-and-drop functionality
                       </Typography>
                     </Box>
-                    <Box>
-                      <Typography variant="subtitle1" className="glass-text" sx={{ fontWeight: 600, mb: 1 }}>
-                        🎯 Interactive Dashboard
+                    
+                    <Box className="modern-card" sx={{ p: 3, background: '#333333', color: 'white' }}>
+                      <Typography variant="h6" sx={{ fontWeight: 700, mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <AutoAwesome />
+                        AI-Powered Insights
                       </Typography>
-                      <Typography variant="body2" className="glass-text-secondary">
-                        Drag, drop, and resize charts in a flexible grid layout
+                      <Typography variant="body1" sx={{ lineHeight: 1.6 }}>
+                        Discover patterns and correlations automatically with Google's Gemini AI integration
                       </Typography>
                     </Box>
-                    <Box>
-                      <Typography variant="subtitle1" className="glass-text" sx={{ fontWeight: 600, mb: 1 }}>
-                        📁 Multiple Formats
+                    
+                    <Box className="modern-card" sx={{ p: 3, background: '#666666', color: 'white' }}>
+                      <Typography variant="h6" sx={{ fontWeight: 700, mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Timeline />
+                        Interactive Dashboard
                       </Typography>
-                      <Typography variant="body2" className="glass-text-secondary">
-                        Support for CSV, JSON, Excel files and more
+                      <Typography variant="body1" sx={{ lineHeight: 1.6 }}>
+                        Drag, drop, and resize charts in a flexible grid layout with real-time data transformations
                       </Typography>
+                    </Box>
+                    
+                    <Box className="modern-card" sx={{ p: 3, background: '#999999', color: 'white' }}>
+                      <Typography variant="h6" sx={{ fontWeight: 700, mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Upload />
+                        Multiple Formats
+                      </Typography>
+                      <Typography variant="body1" sx={{ lineHeight: 1.6 }}>
+                        Support for CSV, JSON, Excel files and more with advanced data processing capabilities
+                      </Typography>
+                    </Box>
+                  </Box>
+                  
+                  <Box sx={{ mt: 6, textAlign: 'center' }}>
+                    <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
+                      Ready to start? Upload your data file to begin exploring!
+                    </Typography>
+                    <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, flexWrap: 'wrap' }}>
+                      <Box className="modern-card" sx={{ p: 1.5, background: '#f5f5f5' }}>
+                        <Typography variant="body2" color="primary.main" sx={{ fontWeight: 600 }}>
+                          📊 CSV Files
+                        </Typography>
+                      </Box>
+                      <Box className="modern-card" sx={{ p: 1.5, background: '#f5f5f5' }}>
+                        <Typography variant="body2" color="success.main" sx={{ fontWeight: 600 }}>
+                          📋 Excel Files
+                        </Typography>
+                      </Box>
+                      <Box className="modern-card" sx={{ p: 1.5, background: '#f5f5f5' }}>
+                        <Typography variant="body2" color="info.main" sx={{ fontWeight: 600 }}>
+                          🔗 JSON Data
+                        </Typography>
+                      </Box>
                     </Box>
                   </Box>
                 </Paper>

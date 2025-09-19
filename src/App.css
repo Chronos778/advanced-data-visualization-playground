@@ -1,320 +1,540 @@
-/* ===== OPTIMIZED CLEAN DASHBOARD THEME ===== */
+/* Enhanced Minimalistic Design */
 :root {
-  /* Clean color palette inspired by the dashboard */
-  --bg-primary: #f8fafc;
-  --bg-secondary: #ffffff;
-  --bg-tertiary: #f1f5f9;
+  /* Refined color palette */
+  --bg-primary: #ffffff;
+  --bg-secondary: #fafafa;
+  --bg-tertiary: #f5f5f5;
+  --bg-quaternary: #eeeeee;
   
-  /* Text colors */
-  --text-primary: #0f172a;
-  --text-secondary: #64748b;
-  --text-muted: #94a3b8;
+  /* Typography colors */
+  --text-primary: #1a1a1a;
+  --text-secondary: #4a4a4a;
+  --text-muted: #757575;
+  --text-subtle: #9e9e9e;
   
-  /* Border and divider colors */
-  --border-light: #e2e8f0;
-  --border-medium: #cbd5e1;
-  --border-dark: #94a3b8;
+  /* Border colors */
+  --border-light: #eeeeee;
+  --border-medium: #e0e0e0;
+  --border-dark: #d0d0d0;
   
   /* Accent colors */
-  --accent-primary: #3b82f6;
-  --accent-success: #10b981;
-  --accent-warning: #f59e0b;
-  --accent-danger: #ef4444;
+  --accent-primary: #000000;
+  --accent-hover: #333333;
   
-  /* Optimized shadows - reduced complexity */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 2px 4px -1px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  --shadow-xl: 0 8px 10px -2px rgba(0, 0, 0, 0.1);
+  /* Subtle shadows */
+  --shadow-subtle: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-soft: 0 2px 8px rgba(0, 0, 0, 0.06);
+  --shadow-medium: 0 4px 16px rgba(0, 0, 0, 0.08);
+  
+  /* Typography scale */
+  --font-xs: 0.75rem;
+  --font-sm: 0.875rem;
+  --font-base: 1rem;
+  --font-lg: 1.125rem;
+  --font-xl: 1.25rem;
+  --font-2xl: 1.5rem;
+  --font-3xl: 1.875rem;
+  
+  /* Spacing scale */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  
+  /* Border radius */
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 6px;
+  --radius-xl: 8px;
 }
 
-/* Main app background */
-.App {
+/* Enhanced reset and base styles */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Inter', 'Helvetica Neue', sans-serif;
+  font-size: var(--font-base);
+  line-height: 1.6;
+  font-weight: 400;
+  color: var(--text-primary);
   background: var(--bg-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Typography improvements */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--text-primary);
+  font-weight: 600;
+  line-height: 1.3;
+  margin: 0;
+}
+
+h1 { font-size: var(--font-3xl); }
+h2 { font-size: var(--font-2xl); }
+h3 { font-size: var(--font-xl); }
+h4 { font-size: var(--font-lg); }
+h5 { font-size: var(--font-base); }
+h6 { font-size: var(--font-sm); }
+
+p {
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+small {
+  font-size: var(--font-sm);
+  color: var(--text-muted);
+}
+
+/* Enhanced app layout */
+.App {
   min-height: 100vh;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  background: var(--bg-primary);
+  display: flex;
+  flex-direction: column;
 }
 
-/* Optimized card base - reduced transitions */
-.clean-card {
-  background: var(--bg-secondary) !important;
-  border: 1px solid var(--border-light) !important;
-  border-radius: 12px !important;
-  box-shadow: var(--shadow-sm) !important;
-  transition: box-shadow 0.15s ease !important; /* Faster, only shadow */
+.app-content {
+  flex: 1;
+  background: var(--bg-primary);
 }
 
-.clean-card:hover {
-  box-shadow: var(--shadow-md) !important;
+/* Enhanced card system */
+.card {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-subtle);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
 }
 
-/* Dashboard card with optimized performance */
-.dashboard-card {
-  background: var(--bg-secondary) !important;
-  border: 1px solid var(--border-light) !important;
-  border-radius: 16px !important;
-  box-shadow: var(--shadow-lg) !important;
-  transition: box-shadow 0.15s ease !important; /* Simplified transition */
+.card:hover {
+  border-color: var(--border-medium);
+  box-shadow: var(--shadow-soft);
 }
 
-.dashboard-card:hover {
-  box-shadow: var(--shadow-xl) !important;
+.card-header {
+  padding: var(--space-6);
+  border-bottom: 1px solid var(--border-light);
+  background: var(--bg-secondary);
 }
 
-/* Text styles - no shadows for performance */
-.text-primary {
-  color: var(--text-primary) !important;
-  font-weight: 600 !important;
+.card-title {
+  font-size: var(--font-lg);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--space-1);
 }
 
-.text-secondary {
-  color: var(--text-secondary) !important;
-  font-weight: 500 !important;
+.card-subtitle {
+  font-size: var(--font-sm);
+  color: var(--text-muted);
 }
 
-.text-muted {
-  color: var(--text-muted) !important;
-  font-weight: 400 !important;
+.card-content {
+  padding: var(--space-6);
 }
 
-/* Optimized button styles */
+.card-footer {
+  padding: var(--space-4) var(--space-6);
+  border-top: 1px solid var(--border-light);
+  background: var(--bg-secondary);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Enhanced button system */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--font-sm);
+  font-weight: 500;
+  line-height: 1;
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  text-decoration: none;
+  user-select: none;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .btn-primary {
-  background: var(--accent-primary) !important;
-  color: white !important;
-  border: none !important;
-  border-radius: 8px !important;
-  font-weight: 500 !important;
-  transition: background 0.15s ease !important; /* Only background transition */
+  background: var(--accent-primary);
+  color: var(--bg-primary);
+  border-color: var(--accent-primary);
 }
 
-.btn-primary:hover {
-  background: #2563eb !important;
+.btn-primary:hover:not(:disabled) {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
 }
 
 .btn-secondary {
-  background: var(--bg-secondary) !important;
-  color: var(--text-secondary) !important;
-  border: 1px solid var(--border-medium) !important;
-  border-radius: 8px !important;
-  font-weight: 500 !important;
-  transition: background 0.15s ease !important;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  border-color: var(--border-medium);
 }
 
-.btn-secondary:hover {
-  background: var(--bg-tertiary) !important;
-  border-color: var(--border-dark) !important;
+.btn-secondary:hover:not(:disabled) {
+  background: var(--bg-secondary);
+  border-color: var(--border-dark);
 }
 
-/* Navigation styling - minimal effects */
-.MuiAppBar-root {
-  background: var(--bg-secondary) !important;
-  border-bottom: 1px solid var(--border-light) !important;
-  box-shadow: var(--shadow-sm) !important;
-  color: var(--text-primary) !important;
+.btn-ghost {
+  background: transparent;
+  color: var(--text-secondary);
+  border-color: transparent;
 }
 
-.MuiTab-root {
-  color: var(--text-secondary) !important;
-  font-weight: 500 !important;
-  text-transform: none !important;
-  transition: color 0.15s ease !important; /* Only color transition */
+.btn-ghost:hover:not(:disabled) {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
 }
 
-.MuiTab-root.Mui-selected {
-  color: var(--accent-primary) !important;
-  font-weight: 600 !important;
+.btn-sm {
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--font-xs);
 }
 
-.MuiTabs-indicator {
-  background: var(--accent-primary) !important;
-  height: 3px !important;
-  border-radius: 2px !important;
+.btn-lg {
+  padding: var(--space-4) var(--space-6);
+  font-size: var(--font-base);
 }
 
-/* Simplified form inputs */
-.MuiTextField-root .MuiOutlinedInput-root {
-  background: var(--bg-secondary) !important;
-  border-radius: 8px !important;
+/* Enhanced form elements */
+.input {
+  width: 100%;
+  padding: var(--space-3);
+  font-size: var(--font-sm);
+  line-height: 1.5;
+  color: var(--text-primary);
+  background: var(--bg-primary);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-md);
+  transition: all 0.15s ease;
 }
 
-.MuiTextField-root .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline {
-  border-color: var(--border-medium) !important;
+.input:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
 }
 
-.MuiTextField-root .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
-  border-color: var(--border-dark) !important;
+.input::placeholder {
+  color: var(--text-subtle);
 }
 
-.MuiTextField-root .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
-  border-color: var(--accent-primary) !important;
+.label {
+  display: block;
+  font-size: var(--font-sm);
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: var(--space-2);
 }
 
-.MuiTextField-root .MuiInputLabel-root {
-  color: var(--text-secondary) !important;
-  font-weight: 500 !important;
+/* Enhanced tab system */
+.tabs {
+  display: flex;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-lg);
+  padding: var(--space-1);
+  border: 1px solid var(--border-light);
 }
 
-.MuiTextField-root .MuiOutlinedInput-input {
-  color: var(--text-primary) !important;
+.tab {
+  flex: 1;
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--font-sm);
+  font-weight: 500;
+  color: var(--text-muted);
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.15s ease;
 }
 
-/* Metric display styles */
-.metric-large {
-  font-size: 2.5rem !important;
-  font-weight: 700 !important;
-  color: var(--text-primary) !important;
-  line-height: 1.2 !important;
+.tab:hover {
+  color: var(--text-secondary);
+  background: var(--bg-tertiary);
 }
 
-.metric-medium {
-  font-size: 1.5rem !important;
-  font-weight: 600 !important;
-  color: var(--text-primary) !important;
+.tab.active {
+  color: var(--text-primary);
+  background: var(--bg-primary);
+  box-shadow: var(--shadow-subtle);
 }
 
-.metric-label {
-  font-size: 0.875rem !important;
-  font-weight: 500 !important;
-  color: var(--text-secondary) !important;
-  text-transform: uppercase !important;
-  letter-spacing: 0.05em !important;
+/* Utility classes */
+.text-xs { font-size: var(--font-xs); }
+.text-sm { font-size: var(--font-sm); }
+.text-base { font-size: var(--font-base); }
+.text-lg { font-size: var(--font-lg); }
+.text-xl { font-size: var(--font-xl); }
+
+.text-primary { color: var(--text-primary); }
+.text-secondary { color: var(--text-secondary); }
+.text-muted { color: var(--text-muted); }
+.text-subtle { color: var(--text-subtle); }
+
+.font-medium { font-weight: 500; }
+.font-semibold { font-weight: 600; }
+.font-bold { font-weight: 700; }
+
+.p-1 { padding: var(--space-1); }
+.p-2 { padding: var(--space-2); }
+.p-3 { padding: var(--space-3); }
+.p-4 { padding: var(--space-4); }
+.p-6 { padding: var(--space-6); }
+.p-8 { padding: var(--space-8); }
+
+.m-1 { margin: var(--space-1); }
+.m-2 { margin: var(--space-2); }
+.m-3 { margin: var(--space-3); }
+.m-4 { margin: var(--space-4); }
+.m-6 { margin: var(--space-6); }
+.m-8 { margin: var(--space-8); }
+
+.mb-1 { margin-bottom: var(--space-1); }
+.mb-2 { margin-bottom: var(--space-2); }
+.mb-3 { margin-bottom: var(--space-3); }
+.mb-4 { margin-bottom: var(--space-4); }
+.mb-6 { margin-bottom: var(--space-6); }
+
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.items-center { align-items: center; }
+.justify-center { justify-content: center; }
+.justify-between { justify-content: space-between; }
+.gap-2 { gap: var(--space-2); }
+.gap-3 { gap: var(--space-3); }
+.gap-4 { gap: var(--space-4); }
+
+.rounded { border-radius: var(--radius-md); }
+.rounded-lg { border-radius: var(--radius-lg); }
+
+.border { border: 1px solid var(--border-light); }
+.border-medium { border: 1px solid var(--border-medium); }
+
+.shadow { box-shadow: var(--shadow-subtle); }
+.shadow-soft { box-shadow: var(--shadow-soft); }
+
+.bg-secondary { background: var(--bg-secondary); }
+.bg-tertiary { background: var(--bg-tertiary); }
+
+/* Loading states */
+.loading {
+  color: var(--text-muted);
+  font-size: var(--font-sm);
 }
 
-/* Status indicators */
-.status-success {
-  color: var(--accent-success) !important;
-  background: rgba(16, 185, 129, 0.1) !important;
-  padding: 4px 8px !important;
-  border-radius: 6px !important;
-  font-size: 0.75rem !important;
-  font-weight: 600 !important;
+.skeleton {
+  background: linear-gradient(90deg, var(--bg-tertiary) 25%, var(--bg-quaternary) 50%, var(--bg-tertiary) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: var(--radius-md);
 }
 
-.status-warning {
-  color: var(--accent-warning) !important;
-  background: rgba(245, 158, 11, 0.1) !important;
-  padding: 4px 8px !important;
-  border-radius: 6px !important;
-  font-size: 0.75rem !important;
-  font-weight: 600 !important;
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
 }
 
-.status-danger {
-  color: var(--accent-danger) !important;
-  background: rgba(239, 68, 68, 0.1) !important;
-  padding: 4px 8px !important;
-  border-radius: 6px !important;
-  font-size: 0.75rem !important;
-  font-weight: 600 !important;
-}
-
-/* Simplified progress bars */
-.progress-bar {
-  height: 8px !important;
-  border-radius: 4px !important;
-  background: var(--bg-tertiary) !important;
-  overflow: hidden !important;
-}
-
-.progress-fill {
-  height: 100% !important;
-  background: var(--accent-primary) !important; /* Simplified gradient */
-  border-radius: 4px !important;
-  transition: width 0.3s ease !important;
-}
-
-/* Simplified scrollbar */
+/* Enhanced scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--bg-tertiary);
-  border-radius: 3px;
+  background: var(--bg-secondary);
 }
 
 ::-webkit-scrollbar-thumb {
   background: var(--border-dark);
-  border-radius: 3px;
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--text-secondary);
+  background: var(--text-muted);
 }
 
-/* Optimized chart tabs styling */
-.chart-tabs {
-  background: var(--bg-tertiary) !important;
-  border-radius: 12px !important;
-  padding: 4px !important;
+::-webkit-scrollbar-corner {
+  background: var(--bg-secondary);
 }
 
-.chart-tab {
-  border-radius: 8px !important;
-  margin: 0 2px !important;
-  transition: background 0.15s ease !important; /* Only background */
-  color: var(--text-secondary) !important;
-  font-weight: 500 !important;
-  text-transform: none !important;
-  min-height: 40px !important;
-}
-
-.chart-tab.Mui-selected {
-  background: var(--bg-secondary) !important;
-  color: var(--accent-primary) !important;
-  font-weight: 600 !important;
-  box-shadow: var(--shadow-sm) !important;
-}
-
-/* Chart workspace styling */
-.chart-workspace {
-  background: var(--bg-secondary) !important;
-  border: 1px solid var(--border-light) !important;
-  border-radius: 16px !important;
-  box-shadow: var(--shadow-lg) !important;
-  overflow: hidden !important;
-}
-
-.chart-workspace-header {
-  background: var(--bg-tertiary) !important;
-  border-bottom: 1px solid var(--border-light) !important;
-  padding: 16px 24px !important;
-}
-
-.chart-content {
-  padding: 24px !important;
-  min-height: 400px !important;
-}
-
-/* Performance optimizations */
-* {
-  box-sizing: border-box;
-}
-
-/* Disable expensive effects on mobile */
+/* Enhanced responsive design */
 @media (max-width: 768px) {
-  .metric-large {
-    font-size: 2rem !important;
+  :root {
+    --font-xs: 0.7rem;
+    --font-sm: 0.8rem;
+    --font-base: 0.9rem;
+    --font-lg: 1rem;
+    --font-xl: 1.125rem;
+    --font-2xl: 1.25rem;
+    --font-3xl: 1.5rem;
   }
   
-  .dashboard-card:hover,
-  .clean-card:hover,
-  .btn-primary:hover,
-  .btn-secondary:hover {
-    transform: none !important; /* Disable transforms on mobile */
+  .card-header,
+  .card-content,
+  .card-footer {
+    padding: var(--space-4);
   }
   
-  /* Disable transitions on mobile for better performance */
-  * {
-    transition: none !important;
+  .btn {
+    padding: var(--space-3);
+    font-size: var(--font-sm);
+  }
+  
+  .tabs {
+    flex-direction: column;
   }
 }
 
-/* Reduce motion for accessibility and performance */
-@media (prefers-reduced-motion: reduce) {
+@media (max-width: 480px) {
+  .card-header,
+  .card-content,
+  .card-footer {
+    padding: var(--space-3);
+  }
+  
+  .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* Focus styles for accessibility */
+.btn:focus-visible,
+.input:focus-visible,
+.tab:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+}
+
+/* Selection styles */
+::selection {
+  background: var(--accent-primary);
+  color: var(--bg-primary);
+}
+
+/* Material-UI Override Styles for Black/White Theme */
+.MuiButton-contained {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+}
+
+.MuiButton-contained:hover {
+  background-color: #333333 !important;
+}
+
+.MuiButton-outlined {
+  border-color: #000000 !important;
+  color: #000000 !important;
+}
+
+.MuiButton-outlined:hover {
+  background-color: #f5f5f5 !important;
+}
+
+.MuiTab-root {
+  color: #666666 !important;
+}
+
+.MuiTab-root.Mui-selected {
+  color: #000000 !important;
+}
+
+.MuiTabs-indicator {
+  background-color: #000000 !important;
+}
+
+.MuiChip-root {
+  background-color: #f5f5f5 !important;
+  color: #000000 !important;
+}
+
+.MuiChip-filled {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+}
+
+.MuiIconButton-root {
+  color: #000000 !important;
+}
+
+.MuiAppBar-root {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+}
+
+.MuiPaper-root {
+  background-color: #ffffff !important;
+}
+
+/* Force override any blue colors */
+[style*="background-color: rgb(25, 118, 210)"] {
+  background-color: #000000 !important;
+}
+
+[style*="color: rgb(25, 118, 210)"] {
+  color: #000000 !important;
+}
+
+.css-*[class*="blue"],
+.css-*[class*="primary"] {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+}
+
+/* Override all linear gradients */
+[style*="linear-gradient"] {
+  background: #ffffff !important;
+}
+
+/* Override colorful backgrounds */
+[style*="rgba(102, 126, 234"],
+[style*="rgba(72, 187, 120"],
+[style*="rgba(66, 153, 225"],
+[style*="rgba(237, 137, 54"],
+[style*="#667eea"],
+[style*="#764ba2"],
+[style*="#48bb78"],
+[style*="#4299e1"],
+[style*="#ed8936"] {
+  background: #f5f5f5 !important;
+}
+
+/* Print styles */
+@media print {
   * {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
+    color: black !important;
+    background: white !important;
+    box-shadow: none !important;
   }
 }

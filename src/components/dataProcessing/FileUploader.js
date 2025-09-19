@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useMemo } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import Papa from 'papaparse';
 import * as XLSX from 'xlsx';
@@ -9,14 +9,7 @@ import {
   LinearProgress,
   Chip,
   IconButton,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemSecondaryAction,
-  Button,
-  Card,
-  CardContent,
-  Avatar
+  Button
 } from '@mui/material';
 import {
   CloudUpload,
@@ -174,13 +167,31 @@ const FileUploader = ({ onDataLoaded, onError }) => {
   const getFileIcon = (fileType) => {
     switch (fileType) {
       case 'CSV':
-        return <TableChart color="primary" />;
+        return <TableChart sx={{ color: '#000000' }} />;
       case 'Excel':
         return <InsertDriveFile color="success" />;
       case 'JSON':
-        return <DataObject color="secondary" />;
+        return <DataObject sx={{ color: '#000000' }} />;
       default:
         return <InsertDriveFile />;
+    }
+  };
+
+  const getFileTypeIcon = (fileType) => {
+    switch (fileType) {
+      case 'CSV': return <TableChart sx={{ fontSize: 20, color: 'white' }} />;
+      case 'Excel': return <InsertDriveFile sx={{ fontSize: 20, color: 'white' }} />;
+      case 'JSON': return <DataObject sx={{ fontSize: 20, color: 'white' }} />;
+      default: return <InsertDriveFile sx={{ fontSize: 20, color: 'white' }} />;
+    }
+  };
+
+  const getFileTypeColor = (fileType) => {
+    switch (fileType) {
+      case 'CSV': return '#000000';
+      case 'Excel': return '#333333';
+      case 'JSON': return '#666666';
+      default: return '#000000';
     }
   };
 
@@ -197,165 +208,257 @@ const FileUploader = ({ onDataLoaded, onError }) => {
 
   return (
     <Box sx={{ p: 3 }}>
-      {/* Clean Upload Zone */}
-      <Card
+      {/* Modern Upload Zone */}
+      <Paper
         {...getRootProps()}
-        className="clean-card"
+        className="modern-card"
         sx={{
-          p: 4,
-          border: isDragActive ? '2px solid #3b82f6' : '2px dashed #cbd5e1',
+          p: 6,
+          border: isDragActive ? '3px solid #000000' : '2px dashed #e0e0e0',
           cursor: 'pointer',
           textAlign: 'center',
-          mb: 3,
-          transition: 'all 0.2s ease',
-          transform: isDragActive ? 'scale(1.01)' : 'scale(1)',
-          minHeight: 180,
+          mb: 4,
+          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+          transform: isDragActive ? 'scale(1.02)' : 'scale(1)',
+          minHeight: 240,
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center',
           alignItems: 'center',
-          backgroundColor: isDragActive ? '#f0f9ff' : '#ffffff',
+          background: isDragActive 
+            ? '#f5f5f5'
+            : '#ffffff',
+          borderRadius: 3,
+          position: 'relative',
+          overflow: 'hidden',
         }}
       >
         <input {...getInputProps()} />
         
-        {/* Upload Icon */}
-        <Avatar
-          sx={{
-            width: 64,
-            height: 64,
-            backgroundColor: '#3b82f6',
-            mb: 2,
-          }}
-        >
-          <FileUpload sx={{ fontSize: 32, color: 'white' }} />
-        </Avatar>
+        {/* Enhanced Upload Icon */}
+        <Box sx={{ 
+          position: 'relative',
+          mb: 3,
+        }}>
+          <Box sx={{
+            width: 80,
+            height: 80,
+            borderRadius: '50%',
+            background: '#000000',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            boxShadow: '0 4px 16px rgba(0, 0, 0, 0.1)',
+            border: '2px solid #ffffff',
+          }}>
+            <CloudUpload sx={{ fontSize: 36, color: 'white' }} />
+          </Box>
+        </Box>
 
         <Typography 
-          variant="h6" 
-          className="text-primary"
-          sx={{ mb: 2, fontWeight: 600 }}
+          variant="h4" 
+          sx={{ 
+            mb: 2, 
+            fontWeight: 800,
+            color: '#000000',
+            letterSpacing: '-0.025em'
+          }}
         >
-          {isDragActive ? '📁 Drop Your Files Here' : '📊 Upload Data Files'}
+          {isDragActive ? 'Drop Files Here!' : 'Upload Your Data'}
         </Typography>
         
         <Typography 
-          variant="body2" 
-          className="text-secondary"
-          sx={{ mb: 2, maxWidth: 350 }}
+          variant="h6" 
+          color="text.secondary"
+          sx={{ 
+            mb: 4, 
+            maxWidth: 400,
+            fontWeight: 400,
+            lineHeight: 1.6
+          }}
         >
           {isDragActive 
-            ? 'Release to upload your data files'
-            : 'Drag and drop CSV, JSON, or Excel files, or click to browse'
+            ? 'Release to upload your data files and start exploring'
+            : 'Drag and drop your files or click to browse. We support multiple formats for maximum flexibility.'
           }
         </Typography>
 
-        {/* File Type Indicators */}
-        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', justifyContent: 'center' }}>
+        {/* Enhanced File Type Indicators */}
+        <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', justifyContent: 'center', mb: 3 }}>
           {[
-            { label: 'CSV', color: '#10b981' },
-            { label: 'JSON', color: '#f59e0b' },
-            { label: 'Excel', color: '#3b82f6' }
+            { label: 'CSV Files', icon: <TableChart />, color: '#000000' },
+            { label: 'JSON Data', icon: <DataObject />, color: '#333333' },
+            { label: 'Excel Files', icon: <InsertDriveFile />, color: '#666666' }
           ].map((type) => (
-            <Chip
+            <Box
               key={type.label}
-              label={type.label}
-              size="small"
-              sx={{ 
-                backgroundColor: type.color,
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1,
+                px: 2,
+                py: 1,
+                borderRadius: 2,
+                background: type.color,
                 color: 'white',
-                fontSize: '0.8rem',
-                fontWeight: 500
+                fontSize: '0.875rem',
+                fontWeight: 600,
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+                transition: 'transform 0.2s ease',
+                '&:hover': {
+                  transform: 'translateY(-2px)'
+                }
               }}
-            />
+            >
+              {type.icon}
+              {type.label}
+            </Box>
           ))}
         </Box>
-      </Card>
 
-      {/* Loading State */}
+        <Button
+          variant="contained"
+          size="large"
+          startIcon={<FileUpload />}
+          sx={{
+            px: 4,
+            py: 1.5,
+            borderRadius: 2,
+            background: '#000000',
+            boxShadow: '0 4px 16px rgba(0, 0, 0, 0.1)',
+            fontSize: '1rem',
+            fontWeight: 600,
+            textTransform: 'none',
+            '&:hover': {
+              background: '#333333',
+              transform: 'translateY(-2px)',
+              boxShadow: '0 6px 20px rgba(0, 0, 0, 0.15)'
+            }
+          }}
+        >
+          Choose Files
+        </Button>
+      </Paper>
+
+      {/* Enhanced Loading State */}
       {uploading && (
-        <Card className="clean-card" sx={{ p: 3, mb: 3 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-            <CloudUpload sx={{ mr: 2, color: '#3b82f6', fontSize: 20 }} />
-            <Typography variant="subtitle1" className="text-primary">
-              Processing Files...
-            </Typography>
+        <Paper className="modern-card" sx={{ p: 4, mb: 4, overflow: 'hidden' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+            <Box sx={{
+              width: 48,
+              height: 48,
+              borderRadius: '50%',
+              background: '#000000',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              mr: 2
+            }}>
+              <CloudUpload sx={{ color: 'white', fontSize: 24 }} />
+            </Box>
+            <Box>
+              <Typography variant="h6" sx={{ fontWeight: 700, color: 'primary.main' }}>
+                Processing Your Data
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Analyzing file structure and preparing preview...
+              </Typography>
+            </Box>
           </Box>
           <LinearProgress 
             sx={{
-              height: 6,
-              borderRadius: 3,
-              backgroundColor: '#f1f5f9',
+              height: 8,
+              borderRadius: 4,
+              backgroundColor: '#f5f5f5',
               '& .MuiLinearProgress-bar': {
-                backgroundColor: '#3b82f6',
-                borderRadius: 3,
+                background: '#000000',
+                borderRadius: 4,
               }
             }}
           />
-        </Card>
+        </Paper>
       )}
 
-      {/* File List */}
+      {/* Enhanced File List */}
       {uploadedFiles.length > 0 && (
-        <Card className="clean-card">
-          <CardContent>
-            <Typography variant="h6" className="text-primary" sx={{ mb: 2, fontWeight: 600 }}>
-              📁 Files ({uploadedFiles.length})
-            </Typography>
-            
+        <Paper className="modern-card" sx={{ p: 4 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+            <CheckCircle sx={{ color: 'success.main', mr: 2, fontSize: 28 }} />
+            <Box>
+              <Typography variant="h6" sx={{ fontWeight: 700, color: 'primary.main' }}>
+                Uploaded Files ({uploadedFiles.length})
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Successfully processed and ready for analysis
+              </Typography>
+            </Box>
+          </Box>
+          
+          <Box sx={{ mt: 2 }}>
             {uploadedFiles.map((file) => (
               <Box 
                 key={file.id}
-                className="clean-card"
+                className="modern-card"
                 sx={{ 
-                  p: 2, 
+                  p: 3, 
                   mb: 2,
                   display: 'flex',
                   alignItems: 'center',
                   transition: 'all 0.2s ease',
+                  background: '#ffffff',
+                  border: '1px solid #e0e0e0',
                   '&:hover': { 
                     transform: 'translateX(4px)',
-                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                    boxShadow: '0 6px 20px rgba(0, 0, 0, 0.1)'
                   }
                 }}
               >
-                <Avatar
-                  sx={{
-                    backgroundColor: '#f1f5f9',
-                    border: '1px solid #e2e8f0',
-                    mr: 2,
-                    width: 40,
-                    height: 40,
-                  }}
-                >
-                  {getFileIcon(file.fileType)}
-                </Avatar>
+                <Box sx={{
+                  width: 48,
+                  height: 48,
+                  borderRadius: 2,
+                  background: getFileTypeColor(file.fileType),
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  mr: 3
+                }}>
+                  {getFileTypeIcon(file.fileType)}
+                </Box>
                 
-                <Box sx={{ flexGrow: 1 }}>
-                  <Typography variant="subtitle2" className="text-primary" sx={{ fontWeight: 600 }}>
+                <Box sx={{ flex: 1 }}>
+                  <Typography variant="subtitle1" sx={{ fontWeight: 600, color: 'primary.main', mb: 0.5 }}>
                     {file.fileName}
                   </Typography>
-                  <Box sx={{ display: 'flex', gap: 1, mt: 0.5, flexWrap: 'wrap' }}>
+                  <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
                     <Chip
                       label={file.fileType}
                       size="small"
                       sx={{ 
-                        height: 20, 
-                        fontSize: '0.7rem',
-                        backgroundColor: '#f1f5f9',
-                        color: '#64748b',
-                        border: '1px solid #e2e8f0'
+                        background: getFileTypeColor(file.fileType),
+                        color: 'white',
+                        fontWeight: 600,
+                        fontSize: '0.75rem'
                       }}
                     />
                     <Chip
                       label={`${file.rowCount.toLocaleString()} rows`}
                       size="small"
                       sx={{ 
-                        height: 20, 
-                        fontSize: '0.7rem',
-                        backgroundColor: '#f1f5f9',
-                        color: '#64748b',
-                        border: '1px solid #e2e8f0'
+                        backgroundColor: '#f5f5f5',
+                        color: '#000000',
+                        fontWeight: 600,
+                        fontSize: '0.75rem'
+                      }}
+                    />
+                    <Chip
+                      label={`${file.columns.length} columns`}
+                      size="small"
+                      sx={{ 
+                        backgroundColor: '#f5f5f5',
+                        color: '#000000',
+                        fontWeight: 600,
+                        fontSize: '0.75rem'
                       }}
                     />
                   </Box>
@@ -363,34 +466,47 @@ const FileUploader = ({ onDataLoaded, onError }) => {
                 
                 <IconButton
                   onClick={() => removeFile(file.id)}
-                  size="small"
                   sx={{ 
-                    color: '#94a3b8',
+                    color: '#000000',
+                    background: '#f5f5f5',
                     '&:hover': {
-                      color: '#ef4444',
-                      backgroundColor: '#fef2f2',
-                    }
+                      background: '#e0e0e0',
+                      transform: 'scale(1.1)'
+                    },
+                    transition: 'all 0.2s ease'
                   }}
                 >
-                  <Delete fontSize="small" />
+                  <Delete />
                 </IconButton>
               </Box>
             ))}
-          </CardContent>
-        </Card>
+          </Box>
+        </Paper>
       )}
 
-      {/* Empty State */}
+      {/* Enhanced Empty State */}
       {uploadedFiles.length === 0 && !uploading && (
-        <Card className="clean-card" sx={{ p: 3, textAlign: 'center' }}>
-          <CheckCircle sx={{ fontSize: 40, color: '#94a3b8', mb: 1 }} />
-          <Typography variant="subtitle1" className="text-primary" sx={{ mb: 0.5 }}>
-            Ready for Data
+        <Paper className="modern-card" sx={{ p: 6, textAlign: 'center', background: '#ffffff' }}>
+          <Box sx={{
+            width: 64,
+            height: 64,
+            borderRadius: '50%',
+            background: '#f5f5f5',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            mx: 'auto',
+            mb: 2
+          }}>
+            <CheckCircle sx={{ fontSize: 32, color: 'primary.main' }} />
+          </Box>
+          <Typography variant="h6" sx={{ fontWeight: 700, color: 'primary.main', mb: 1 }}>
+            System Ready
           </Typography>
-          <Typography variant="body2" className="text-secondary">
-            Upload your first file to begin visualization
+          <Typography variant="body1" color="text.secondary">
+            Upload your data files to unlock powerful visualizations and AI insights
           </Typography>
-        </Card>
+        </Paper>
       )}
     </Box>
   );

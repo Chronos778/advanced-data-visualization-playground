@@ -8,7 +8,6 @@ import {
   CardContent,
   Grid,
   Chip,
-  IconButton,
   Accordion,
   AccordionSummary,
   AccordionDetails,
@@ -21,9 +20,7 @@ import {
   Button,
   Tooltip,
   CircularProgress,
-  Divider,
-  Stack,
-  useTheme
+  Stack
 } from '@mui/material';
 import {
   Psychology,
@@ -629,9 +626,9 @@ Format your response in clear, actionable insights that would be valuable for da
         <Paper sx={{ 
           p: 3, 
           mb: 3, 
-          background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+          background: '#ffffff',
           border: '2px solid',
-          borderColor: 'secondary.light',
+          borderColor: '#e0e0e0',
           borderRadius: 2
         }}>
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
@@ -734,7 +731,7 @@ Format your response in clear, actionable insights that would be valuable for da
                     }}
                   >
                     <Box sx={{ 
-                      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                      background: '#000000',
                       color: 'white',
                       p: 2
                     }}>

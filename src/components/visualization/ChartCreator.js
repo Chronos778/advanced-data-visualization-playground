@@ -18,7 +18,6 @@ import {
   Tab,
   Card,
   CardContent,
-  CardActions,
   Chip,
   Menu,
   MenuItem as MenuItemComponent,
@@ -28,7 +27,6 @@ import {
 import {
   Add,
   Delete,
-  Edit,
   ContentCopy,
   MoreVert,
   Fullscreen,
@@ -171,7 +169,7 @@ const ChartCreator = ({ uploadedFiles, cleanedData }) => {
       sizeBy: '',
       dataSource: null
     });
-  }, [newChart, charts.length, dataSources]);
+  }, [newChart, charts.length, dataSources, chartTypes]);
 
   const removeChart = useCallback((chartId) => {
     const chartIndex = charts.findIndex(chart => chart.id === chartId);
@@ -264,7 +262,7 @@ const ChartCreator = ({ uploadedFiles, cleanedData }) => {
 
           {/* Chart Tabs */}
           {charts.length > 0 && (
-            <Paper elevation={0} sx={{ backgroundColor: '#f8fafc', borderRadius: 2 }}>
+            <Paper elevation={0} sx={{ backgroundColor: '#ffffff', borderRadius: 2 }}>
               <Tabs
                 value={currentChartTab}
                 onChange={(event, newValue) => setCurrentChartTab(newValue)}
@@ -275,14 +273,14 @@ const ChartCreator = ({ uploadedFiles, cleanedData }) => {
                     textTransform: 'none',
                     fontWeight: 500,
                     minHeight: 48,
-                    color: '#64748b',
+                    color: '#666666',
                     '&.Mui-selected': {
-                      color: '#3b82f6',
+                      color: '#000000',
                       fontWeight: 600,
                     },
                   },
                   '& .MuiTabs-indicator': {
-                    backgroundColor: '#3b82f6',
+                    backgroundColor: '#000000',
                   },
                 }}
               >
@@ -300,8 +298,8 @@ const ChartCreator = ({ uploadedFiles, cleanedData }) => {
                           sx={{ 
                             height: 20, 
                             fontSize: '0.7rem',
-                            backgroundColor: '#e2e8f0',
-                            color: '#64748b'
+                            backgroundColor: '#f5f5f5',
+                            color: '#000000'
                           }}
                         />
                         <IconButton
@@ -358,7 +356,7 @@ const ChartCreator = ({ uploadedFiles, cleanedData }) => {
         </Card>
       ) : (
         <Card className="clean-card" sx={{ p: 6, textAlign: 'center' }}>
-          <BarChart sx={{ fontSize: 64, color: '#94a3b8', mb: 2 }} />
+          <BarChart sx={{ fontSize: 64, color: '#000000', mb: 2 }} />
           <Typography variant="h6" className="text-primary" sx={{ mb: 1 }}>
             No Charts Created Yet
           </Typography>
@@ -394,7 +392,7 @@ const ChartCreator = ({ uploadedFiles, cleanedData }) => {
         <Divider />
         <MenuItemComponent 
           onClick={() => { removeChart(menuChartId); handleMenuClose(); }}
-          sx={{ color: '#ef4444' }}
+          sx={{ color: '#000000' }}
         >
           <Delete sx={{ mr: 1 }} />
           Delete
@@ -423,7 +421,7 @@ const ChartCreator = ({ uploadedFiles, cleanedData }) => {
         <DialogContent>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, pt: 2 }}>
             {/* Help Text */}
-            <Paper sx={{ p: 2, backgroundColor: '#f8fafc', border: '1px solid #e2e8f0' }}>
+            <Paper sx={{ p: 2, backgroundColor: '#ffffff', border: '1px solid #e0e0e0' }}>
               <Typography variant="body2" color="text.secondary">
                 💡 <strong>Quick Guide:</strong> Choose Recharts for simple charts or Plotly for advanced 3D visualizations with interactive features.
                 {newChart.type === 'plotly' && ' Plotly supports Z-axis, color coding, and size encoding for complex data exploration.'}

@@ -61,16 +61,36 @@ const PlotlyChart = React.memo(({
       const plotData = getPlotlyData();
       const layout = getLayout();
       
+      // Enhanced config for 3D charts
+      const plotConfig = {
+        responsive: true,
+        displayModeBar: true,
+        modeBarButtonsToRemove: ['pan2d', 'lasso2d'],
+        displaylogo: false,
+        // Disable problematic features for 3D charts
+        ...(chartType === 'scatter3d' || chartType === 'surface') && {
+          modeBarButtonsToRemove: [
+            'pan2d', 'lasso2d', 'select2d', 'autoScale2d',
+            'toggleSpikelines', 'hoverClosestCartesian', 'hoverCompareCartesian'
+          ]
+        }
+      };
+      
       return (
         <Plot
           data={plotData}
           layout={layout}
-          config={{
-            responsive: true,
-            displayModeBar: true,
-            modeBarButtonsToRemove: ['pan2d', 'lasso2d'],
-            displaylogo: false
+          config={plotConfig}
+          onError={(error) => {
+            console.error('Plotly error:', error);
+            // Fallback to 2D chart if 3D fails
+            if (chartType === 'scatter3d' || chartType === 'surface') {
+              console.warn('3D chart failed, falling back to scatter plot');
+              // You could trigger a fallback to 2D here
+            }
           }}
+          useResizeHandler={true}
+          style={{ width: '100%', height: '100%' }}
         />
       );
     } catch (error) {
@@ -149,6 +169,27 @@ const PlotlyChart = React.memo(({
 
     try {
       const plotData = data.data;
+      
+      // Validate 3D chart requirements
+      if ((chartType === 'scatter3d' || chartType === 'surface') && !zAxis) {
+        console.warn(`${chartType} requires a Z-axis. Falling back to scatter plot.`);
+        // Fallback to 2D scatter
+        return [{
+          x: plotData.map(row => row[xAxis]),
+          y: plotData.map(row => row[yAxis]),
+          mode: 'markers',
+          type: 'scatter',
+          marker: {
+            size: sizeBy ? plotData.map(row => parseFloat(row[sizeBy]) || config.markerSize) : config.markerSize,
+            color: colorBy ? plotData.map(row => row[colorBy]) : '#1f77b4',
+            colorscale: config.colorScale,
+            opacity: config.opacity,
+            showscale: !!colorBy,
+            colorbar: colorBy ? { title: colorBy } : undefined
+          },
+          name: '2D Fallback'
+        }];
+      }
     
     switch (chartType) {
       case 'scatter':
@@ -532,11 +573,17 @@ const PlotlyChart = React.memo(({
       showgrid: config.showGrid,
       zeroline: false
     },
-    ...(chartType === 'scatter3d' && {
+    ...((chartType === 'scatter3d' || chartType === 'surface') && {
       scene: {
         xaxis: { title: xAxis },
         yaxis: { title: yAxis },
-        zaxis: { title: zAxis }
+        zaxis: { title: zAxis },
+        camera: {
+          eye: { x: 1.2, y: 1.2, z: 1.2 },
+          center: { x: 0, y: 0, z: 0 },
+          up: { x: 0, y: 0, z: 1 }
+        },
+        aspectmode: 'cube'
       }
     }),
     showlegend: config.showLegend,
@@ -563,10 +610,11 @@ const PlotlyChart = React.memo(({
   const chartTypeOptions = [
     { value: 'scatter', label: 'Scatter Plot', requiresZ: false },
     { value: 'bubble', label: 'Bubble Chart', requiresZ: false },
-    { value: 'scatter3d', label: '3D Scatter', requiresZ: true },
     { value: 'heatmap', label: 'Heatmap', requiresZ: true },
-    { value: 'contour', label: 'Contour Plot', requiresZ: true },
-    { value: 'surface', label: '3D Surface', requiresZ: true }
+    { value: 'contour', label: 'Contour Plot', requiresZ: true }
+    // Temporarily disabled 3D charts to prevent camera initialization errors
+    // { value: 'scatter3d', label: '3D Scatter', requiresZ: true },
+    // { value: 'surface', label: '3D Surface', requiresZ: true }
   ];
 
   const colorScales = [

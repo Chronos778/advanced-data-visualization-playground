@@ -108,11 +108,6 @@ const DataPreview = React.memo(({ data, title = "Data Preview" }) => {
     setPage(0);
   }, []);
 
-  const handleSearchChange = useCallback((event) => {
-    setSearchTerm(event.target.value);
-    setPage(0);
-  }, []);
-
   const formatCellValue = useCallback((value, column) => {
     if (value === null || value === undefined) {
       return <Chip label="NULL" size="small" variant="outlined" color="default" />;
@@ -167,13 +162,42 @@ const DataPreview = React.memo(({ data, title = "Data Preview" }) => {
 
   if (!data || !data.data) {
     return (
-      <Paper sx={{ p: 3, textAlign: 'center' }}>
-        <Typography variant="h6" color="text.secondary">
-          No data to preview
+      <Paper className="modern-card" sx={{ p: 6, textAlign: 'center' }}>
+        <Box sx={{
+          width: 80,
+          height: 80,
+          borderRadius: '50%',
+          background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          mx: 'auto',
+          mb: 3
+        }}>
+          <TableChart sx={{ fontSize: 40, color: '#000000' }} />
+        </Box>
+        <Typography variant="h5" sx={{ 
+          fontWeight: 700, 
+          color: 'primary.main',
+          mb: 2
+        }}>
+          No Data Available
         </Typography>
-        <Typography variant="body2" color="text.secondary">
-          Upload a data file to see its contents here
+        <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
+          Upload a data file to see its detailed preview and analysis
         </Typography>
+        <Box sx={{
+          px: 3,
+          py: 1.5,
+          borderRadius: 2,
+          background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%)',
+          border: '1px solid rgba(102, 126, 234, 0.2)',
+          display: 'inline-block'
+        }}>
+          <Typography variant="body2" sx={{ fontWeight: 600, color: 'primary.main' }}>
+            Ready to analyze your data
+          </Typography>
+        </Box>
       </Paper>
     );
   }
@@ -183,64 +207,192 @@ const DataPreview = React.memo(({ data, title = "Data Preview" }) => {
 
   return (
     <Box>
-      {/* Performance Warning for Large Datasets */}
+      {/* Enhanced Performance Warning for Large Datasets */}
       {processedData.isLimited && (
-        <Box sx={{ mb: 2 }}>
-          <Chip 
-            label={`Showing first ${processedData.data.length.toLocaleString()} of ${processedData.totalRows.toLocaleString()} rows (optimized for performance)`}
-            color="warning" 
-            variant="outlined"
-            icon={<Info />}
-            sx={{ mb: 1 }}
-          />
+        <Box sx={{ mb: 3 }}>
+          <Paper className="modern-card" sx={{ 
+            p: 3,
+            background: 'linear-gradient(135deg, rgba(237, 137, 54, 0.1) 0%, rgba(221, 107, 32, 0.1) 100%)',
+            border: '1px solid rgba(237, 137, 54, 0.2)'
+          }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <Box sx={{
+                width: 40,
+                height: 40,
+                borderRadius: '50%',
+                background: '#000000',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                <Info sx={{ color: 'white', fontSize: 20 }} />
+              </Box>
+              <Box>
+                <Typography variant="h6" sx={{ fontWeight: 700, color: '#000000', mb: 0.5 }}>
+                  Performance Optimization Active
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Showing first {processedData.data.length.toLocaleString()} of {processedData.totalRows.toLocaleString()} rows for optimal performance
+                </Typography>
+              </Box>
+            </Box>
+          </Paper>
         </Box>
       )}
       
-      {/* Data Summary Cards */}
-      <Grid container spacing={2} sx={{ mb: 3 }}>
+      {/* Enhanced Data Summary Cards */}
+      <Grid container spacing={3} sx={{ mb: 4 }}>
         <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent sx={{ textAlign: 'center' }}>
-              <Typography variant="h4" color="primary">
+          <Card className="modern-card" sx={{ 
+            background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%)',
+            border: '1px solid rgba(102, 126, 234, 0.2)',
+            transition: 'transform 0.2s ease',
+            '&:hover': { 
+              transform: 'translateY(-4px)',
+              boxShadow: '0 8px 32px rgba(102, 126, 234, 0.2)'
+            }
+          }}>
+            <CardContent sx={{ textAlign: 'center', p: 3 }}>
+              <Box sx={{
+                width: 56,
+                height: 56,
+                borderRadius: '50%',
+                background: '#000000',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                mx: 'auto',
+                mb: 2
+              }}>
+                <TableChart sx={{ color: 'white', fontSize: 28 }} />
+              </Box>
+              <Typography variant="h3" sx={{ 
+                fontWeight: 800,
+                color: '#000000',
+                mb: 1
+              }}>
                 {processedData.totalRows.toLocaleString()}
               </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Total Rows {processedData.isLimited && `(${processedData.data.length.toLocaleString()} shown)`}
+              <Typography variant="body1" sx={{ fontWeight: 600, color: 'text.primary' }}>
+                Total Rows
               </Typography>
+              {processedData.isLimited && (
+                <Typography variant="caption" color="text.secondary">
+                  ({processedData.data.length.toLocaleString()} shown)
+                </Typography>
+              )}
             </CardContent>
           </Card>
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent sx={{ textAlign: 'center' }}>
-              <Typography variant="h4" color="secondary">
+          <Card className="modern-card" sx={{ 
+            background: 'linear-gradient(135deg, rgba(72, 187, 120, 0.1) 0%, rgba(56, 161, 105, 0.1) 100%)',
+            border: '1px solid rgba(72, 187, 120, 0.2)',
+            transition: 'transform 0.2s ease',
+            '&:hover': { 
+              transform: 'translateY(-4px)',
+              boxShadow: '0 8px 32px rgba(72, 187, 120, 0.2)'
+            }
+          }}>
+            <CardContent sx={{ textAlign: 'center', p: 3 }}>
+              <Box sx={{
+                width: 56,
+                height: 56,
+                borderRadius: '50%',
+                background: '#333333',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                mx: 'auto',
+                mb: 2
+              }}>
+                <Assessment sx={{ color: 'white', fontSize: 28 }} />
+              </Box>
+              <Typography variant="h3" sx={{ 
+                fontWeight: 800,
+                color: '#333333',
+                mb: 1
+              }}>
                 {columns.length}
               </Typography>
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body1" sx={{ fontWeight: 600, color: 'text.primary' }}>
                 Columns
               </Typography>
             </CardContent>
           </Card>
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent sx={{ textAlign: 'center' }}>
-              <Typography variant="h4" color="success.main">
+          <Card className="modern-card" sx={{ 
+            background: 'linear-gradient(135deg, rgba(66, 153, 225, 0.1) 0%, rgba(49, 130, 206, 0.1) 100%)',
+            border: '1px solid rgba(66, 153, 225, 0.2)',
+            transition: 'transform 0.2s ease',
+            '&:hover': { 
+              transform: 'translateY(-4px)',
+              boxShadow: '0 8px 32px rgba(66, 153, 225, 0.2)'
+            }
+          }}>
+            <CardContent sx={{ textAlign: 'center', p: 3 }}>
+              <Box sx={{
+                width: 56,
+                height: 56,
+                borderRadius: '50%',
+                background: '#666666',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                mx: 'auto',
+                mb: 2
+              }}>
+                <TrendingUp sx={{ color: 'white', fontSize: 28 }} />
+              </Box>
+              <Typography variant="h3" sx={{ 
+                fontWeight: 800,
+                color: '#666666',
+                mb: 1
+              }}>
                 {columns.filter(col => stats[col]?.isNumeric).length}
               </Typography>
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body1" sx={{ fontWeight: 600, color: 'text.primary' }}>
                 Numeric Columns
               </Typography>
             </CardContent>
           </Card>
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent sx={{ textAlign: 'center' }}>
-              <Typography variant="h4" color="info.main">
+          <Card className="modern-card" sx={{ 
+            background: 'linear-gradient(135deg, rgba(237, 137, 54, 0.1) 0%, rgba(221, 107, 32, 0.1) 100%)',
+            border: '1px solid rgba(237, 137, 54, 0.2)',
+            transition: 'transform 0.2s ease',
+            '&:hover': { 
+              transform: 'translateY(-4px)',
+              boxShadow: '0 8px 32px rgba(237, 137, 54, 0.2)'
+            }
+          }}>
+            <CardContent sx={{ textAlign: 'center', p: 3 }}>
+              <Box sx={{
+                width: 56,
+                height: 56,
+                borderRadius: '50%',
+                background: 'linear-gradient(135deg, #ed8936 0%, #dd6b20 100%)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                mx: 'auto',
+                mb: 2
+              }}>
+                <Search sx={{ color: 'white', fontSize: 28 }} />
+              </Box>
+              <Typography variant="h3" sx={{ 
+                fontWeight: 800,
+                background: 'linear-gradient(135deg, #ed8936 0%, #dd6b20 100%)',
+                backgroundClip: 'text',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                mb: 1
+              }}>
                 {Math.round((filteredData.length / data.data.length) * 100)}%
               </Typography>
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body1" sx={{ fontWeight: 600, color: 'text.primary' }}>
                 Visible Data
               </Typography>
             </CardContent>
@@ -248,22 +400,47 @@ const DataPreview = React.memo(({ data, title = "Data Preview" }) => {
         </Grid>
       </Grid>
 
-      <Paper>
-        {/* Header */}
-        <Box sx={{ p: 2, borderBottom: '1px solid', borderColor: 'divider' }}>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-            <Typography variant="h6">{title}</Typography>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+      <Paper className="modern-card" sx={{ overflow: 'hidden' }}>
+        {/* Enhanced Header */}
+        <Box sx={{ 
+          p: 4, 
+          borderBottom: '1px solid', 
+          borderColor: 'divider',
+          background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%)'
+        }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+            <Box>
+              <Typography variant="h4" sx={{ 
+                fontWeight: 800,
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                backgroundClip: 'text',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                mb: 1
+              }}>
+                {title}
+              </Typography>
+              <Typography variant="body1" color="text.secondary">
+                Explore and analyze your data in detail
+              </Typography>
+            </Box>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               <Chip 
                 label={`${filteredData.length} of ${data.data.length} rows`}
-                size="small"
-                color="primary"
+                sx={{
+                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  color: 'white',
+                  fontWeight: 600
+                }}
               />
               {data.fileName && (
                 <Chip 
                   label={data.fileName}
-                  size="small"
-                  variant="outlined"
+                  sx={{
+                    background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%)',
+                    border: '1px solid rgba(102, 126, 234, 0.2)',
+                    fontWeight: 600
+                  }}
                 />
               )}
             </Box>
@@ -271,45 +448,80 @@ const DataPreview = React.memo(({ data, title = "Data Preview" }) => {
           
           <TextField
             fullWidth
-            size="small"
-            placeholder="Search in all columns..."
+            placeholder="Search across all columns and data..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                borderRadius: 3,
+                background: 'white',
+                transition: 'all 0.2s ease',
+                '&:hover': {
+                  boxShadow: '0 4px 16px rgba(102, 126, 234, 0.1)'
+                },
+                '&.Mui-focused': {
+                  boxShadow: '0 4px 20px rgba(102, 126, 234, 0.2)',
+                  '& fieldset': {
+                    borderColor: '#667eea'
+                  }
+                }
+              }
+            }}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <Search />
+                  <Search sx={{ color: '#667eea' }} />
                 </InputAdornment>
               ),
             }}
           />
         </Box>
 
-        {/* Table */}
+        {/* Enhanced Table */}
         <TableContainer sx={{ maxHeight: 600 }}>
           <Table stickyHeader>
             <TableHead>
               <TableRow>
-                <TableCell sx={{ backgroundColor: 'background.paper', fontWeight: 'bold', minWidth: 50 }}>
-                  #
+                <TableCell sx={{ 
+                  background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
+                  fontWeight: 'bold', 
+                  minWidth: 60,
+                  borderBottom: '2px solid #e2e8f0'
+                }}>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 700, color: 'primary.main' }}>
+                    #
+                  </Typography>
                 </TableCell>
                 {columns.map((column) => (
                   <TableCell
                     key={column}
                     sx={{
-                      backgroundColor: 'background.paper',
+                      background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
                       fontWeight: 'bold',
-                      minWidth: 120,
-                      maxWidth: 200
+                      minWidth: 140,
+                      maxWidth: 220,
+                      borderBottom: '2px solid #e2e8f0'
                     }}
                   >
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      {getColumnIcon(column)}
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                      <Box sx={{
+                        width: 32,
+                        height: 32,
+                        borderRadius: 2,
+                        background: stats[column]?.isNumeric 
+                          ? 'linear-gradient(135deg, #4299e1 0%, #3182ce 100%)'
+                          : 'linear-gradient(135deg, #48bb78 0%, #38a169 100%)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}>
+                        {getColumnIcon(column)}
+                      </Box>
                       <Box sx={{ flex: 1, minWidth: 0 }}>
-                        <Typography variant="subtitle2" noWrap>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 700, color: 'primary.main' }} noWrap>
                           {column}
                         </Typography>
-                        <Typography variant="caption" color="text.secondary">
+                        <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>
                           {stats[column]?.isNumeric ? 'Numeric' : 'Text'} • 
                           {stats[column]?.uniqueCount} unique
                         </Typography>
@@ -317,7 +529,9 @@ const DataPreview = React.memo(({ data, title = "Data Preview" }) => {
                       {getTrendIcon(column)}
                       <Tooltip title={
                         <Box>
-                          <Typography variant="body2">Column Statistics:</Typography>
+                          <Typography variant="body2" sx={{ fontWeight: 600, mb: 1 }}>
+                            Column Statistics:
+                          </Typography>
                           <Typography variant="caption">
                             • Total: {stats[column]?.totalCount}<br/>
                             • Non-null: {stats[column]?.nonNullCount}<br/>
@@ -333,8 +547,18 @@ const DataPreview = React.memo(({ data, title = "Data Preview" }) => {
                           </Typography>
                         </Box>
                       }>
-                        <IconButton size="small">
-                          <Info sx={{ fontSize: 14 }} />
+                        <IconButton 
+                          size="small"
+                          sx={{
+                            background: 'rgba(102, 126, 234, 0.1)',
+                            '&:hover': {
+                              background: 'rgba(102, 126, 234, 0.2)',
+                              transform: 'scale(1.1)'
+                            },
+                            transition: 'all 0.2s ease'
+                          }}
+                        >
+                          <Info sx={{ fontSize: 16, color: '#667eea' }} />
                         </IconButton>
                       </Tooltip>
                     </Box>
@@ -344,12 +568,27 @@ const DataPreview = React.memo(({ data, title = "Data Preview" }) => {
             </TableHead>
             <TableBody>
               {paginatedData.map((row, index) => (
-                <TableRow key={page * rowsPerPage + index} hover>
-                  <TableCell sx={{ fontWeight: 'bold', color: 'text.secondary' }}>
+                <TableRow 
+                  key={page * rowsPerPage + index} 
+                  hover
+                  sx={{
+                    '&:hover': {
+                      background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.03) 0%, rgba(118, 75, 162, 0.03) 100%)'
+                    },
+                    '&:nth-of-type(even)': {
+                      backgroundColor: 'rgba(102, 126, 234, 0.01)'
+                    }
+                  }}
+                >
+                  <TableCell sx={{ 
+                    fontWeight: 'bold', 
+                    color: 'primary.main',
+                    background: 'rgba(102, 126, 234, 0.05)'
+                  }}>
                     {page * rowsPerPage + index + 1}
                   </TableCell>
                   {columns.map((column) => (
-                    <TableCell key={column} sx={{ maxWidth: 200 }}>
+                    <TableCell key={column} sx={{ maxWidth: 220 }}>
                       {formatCellValue(row[column], column)}
                     </TableCell>
                   ))}
@@ -359,16 +598,41 @@ const DataPreview = React.memo(({ data, title = "Data Preview" }) => {
           </Table>
         </TableContainer>
 
-        {/* Pagination */}
-        <TablePagination
-          rowsPerPageOptions={[5, 10, 25, 50, 100]}
-          component="div"
-          count={filteredData.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
+        {/* Enhanced Pagination */}
+        <Box sx={{ 
+          p: 3, 
+          borderTop: '1px solid #e2e8f0',
+          background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)'
+        }}>
+          <TablePagination
+            rowsPerPageOptions={[5, 10, 25, 50, 100]}
+            component="div"
+            count={filteredData.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+            sx={{
+              '& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows': {
+                fontWeight: 600,
+                color: 'primary.main'
+              },
+              '& .MuiTablePagination-select': {
+                borderRadius: 2,
+                border: '1px solid rgba(102, 126, 234, 0.2)',
+                '&:focus': {
+                  borderColor: '#667eea'
+                }
+              },
+              '& .MuiIconButton-root': {
+                borderRadius: 2,
+                '&:hover': {
+                  background: 'rgba(102, 126, 234, 0.1)'
+                }
+              }
+            }}
+          />
+        </Box>
       </Paper>
     </Box>
   );
