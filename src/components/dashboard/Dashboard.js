@@ -9,32 +9,23 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  TextField,
   Alert,
   Chip,
   Tabs,
-  Tab,
-  Card,
-  CardContent
+  Tab
 } from '@mui/material';
 import {
   Add,
   Delete,
   Edit,
-  Download,
-  BarChart,
-  ShowChart,
-  PieChart,
-  ScatterPlot,
-  Insights
+  Download
 } from '@mui/icons-material';
 import ChartComponent from '../charts/ChartComponent';
 import PlotlyChart from '../charts/PlotlyChart';
+import RawGraphsChart from '../charts/RawGraphsChart';
 import ChartTypeGrid from '../charts/ChartTypeGrid';
+import DynamicChartConfig from '../charts/DynamicChartConfig';
+import { validateChartConfig } from '../charts/ChartConfigurations';
 
 // Custom TabPanel component
 function CustomTabPanel(props) {
@@ -67,31 +58,9 @@ const Dashboard = ({ data, onExport }) => {
     type: 'chart',
     chartType: 'line',
     library: 'recharts',
-    title: '',
-    xAxis: '',
-    yAxis: '',
-    zAxis: '',
-    colorBy: '',
-    sizeBy: ''
+    title: ''
   });
 
-  const chartTypes = {
-    recharts: [
-      { value: 'line', label: 'Line Chart', icon: <ShowChart /> },
-      { value: 'bar', label: 'Bar Chart', icon: <BarChart /> },
-      { value: 'scatter', label: 'Scatter Plot', icon: <ScatterPlot /> },
-      { value: 'pie', label: 'Pie Chart', icon: <PieChart /> },
-      { value: 'area', label: 'Area Chart', icon: <ShowChart /> }
-    ],
-    plotly: [
-      { value: 'scatter', label: 'Scatter Plot', icon: <ScatterPlot /> },
-      { value: 'bubble', label: 'Bubble Chart', icon: <ScatterPlot /> },
-      { value: 'scatter3d', label: '3D Scatter', icon: <Insights /> },
-      { value: 'heatmap', label: 'Heatmap', icon: <Insights /> },
-      { value: 'contour', label: 'Contour Plot', icon: <Insights /> },
-      { value: 'surface', label: '3D Surface', icon: <Insights /> }
-    ]
-  };
 
   const availableColumns = data && data.columns ? data.columns : [];
   const numericColumns = React.useMemo(() => {
@@ -102,10 +71,19 @@ const Dashboard = ({ data, onExport }) => {
     });
   }, [availableColumns, data]);
 
+  const dateColumns = React.useMemo(() => {
+    if (!data || !data.data || data.data.length === 0) return [];
+    return availableColumns.filter(col => {
+      const sampleValue = data.data[0][col];
+      return !isNaN(Date.parse(sampleValue));
+    });
+  }, [availableColumns, data]);
+
   const generateId = () => `widget_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
   const addWidget = useCallback(() => {
-    if (!newWidget.title || !newWidget.xAxis || !newWidget.yAxis) {
+    // Use dynamic validation from ChartConfigurations
+    if (!validateChartConfig(newWidget.chartType, newWidget)) {
       return;
     }
 
@@ -125,12 +103,7 @@ const Dashboard = ({ data, onExport }) => {
       type: 'chart',
       chartType: 'line',
       library: 'recharts',
-      title: '',
-      xAxis: '',
-      yAxis: '',
-      zAxis: '',
-      colorBy: '',
-      sizeBy: ''
+      title: ''
     });
     setDialogStep(0);
     setAddWidgetOpen(false);
@@ -203,12 +176,7 @@ const Dashboard = ({ data, onExport }) => {
       type: 'chart',
       chartType: 'line',
       library: 'recharts',
-      title: '',
-      xAxis: '',
-      yAxis: '',
-      zAxis: '',
-      colorBy: '',
-      sizeBy: ''
+      title: ''
     });
   };
 
@@ -220,6 +188,26 @@ const Dashboard = ({ data, onExport }) => {
         if (widget.library === 'plotly') {
           return (
             <PlotlyChart
+              data={widgetData}
+              chartType={widget.chartType}
+              title={widget.title}
+              xAxis={widget.xAxis}
+              yAxis={widget.yAxis}
+              zAxis={widget.zAxis}
+              colorBy={widget.colorBy}
+              sizeBy={widget.sizeBy}
+              chartConfig={widget.config}
+              onConfigChange={(config) => updateWidget(widget.id, { config })}
+              onExport={(format) => {
+                if (onExport) {
+                  onExport(widget.id, format);
+                }
+              }}
+            />
+          );
+        } else if (widget.library === 'rawgraphs') {
+          return (
+            <RawGraphsChart
               data={widgetData}
               chartType={widget.chartType}
               title={widget.title}
@@ -460,92 +448,14 @@ const Dashboard = ({ data, onExport }) => {
 
           {/* Step 1: Configuration */}
           {dialogStep === 1 && (
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
-              <TextField
-                fullWidth
-                label="Chart Title"
-                value={newWidget.title}
-                onChange={(e) => setNewWidget(prev => ({ ...prev, title: e.target.value }))}
-                placeholder="Enter a descriptive title for your chart"
-              />
-              
-              <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
-                <FormControl fullWidth>
-                  <InputLabel>X-Axis</InputLabel>
-                  <Select
-                    value={newWidget.xAxis}
-                    label="X-Axis"
-                    onChange={(e) => setNewWidget(prev => ({ ...prev, xAxis: e.target.value }))}
-                  >
-                    {availableColumns.map(col => (
-                      <MenuItem key={col} value={col}>{col}</MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-
-                <FormControl fullWidth>
-                  <InputLabel>Y-Axis</InputLabel>
-                  <Select
-                    value={newWidget.yAxis}
-                    label="Y-Axis"
-                    onChange={(e) => setNewWidget(prev => ({ ...prev, yAxis: e.target.value }))}
-                  >
-                    {newWidget.chartType === 'pie' ? availableColumns.map(col => (
-                      <MenuItem key={col} value={col}>{col}</MenuItem>
-                    )) : numericColumns.map(col => (
-                      <MenuItem key={col} value={col}>{col}</MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Box>
-
-              {newWidget.library === 'plotly' && ['scatter3d', 'heatmap', 'contour', 'surface'].includes(newWidget.chartType) && (
-                <FormControl fullWidth>
-                  <InputLabel>Z-Axis</InputLabel>
-                  <Select
-                    value={newWidget.zAxis}
-                    label="Z-Axis"
-                    onChange={(e) => setNewWidget(prev => ({ ...prev, zAxis: e.target.value }))}
-                  >
-                    {numericColumns.map(col => (
-                      <MenuItem key={col} value={col}>{col}</MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              )}
-
-              <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
-                <FormControl fullWidth>
-                  <InputLabel>Color By (Optional)</InputLabel>
-                  <Select
-                    value={newWidget.colorBy}
-                    label="Color By (Optional)"
-                    onChange={(e) => setNewWidget(prev => ({ ...prev, colorBy: e.target.value }))}
-                  >
-                    <MenuItem value="">None</MenuItem>
-                    {availableColumns.map(col => (
-                      <MenuItem key={col} value={col}>{col}</MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-
-                {(newWidget.chartType === 'scatter' || newWidget.chartType === 'bubble') && (
-                  <FormControl fullWidth>
-                    <InputLabel>Size By (Optional)</InputLabel>
-                    <Select
-                      value={newWidget.sizeBy}
-                      label="Size By (Optional)"
-                      onChange={(e) => setNewWidget(prev => ({ ...prev, sizeBy: e.target.value }))}
-                    >
-                      <MenuItem value="">None</MenuItem>
-                      {numericColumns.map(col => (
-                        <MenuItem key={col} value={col}>{col}</MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                )}
-              </Box>
-            </Box>
+            <DynamicChartConfig
+              chartType={newWidget.chartType}
+              config={newWidget}
+              onConfigChange={(updates) => setNewWidget(prev => ({ ...prev, ...updates }))}
+              availableColumns={availableColumns}
+              numericColumns={numericColumns}
+              dateColumns={dateColumns}
+            />
           )}
         </DialogContent>
         <DialogActions>
@@ -557,7 +467,7 @@ const Dashboard = ({ data, onExport }) => {
             <Button 
               onClick={addWidget} 
               variant="contained"
-              disabled={!newWidget.title || !newWidget.xAxis || !newWidget.yAxis}
+              disabled={!validateChartConfig(newWidget.chartType, newWidget)}
             >
               Add Chart
             </Button>
@@ -575,44 +485,14 @@ const Dashboard = ({ data, onExport }) => {
         <DialogTitle>Edit Chart</DialogTitle>
         <DialogContent>
           {editWidget && (
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
-              <TextField
-                fullWidth
-                label="Chart Title"
-                value={editWidget.title}
-                onChange={(e) => setEditWidget(prev => ({ ...prev, title: e.target.value }))}
-              />
-              
-              <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
-                <FormControl fullWidth>
-                  <InputLabel>X-Axis</InputLabel>
-                  <Select
-                    value={editWidget.xAxis}
-                    label="X-Axis"
-                    onChange={(e) => setEditWidget(prev => ({ ...prev, xAxis: e.target.value }))}
-                  >
-                    {availableColumns.map(col => (
-                      <MenuItem key={col} value={col}>{col}</MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-
-                <FormControl fullWidth>
-                  <InputLabel>Y-Axis</InputLabel>
-                  <Select
-                    value={editWidget.yAxis}
-                    label="Y-Axis"
-                    onChange={(e) => setEditWidget(prev => ({ ...prev, yAxis: e.target.value }))}
-                  >
-                    {editWidget.chartType === 'pie' ? availableColumns.map(col => (
-                      <MenuItem key={col} value={col}>{col}</MenuItem>
-                    )) : numericColumns.map(col => (
-                      <MenuItem key={col} value={col}>{col}</MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Box>
-            </Box>
+            <DynamicChartConfig
+              chartType={editWidget.chartType}
+              config={editWidget}
+              onConfigChange={(updates) => setEditWidget(prev => ({ ...prev, ...updates }))}
+              availableColumns={availableColumns}
+              numericColumns={numericColumns}
+              dateColumns={dateColumns}
+            />
           )}
         </DialogContent>
         <DialogActions>
@@ -623,6 +503,7 @@ const Dashboard = ({ data, onExport }) => {
               setEditWidget(null);
             }}
             variant="contained"
+            disabled={editWidget && !validateChartConfig(editWidget.chartType, editWidget)}
           >
             Save Changes
           </Button>

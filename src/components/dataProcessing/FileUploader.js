@@ -49,6 +49,30 @@ const FileUploader = ({ onDataLoaded, onError }) => {
     });
   };
 
+  const processTSV = (file) => {
+    return new Promise((resolve, reject) => {
+      Papa.parse(file, {
+        header: true,
+        delimiter: '\t', // Tab delimiter for TSV
+        skipEmptyLines: true,
+        complete: (results) => {
+          if (results.errors.length > 0) {
+            reject(new Error(`TSV parsing error: ${results.errors[0].message}`));
+          } else {
+            resolve({
+              data: results.data,
+              columns: results.meta.fields,
+              fileName: file.name,
+              fileType: 'TSV',
+              rowCount: results.data.length
+            });
+          }
+        },
+        error: (error) => reject(error)
+      });
+    });
+  };
+
   const processExcel = (file) => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -134,6 +158,9 @@ const FileUploader = ({ onDataLoaded, onError }) => {
           case 'csv':
             processedData = await processCSV(file);
             break;
+          case 'tsv':
+            processedData = await processTSV(file);
+            break;
           case 'xlsx':
           case 'xls':
             processedData = await processExcel(file);
@@ -169,6 +196,8 @@ const FileUploader = ({ onDataLoaded, onError }) => {
     switch (fileType) {
       case 'CSV':
         return <TableChart color="primary" />;
+      case 'TSV':
+        return <TableChart color="primary" />;
       case 'Excel':
         return <InsertDriveFile color="success" />;
       case 'JSON':
@@ -182,6 +211,7 @@ const FileUploader = ({ onDataLoaded, onError }) => {
     onDrop,
     accept: {
       'text/csv': ['.csv'],
+      'text/tab-separated-values': ['.tsv'],
       'application/json': ['.json'],
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'],
       'application/vnd.ms-excel': ['.xls']
@@ -210,10 +240,11 @@ const FileUploader = ({ onDataLoaded, onError }) => {
           {isDragActive ? 'Drop files here...' : 'Upload Data Files'}
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          Drag and drop CSV, JSON, or Excel files here, or click to browse
+          Drag and drop CSV, TSV, JSON, or Excel files here, or click to browse
         </Typography>
         <Box sx={{ mt: 2 }}>
           <Chip label="CSV" size="small" sx={{ mr: 1 }} />
+          <Chip label="TSV" size="small" sx={{ mr: 1 }} />
           <Chip label="JSON" size="small" sx={{ mr: 1 }} />
           <Chip label="Excel" size="small" />
         </Box>
