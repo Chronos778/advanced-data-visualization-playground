@@ -273,7 +273,7 @@ const ChartCreator = ({ uploadedFiles, cleanedData }) => {
                     textTransform: 'none',
                     fontWeight: 500,
                     minHeight: 48,
-                    color: '#666666',
+                    color: '#000000',
                     '&.Mui-selected': {
                       color: '#000000',
                       fontWeight: 600,

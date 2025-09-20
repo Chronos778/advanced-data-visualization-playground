@@ -1,4 +1,4 @@
-﻿import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import RGL, { WidthProvider } from 'react-grid-layout';
 import {
   Box,
@@ -269,13 +269,13 @@ const Dashboard = ({ data, onExport }) => {
         p: 4, 
         mb: 4,
         background: '#ffffff',
-        border: '1px solid #e0e0e0'
+        border: '1px solid #ffffff'
       }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
           <Box>
             <Typography variant="h3" sx={{ 
               fontWeight: 800,
-              color: '#000000',
+              color: '#ffffff',
               WebkitTextFillColor: 'transparent',
               mb: 1
             }}>
@@ -295,18 +295,18 @@ const Dashboard = ({ data, onExport }) => {
                 px: 3,
                 py: 1.5,
                 borderRadius: 2,
-                border: '2px solid #667eea',
-                color: '#667eea',
+                border: '2px solid #ffffff',
+                color: '#ffffff',
                 fontWeight: 600,
                 textTransform: 'none',
                 '&:hover': {
-                  background: 'rgba(102, 126, 234, 0.1)',
-                  border: '2px solid #5a6acf',
+                  background: 'rgba(0, 0, 0, 0.1)',
+                  border: '2px solid #ffffff',
                   transform: 'translateY(-2px)'
                 },
                 '&:disabled': {
-                  border: '2px solid #e2e8f0',
-                  color: '#a0aec0'
+                  border: '2px solid #ffffff',
+                  color: '#ffffff'
                 }
               }}
             >
@@ -320,15 +320,15 @@ const Dashboard = ({ data, onExport }) => {
                 px: 3,
                 py: 1.5,
                 borderRadius: 2,
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                boxShadow: '0 4px 16px rgba(102, 126, 234, 0.4)',
+                background: '#ffffff',
+                boxShadow: '0 4px 16px rgba(0, 0, 0, 0.1)',
                 fontSize: '1rem',
                 fontWeight: 600,
                 textTransform: 'none',
                 '&:hover': {
-                  background: 'linear-gradient(135deg, #5a6acf 0%, #6b4489 100%)',
+                  background: '#ffffff',
                   transform: 'translateY(-2px)',
-                  boxShadow: '0 6px 20px rgba(102, 126, 234, 0.6)'
+                  boxShadow: '0 6px 20px rgba(0, 0, 0, 0.1)'
                 }
               }}
             >
@@ -344,7 +344,7 @@ const Dashboard = ({ data, onExport }) => {
               width: 40,
               height: 40,
               borderRadius: 2,
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              background: '#ffffff',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center'
@@ -366,7 +366,7 @@ const Dashboard = ({ data, onExport }) => {
                 width: 40,
                 height: 40,
                 borderRadius: 2,
-                background: 'linear-gradient(135deg, #48bb78 0%, #38a169 100%)',
+                background: '#ffffff',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center'
@@ -388,7 +388,7 @@ const Dashboard = ({ data, onExport }) => {
               width: 40,
               height: 40,
               borderRadius: 2,
-              background: 'linear-gradient(135deg, #4299e1 0%, #3182ce 100%)',
+              background: '#ffffff',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center'
@@ -435,18 +435,18 @@ const Dashboard = ({ data, onExport }) => {
             width: 120,
             height: 120,
             borderRadius: '50%',
-            background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%)',
+            background: '#ffffff 0%, rgba(0, 0, 0, 0.1) 100%)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             mx: 'auto',
             mb: 4
           }}>
-            <BarChart sx={{ fontSize: 60, color: '#667eea' }} />
+            <BarChart sx={{ fontSize: 60, color: '#ffffff' }} />
           </Box>
           <Typography variant="h3" sx={{ 
             fontWeight: 800,
-            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            background: '#ffffff',
             backgroundClip: 'text',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
@@ -466,15 +466,15 @@ const Dashboard = ({ data, onExport }) => {
               px: 4,
               py: 2,
               borderRadius: 3,
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-              boxShadow: '0 8px 32px rgba(102, 126, 234, 0.4)',
+              background: '#ffffff',
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
               fontSize: '1.1rem',
               fontWeight: 700,
               textTransform: 'none',
               '&:hover': {
-                background: 'linear-gradient(135deg, #5a6acf 0%, #6b4489 100%)',
+                background: '#ffffff',
                 transform: 'translateY(-4px)',
-                boxShadow: '0 12px 40px rgba(102, 126, 234, 0.6)'
+                boxShadow: '0 12px 40px rgba(0, 0, 0, 0.1)'
               }
             }}
           >

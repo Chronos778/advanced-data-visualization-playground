@@ -515,6 +515,7 @@ small {
 /* Override all linear gradients */
 [style*="linear-gradient"] {
   background: #ffffff !important;
+  background-image: none !important;
 }
 
 /* Override colorful backgrounds */
@@ -522,12 +523,33 @@ small {
 [style*="rgba(72, 187, 120"],
 [style*="rgba(66, 153, 225"],
 [style*="rgba(237, 137, 54"],
+[style*="rgba(118, 75, 162"],
 [style*="#667eea"],
 [style*="#764ba2"],
 [style*="#48bb78"],
+[style*="#38a169"],
 [style*="#4299e1"],
-[style*="#ed8936"] {
-  background: #f5f5f5 !important;
+[style*="#3182ce"],
+[style*="#ed8936"],
+[style*="#dd6b20"],
+[style*="#5a6acf"],
+[style*="#6b4489"],
+[style*="#f8fafc"],
+[style*="#f1f5f9"] {
+  background: #ffffff !important;
+  background-image: none !important;
+  background-color: #ffffff !important;
+}
+
+/* NUCLEAR OPTION - Remove ALL background images */
+* {
+  background-image: none !important;
+}
+
+*[style*="background:"] div,
+*[style*="background:"] span,
+*[style*="background:"] section {
+  background: inherit !important;
 }
 
 /* Print styles */

@@ -189,8 +189,8 @@ const FileUploader = ({ onDataLoaded, onError }) => {
   const getFileTypeColor = (fileType) => {
     switch (fileType) {
       case 'CSV': return '#000000';
-      case 'Excel': return '#333333';
-      case 'JSON': return '#666666';
+      case 'Excel': return '#000000';
+      case 'JSON': return '#000000';
       default: return '#000000';
     }
   };
@@ -287,8 +287,8 @@ const FileUploader = ({ onDataLoaded, onError }) => {
         <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', justifyContent: 'center', mb: 3 }}>
           {[
             { label: 'CSV Files', icon: <TableChart />, color: '#000000' },
-            { label: 'JSON Data', icon: <DataObject />, color: '#333333' },
-            { label: 'Excel Files', icon: <InsertDriveFile />, color: '#666666' }
+            { label: 'JSON Data', icon: <DataObject />, color: '#000000' },
+            { label: 'Excel Files', icon: <InsertDriveFile />, color: '#000000' }
           ].map((type) => (
             <Box
               key={type.label}
@@ -330,7 +330,7 @@ const FileUploader = ({ onDataLoaded, onError }) => {
             fontWeight: 600,
             textTransform: 'none',
             '&:hover': {
-              background: '#333333',
+              background: '#000000',
               transform: 'translateY(-2px)',
               boxShadow: '0 6px 20px rgba(0, 0, 0, 0.15)'
             }
