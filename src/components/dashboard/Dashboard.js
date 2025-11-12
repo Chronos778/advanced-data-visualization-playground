@@ -1,4 +1,5 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo, useRef } from 'react';
+import PropTypes from 'prop-types';
 import RGL, { WidthProvider } from 'react-grid-layout';
 import {
   Box,
@@ -16,7 +17,16 @@ import {
   MenuItem,
   TextField,
   Alert,
-  Chip
+  Chip,
+  Fab,
+  SpeedDial,
+  SpeedDialAction,
+  SpeedDialIcon,
+  Tooltip,
+  Snackbar,
+  Card,
+  CardContent,
+  LinearProgress
 } from '@mui/material';
 import {
   Add,
@@ -28,24 +38,50 @@ import {
   ShowChart,
   PieChart,
   ScatterPlot,
-  Insights
+  Insights,
+  Assessment,
+  Timeline,
+  Save,
+  Refresh,
+  DeleteSweep,
+  Upload,
+  GetApp,
+  ViewModule,
+  TrendingUp,
+  Dashboard as DashboardIcon
 } from '@mui/icons-material';
 import ChartComponent from '../charts/ChartComponent';
-import PlotlyChart from '../charts/PlotlyChart';
+import UnifiedChart from '../charts/UnifiedChart';
+import ChartContainer from '../charts/ChartContainer';
+import { useDashboardLayout } from '../../hooks/useDashboard';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 
 const ResponsiveGridLayout = WidthProvider(RGL);
 
 const Dashboard = ({ data, onExport }) => {
-  const [widgets, setWidgets] = useState([]);
-  const [layout, setLayout] = useState([]);
+  const {
+    widgets,
+    layout,
+    setLayout,
+    addWidget,
+    updateWidget,
+    deleteWidget,
+    duplicateWidget,
+    clearAll
+  } = useDashboardLayout();
+
   const [addWidgetOpen, setAddWidgetOpen] = useState(false);
   const [editWidget, setEditWidget] = useState(null);
+  const [speedDialOpen, setSpeedDialOpen] = useState(false);
+  const [notification, setNotification] = useState({ open: false, message: '', severity: 'success' });
+  const [isLayoutLocked, setIsLayoutLocked] = useState(false);
+  const dashboardRef = useRef(null);
+  
   const [newWidget, setNewWidget] = useState({
     type: 'chart',
     chartType: 'line',
-    library: 'recharts',
+    library: 'unified',
     title: '',
     xAxis: '',
     yAxis: '',
@@ -62,13 +98,25 @@ const Dashboard = ({ data, onExport }) => {
       { value: 'pie', label: 'Pie Chart', icon: <PieChart /> },
       { value: 'area', label: 'Area Chart', icon: <ShowChart /> }
     ],
-    plotly: [
+    unified: [
+      { value: 'bar', label: 'Bar Chart', icon: <BarChart /> },
+      { value: 'line', label: 'Line Chart', icon: <ShowChart /> },
+      { value: 'area', label: 'Area Chart', icon: <ShowChart /> },
+      { value: 'pie', label: 'Pie Chart', icon: <PieChart /> },
+      { value: 'doughnut', label: 'Doughnut Chart', icon: <PieChart /> },
       { value: 'scatter', label: 'Scatter Plot', icon: <ScatterPlot /> },
       { value: 'bubble', label: 'Bubble Chart', icon: <ScatterPlot /> },
-      { value: 'scatter3d', label: '3D Scatter', icon: <Insights /> },
-      { value: 'heatmap', label: 'Heatmap', icon: <Insights /> },
-      { value: 'contour', label: 'Contour Plot', icon: <Insights /> },
-      { value: 'surface', label: '3D Surface', icon: <Insights /> }
+      { value: 'polarArea', label: 'Polar Area', icon: <Insights /> },
+      { value: 'radar', label: 'Radar Chart', icon: <Assessment /> },
+      { value: 'histogram', label: 'Histogram', icon: <BarChart /> },
+      { value: 'boxplot', label: 'Box Plot', icon: <BarChart /> },
+      { value: 'violin', label: 'Violin Plot', icon: <BarChart /> },
+      { value: 'heatmap', label: 'Heatmap', icon: <Assessment /> },
+      { value: 'treemap', label: 'Treemap', icon: <Assessment /> },
+      { value: 'waterfall', label: 'Waterfall Chart', icon: <BarChart /> },
+      { value: 'funnel', label: 'Funnel Chart', icon: <PieChart /> },
+      { value: 'gauge', label: 'Gauge Chart', icon: <Assessment /> },
+      { value: 'candlestick', label: 'Candlestick Chart', icon: <BarChart /> }
     ]
   };
 
@@ -81,36 +129,26 @@ const Dashboard = ({ data, onExport }) => {
     });
   }, [availableColumns, data]);
 
-  const generateId = () => `widget_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-
-  const addWidget = useCallback(() => {
+  const handleAddWidget = useCallback(() => {
     if (!newWidget.title || !newWidget.xAxis || !newWidget.yAxis) {
+      setNotification({ 
+        open: true, 
+        message: 'Please fill in all required fields', 
+        severity: 'warning' 
+      });
       return;
     }
 
-    const id = generateId();
     const widget = {
-      id,
       ...newWidget,
       config: {}
     };
 
-    const layoutItem = {
-      i: id,
-      x: (widgets.length * 2) % 12,
-      y: Math.floor(widgets.length / 6) * 6,
-      w: 6,
-      h: 6,
-      minW: 3,
-      minH: 3
-    };
-
-    setWidgets(prev => [...prev, widget]);
-    setLayout(prev => [...prev, layoutItem]);
+    const widgetId = addWidget(widget);
     setNewWidget({
       type: 'chart',
       chartType: 'line',
-      library: 'recharts',
+      library: 'unified',
       title: '',
       xAxis: '',
       yAxis: '',
@@ -119,22 +157,36 @@ const Dashboard = ({ data, onExport }) => {
       sizeBy: ''
     });
     setAddWidgetOpen(false);
-  }, [newWidget, widgets.length]);
+    setNotification({ 
+      open: true, 
+      message: 'Chart added successfully!', 
+      severity: 'success' 
+    });
+  }, [newWidget, addWidget]);
 
-  const deleteWidget = useCallback((widgetId) => {
-    setWidgets(prev => prev.filter(w => w.id !== widgetId));
-    setLayout(prev => prev.filter(l => l.i !== widgetId));
-  }, []);
+  const handleDeleteWidget = useCallback((widgetId) => {
+    deleteWidget(widgetId);
+    setNotification({ 
+      open: true, 
+      message: 'Chart deleted', 
+      severity: 'info' 
+    });
+  }, [deleteWidget]);
 
-  const updateWidget = useCallback((widgetId, updates) => {
-    setWidgets(prev => prev.map(w => 
-      w.id === widgetId ? { ...w, ...updates } : w
-    ));
-  }, []);
+  const handleDuplicateWidget = useCallback((widgetId) => {
+    duplicateWidget(widgetId);
+    setNotification({ 
+      open: true, 
+      message: 'Chart duplicated', 
+      severity: 'success' 
+    });
+  }, [duplicateWidget]);
 
   const handleLayoutChange = useCallback((newLayout) => {
-    setLayout(newLayout);
-  }, []);
+    if (!isLayoutLocked) {
+      setLayout(newLayout);
+    }
+  }, [setLayout, isLayoutLocked]);
 
   const exportDashboard = useCallback(() => {
     const dashboardConfig = {
@@ -159,87 +211,81 @@ const Dashboard = ({ data, onExport }) => {
     URL.revokeObjectURL(url);
   }, [widgets, layout, data]);
 
-  const renderWidget = (widget) => {
+  const renderWidget = useCallback((widget) => {
     const widgetData = data;
+    
+    // Safety: Block 3D charts at the dashboard level
+    const safeWidget = {
+      ...widget,
+      chartType: (widget.chartType === 'scatter3d' || widget.chartType === 'surface') ? 'scatter' : widget.chartType
+    };
 
-    switch (widget.type) {
-      case 'chart':
-        if (widget.library === 'plotly') {
-          return (
-            <PlotlyChart
-              data={widgetData}
-              chartType={widget.chartType}
-              title={widget.title}
-              xAxis={widget.xAxis}
-              yAxis={widget.yAxis}
-              zAxis={widget.zAxis}
-              colorBy={widget.colorBy}
-              sizeBy={widget.sizeBy}
-              chartConfig={widget.config}
-              onConfigChange={(config) => updateWidget(widget.id, { config })}
-              onExport={(format) => {
-                if (onExport) {
-                  onExport(widget.id, format);
-                }
-              }}
-            />
-          );
-        } else {
-          return (
-            <ChartComponent
-              data={widgetData}
-              chartType={widget.chartType}
-              title={widget.title}
-              xAxis={widget.xAxis}
-              yAxis={widget.yAxis}
-              colorBy={widget.colorBy}
-              chartConfig={widget.config}
-              onConfigChange={(config) => updateWidget(widget.id, { config })}
-              onExport={(format) => {
-                if (onExport) {
-                  onExport(widget.id, format);
-                }
-              }}
-            />
-          );
-        }
-      default:
-        return (
-          <Paper sx={{ p: 2, height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Typography>Unknown widget type</Typography>
-          </Paper>
-        );
-    }
-  };
+    // Determine chart status
+    const hasData = widgetData && widgetData.data && widgetData.data.length > 0;
+    const hasValidAxes = safeWidget.xAxis && safeWidget.yAxis;
+    const status = !hasData ? 'error' : !hasValidAxes ? 'error' : 'ready';
+    const error = !hasData ? 'No data available' : !hasValidAxes ? 'Missing axis configuration' : '';
 
-  const getWidgetHeader = (widget) => (
-    <Box sx={{
-      position: 'absolute',
-      top: 8,
-      right: 8,
-      zIndex: 1000,
-      display: 'flex',
-      gap: 0.5,
-      opacity: 0.7,
-      '&:hover': { opacity: 1 }
-    }}>
-      <IconButton
-        size="small"
-        onClick={() => setEditWidget(widget)}
-        sx={{ bgcolor: 'background.paper', boxShadow: 1 }}
+    const chartElement = (() => {
+      switch (safeWidget.type) {
+        case 'chart':
+          if (safeWidget.library === 'unified') {
+            return (
+              <UnifiedChart
+                data={widgetData}
+                chartType={safeWidget.chartType}
+                title={safeWidget.title}
+                xAxis={safeWidget.xAxis}
+                yAxis={safeWidget.yAxis}
+                colorBy={safeWidget.colorBy}
+                sizeBy={safeWidget.sizeBy}
+                config={safeWidget.config}
+                onError={(error) => {
+                  setNotification({ 
+                    open: true, 
+                    message: `Chart error: ${error.message || 'Unknown error'}`, 
+                    severity: 'error' 
+                  });
+                }}
+              />
+            );
+          } else {
+            return (
+              <ChartComponent
+                data={widgetData}
+                chartType={safeWidget.chartType}
+                title={safeWidget.title}
+                xAxis={safeWidget.xAxis}
+                yAxis={safeWidget.yAxis}
+                colorBy={safeWidget.colorBy}
+                chartConfig={safeWidget.config}
+              />
+            );
+          }
+        default:
+          return <div>Unknown widget type</div>;
+      }
+    })();
+
+    return (
+      <ChartContainer
+        title={safeWidget.title}
+        chartType={safeWidget.chartType}
+        status={status}
+        error={error}
+        config={safeWidget.config || {}}
+        onEdit={() => setEditWidget(safeWidget)}
+        onDelete={() => handleDeleteWidget(safeWidget.id)}
+        onDuplicate={() => handleDuplicateWidget(safeWidget.id)}
+        onExport={(format) => onExport && onExport(safeWidget.id, format)}
+        onConfigChange={(config) => updateWidget(safeWidget.id, { config })}
       >
-        <Edit fontSize="small" />
-      </IconButton>
-      <IconButton
-        size="small"
-        onClick={() => deleteWidget(widget.id)}
-        sx={{ bgcolor: 'background.paper', boxShadow: 1 }}
-        color="error"
-      >
-        <Delete fontSize="small" />
-      </IconButton>
-    </Box>
-  );
+        {chartElement}
+      </ChartContainer>
+    );
+  }, [data, updateWidget, handleDeleteWidget, handleDuplicateWidget, onExport]);
+
+
 
   if (!data || !data.data) {
     return (
@@ -423,8 +469,7 @@ const Dashboard = ({ data, onExport }) => {
           preventCollision={false}
         >
           {widgets.map((widget) => (
-            <Box key={widget.id} sx={{ position: 'relative' }}>
-              {getWidgetHeader(widget)}
+            <Box key={widget.id}>
               {renderWidget(widget)}
             </Box>
           ))}
@@ -513,7 +558,7 @@ const Dashboard = ({ data, onExport }) => {
                 }))}
               >
                 <MenuItem value="recharts">Recharts (Basic Charts)</MenuItem>
-                <MenuItem value="plotly">Plotly (Advanced Charts)</MenuItem>
+                <MenuItem value="unified">Chart.js (Modern Charts)</MenuItem>
               </Select>
             </FormControl>
 
@@ -565,21 +610,6 @@ const Dashboard = ({ data, onExport }) => {
               </FormControl>
             </Box>
 
-            {newWidget.library === 'plotly' && ['scatter3d', 'heatmap', 'contour', 'surface'].includes(newWidget.chartType) && (
-              <FormControl fullWidth>
-                <InputLabel>Z-Axis</InputLabel>
-                <Select
-                  value={newWidget.zAxis}
-                  label="Z-Axis"
-                  onChange={(e) => setNewWidget(prev => ({ ...prev, zAxis: e.target.value }))}
-                >
-                  {numericColumns.map(col => (
-                    <MenuItem key={col} value={col}>{col}</MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            )}
-
             <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
               <FormControl fullWidth>
                 <InputLabel>Color By (Optional)</InputLabel>
@@ -616,7 +646,7 @@ const Dashboard = ({ data, onExport }) => {
         <DialogActions>
           <Button onClick={() => setAddWidgetOpen(false)}>Cancel</Button>
           <Button 
-            onClick={addWidget} 
+            onClick={handleAddWidget} 
             variant="contained"
             disabled={!newWidget.title || !newWidget.xAxis || !newWidget.yAxis}
           >
@@ -688,8 +718,92 @@ const Dashboard = ({ data, onExport }) => {
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Enhanced SpeedDial for Dashboard Actions */}
+      <SpeedDial
+        ariaLabel="Dashboard actions"
+        sx={{ position: 'fixed', bottom: 24, right: 24 }}
+        icon={<SpeedDialIcon />}
+        open={speedDialOpen}
+        onOpen={() => setSpeedDialOpen(true)}
+        onClose={() => setSpeedDialOpen(false)}
+      >
+        <SpeedDialAction
+          icon={<Add />}
+          tooltipTitle="Add Chart"
+          onClick={() => {
+            setAddWidgetOpen(true);
+            setSpeedDialOpen(false);
+          }}
+        />
+        <SpeedDialAction
+          icon={<Save />}
+          tooltipTitle="Save Dashboard"
+          onClick={() => {
+            exportDashboard();
+            setSpeedDialOpen(false);
+          }}
+        />
+        <SpeedDialAction
+          icon={<DragIndicator />}
+          tooltipTitle={isLayoutLocked ? "Unlock Layout" : "Lock Layout"}
+          onClick={() => {
+            setIsLayoutLocked(!isLayoutLocked);
+            setNotification({
+              open: true,
+              message: `Layout ${isLayoutLocked ? 'unlocked' : 'locked'}`,
+              severity: 'info'
+            });
+            setSpeedDialOpen(false);
+          }}
+        />
+        <SpeedDialAction
+          icon={<DeleteSweep />}
+          tooltipTitle="Clear All"
+          onClick={() => {
+            if (window.confirm('Are you sure you want to clear all charts?')) {
+              clearAll();
+              setNotification({
+                open: true,
+                message: 'Dashboard cleared',
+                severity: 'info'
+              });
+            }
+            setSpeedDialOpen(false);
+          }}
+        />
+      </SpeedDial>
+
+      {/* Notification Snackbar */}
+      <Snackbar
+        open={notification.open}
+        autoHideDuration={3000}
+        onClose={() => setNotification({ ...notification, open: false })}
+      >
+        <Alert
+          onClose={() => setNotification({ ...notification, open: false })}
+          severity={notification.severity}
+          sx={{ width: '100%' }}
+        >
+          {notification.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };
 
-export default Dashboard;
+Dashboard.propTypes = {
+  data: PropTypes.shape({
+    data: PropTypes.arrayOf(PropTypes.object).isRequired,
+    columns: PropTypes.arrayOf(PropTypes.string),
+    fileName: PropTypes.string,
+    rowCount: PropTypes.number
+  }),
+  onExport: PropTypes.func
+};
+
+Dashboard.defaultProps = {
+  onExport: () => {}
+};
+
+export default React.memo(Dashboard);

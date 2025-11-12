@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import PropTypes from 'prop-types';
 import ReactMarkdown from 'react-markdown';
 import {
   Box,
@@ -50,7 +51,7 @@ import {
 
 // Gemini API Configuration
 const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent";
-const API_KEY = "AIzaSyACloMraQUd2plyqOVpsGTc4QeMRb54-nw";
+const API_KEY = "AIzaSyDvQL-v2yE-R-uv254uXHsDBmQeMMpGq58";
 
 const AIInsights = ({ data }) => {
   const [analyzing, setAnalyzing] = useState(false);
@@ -180,8 +181,7 @@ Format your response in clear, actionable insights that would be valuable for da
       setAiInsights(structuredInsights);
       
     } catch (error) {
-      console.error('AI Insights error:', error);
-      setAiError(error.message);
+      setAiError(`AI Insights analysis failed: ${error.message}`);
     } finally {
       setLoadingAI(false);
     }
@@ -1031,4 +1031,11 @@ Format your response in clear, actionable insights that would be valuable for da
   );
 };
 
-export default AIInsights;
+AIInsights.propTypes = {
+  data: PropTypes.shape({
+    data: PropTypes.arrayOf(PropTypes.object).isRequired,
+    columns: PropTypes.arrayOf(PropTypes.string)
+  }).isRequired
+};
+
+export default React.memo(AIInsights);

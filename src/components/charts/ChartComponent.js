@@ -1,4 +1,5 @@
 import React, { useMemo, useState, useCallback } from 'react';
+import PropTypes from 'prop-types';
 import {
   LineChart,
   Line,
@@ -461,5 +462,20 @@ const ChartComponent = React.memo(({
     </Paper>
   );
 });
+
+ChartComponent.propTypes = {
+  data: PropTypes.shape({
+    data: PropTypes.arrayOf(PropTypes.object).isRequired,
+    columns: PropTypes.arrayOf(PropTypes.string)
+  }).isRequired,
+  chartType: PropTypes.oneOf(['line', 'bar', 'scatter', 'pie', 'area']),
+  title: PropTypes.string,
+  xAxis: PropTypes.string,
+  yAxis: PropTypes.string,
+  colorBy: PropTypes.string,
+  onExport: PropTypes.func,
+  onConfigChange: PropTypes.func,
+  chartConfig: PropTypes.object
+};
 
 export default ChartComponent;

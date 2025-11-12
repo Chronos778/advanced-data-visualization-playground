@@ -1,7 +1,8 @@
 import React, { useCallback, useState } from 'react';
+import PropTypes from 'prop-types';
 import { useDropzone } from 'react-dropzone';
 import Papa from 'papaparse';
-import * as XLSX from 'xlsx';
+import readXlsxFile from 'read-excel-file';
 import {
   Box,
   Paper,
@@ -50,35 +51,41 @@ const FileUploader = ({ onDataLoaded, onError }) => {
 
   const processExcel = (file) => {
     return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = (e) => {
+      readXlsxFile(file).then((rows) => {
         try {
-          const data = new Uint8Array(e.target.result);
-          const workbook = XLSX.read(data, { type: 'array' });
-          const sheetName = workbook.SheetNames[0];
-          const worksheet = workbook.Sheets[sheetName];
-          const jsonData = XLSX.utils.sheet_to_json(worksheet);
-          
-          if (jsonData.length === 0) {
+          if (!rows || rows.length === 0) {
             reject(new Error('Excel file contains no data'));
             return;
           }
 
-          const columns = Object.keys(jsonData[0]);
+          // First row contains headers
+          const headers = rows[0];
+          const dataRows = rows.slice(1);
+          
+          // Convert to objects
+          const jsonData = dataRows.map(row => {
+            const obj = {};
+            headers.forEach((header, index) => {
+              obj[header] = row[index];
+            });
+            return obj;
+          });
+
+          const columns = headers.map(h => String(h));
           resolve({
             data: jsonData,
             columns: columns,
             fileName: file.name,
             fileType: 'Excel',
             rowCount: jsonData.length,
-            sheetName: sheetName
+            sheetName: 'Sheet1'
           });
         } catch (error) {
           reject(new Error(`Excel parsing error: ${error.message}`));
         }
-      };
-      reader.onerror = () => reject(new Error('Failed to read Excel file'));
-      reader.readAsArrayBuffer(file);
+      }).catch(error => {
+        reject(new Error(`Failed to read Excel file: ${error.message}`));
+      });
     });
   };
 
@@ -510,6 +517,11 @@ const FileUploader = ({ onDataLoaded, onError }) => {
       )}
     </Box>
   );
+};
+
+FileUploader.propTypes = {
+  onDataLoaded: PropTypes.func.isRequired,
+  onError: PropTypes.func.isRequired
 };
 
 export default React.memo(FileUploader);

@@ -38,14 +38,14 @@ import {
   Close
 } from '@mui/icons-material';
 import ChartComponent from '../charts/ChartComponent';
-import PlotlyChart from '../charts/PlotlyChart';
+import UnifiedChart from '../charts/UnifiedChart';
 
 const ChartCreator = ({ uploadedFiles, cleanedData }) => {
   const [charts, setCharts] = useState([]);
   const [currentChartTab, setCurrentChartTab] = useState(0);
   const [addChartOpen, setAddChartOpen] = useState(false);
   const [newChart, setNewChart] = useState({
-    type: 'recharts',
+    type: 'unified',
     chartType: 'line',
     title: '',
     xAxis: '',
@@ -92,19 +92,25 @@ const ChartCreator = ({ uploadedFiles, cleanedData }) => {
       { value: 'pie', label: 'Pie Chart', icon: <PieChart />, description: 'Show proportions' },
       { value: 'scatter', label: 'Scatter Plot', icon: <ScatterPlot />, description: 'Show correlations' }
     ],
-    plotly: [
-      { value: 'scatter', label: 'Scatter Plot', icon: <ScatterPlot />, description: 'Basic scatter with customization', requiresZ: false },
-      { value: 'scatter3d', label: '3D Scatter', icon: <ScatterPlot />, description: '3D scatter plot', requiresZ: true },
-      { value: 'line', label: 'Line Chart', icon: <ShowChart />, description: 'Interactive line charts', requiresZ: false },
-      { value: 'bar', label: 'Bar Chart', icon: <BarChart />, description: 'Interactive bar charts', requiresZ: false },
-      { value: 'surface', label: '3D Surface', icon: <Timeline />, description: '3D surface plot', requiresZ: true },
-      { value: 'heatmap', label: 'Heatmap', icon: <Timeline />, description: '2D heat map', requiresZ: false },
-      { value: 'contour', label: 'Contour Plot', icon: <Timeline />, description: 'Contour lines', requiresZ: true },
-      { value: 'bubble', label: 'Bubble Chart', icon: <ScatterPlot />, description: 'Size-encoded scatter', requiresZ: false },
-      { value: 'violin', label: 'Violin Plot', icon: <BarChart />, description: 'Distribution shape', requiresZ: false },
-      { value: 'box', label: 'Box Plot', icon: <BarChart />, description: 'Statistical summary', requiresZ: false },
-      { value: 'histogram', label: 'Histogram', icon: <BarChart />, description: 'Value distribution', requiresZ: false },
-      { value: 'parallel', label: 'Parallel Coordinates', icon: <ShowChart />, description: 'Multi-dimensional data', requiresZ: false }
+    unified: [
+      { value: 'line', label: 'Line Chart', icon: <ShowChart />, description: 'Smooth line charts' },
+      { value: 'bar', label: 'Bar Chart', icon: <BarChart />, description: 'Compare categories' },
+      { value: 'area', label: 'Area Chart', icon: <Timeline />, description: 'Filled line charts' },
+      { value: 'pie', label: 'Pie Chart', icon: <PieChart />, description: 'Show proportions' },
+      { value: 'doughnut', label: 'Doughnut Chart', icon: <PieChart />, description: 'Hollow pie chart' },
+      { value: 'scatter', label: 'Scatter Plot', icon: <ScatterPlot />, description: 'Show correlations' },
+      { value: 'bubble', label: 'Bubble Chart', icon: <ScatterPlot />, description: 'Size-encoded scatter' },
+      { value: 'polarArea', label: 'Polar Area', icon: <Timeline />, description: 'Radial data display' },
+      { value: 'radar', label: 'Radar Chart', icon: <Timeline />, description: 'Multi-dimensional comparison' },
+      { value: 'histogram', label: 'Histogram', icon: <BarChart />, description: 'Distribution analysis' },
+      { value: 'boxplot', label: 'Box Plot', icon: <BarChart />, description: 'Statistical summary' },
+      { value: 'violin', label: 'Violin Plot', icon: <BarChart />, description: 'Distribution shape' },
+      { value: 'heatmap', label: 'Heatmap', icon: <Timeline />, description: 'Matrix visualization' },
+      { value: 'treemap', label: 'Treemap', icon: <Timeline />, description: 'Hierarchical data' },
+      { value: 'waterfall', label: 'Waterfall Chart', icon: <BarChart />, description: 'Cumulative changes' },
+      { value: 'funnel', label: 'Funnel Chart', icon: <PieChart />, description: 'Process flow' },
+      { value: 'gauge', label: 'Gauge Chart', icon: <Timeline />, description: 'Progress indicator' },
+      { value: 'candlestick', label: 'Candlestick Chart', icon: <BarChart />, description: 'Financial data' }
     ]
   }), []);
 
@@ -214,16 +220,13 @@ const ChartCreator = ({ uploadedFiles, cleanedData }) => {
 
   // Memoize chart rendering to prevent unnecessary re-renders
   const renderChart = useCallback((chart) => {
-    if (chart.type === 'plotly') {
+    if (chart.type === 'unified') {
       return (
-        <PlotlyChart
+        <UnifiedChart
           data={chart.data}
           chartType={chart.chartType}
           xAxis={chart.xAxis}
           yAxis={chart.yAxis}
-          zAxis={chart.zAxis}
-          colorBy={chart.colorBy}
-          sizeBy={chart.sizeBy}
           title={chart.title}
         />
       );
@@ -412,8 +415,8 @@ const ChartCreator = ({ uploadedFiles, cleanedData }) => {
               Create New Chart
             </Typography>
             <Chip 
-              label={newChart.type === 'plotly' ? 'Plotly (Advanced)' : 'Recharts (Simple)'} 
-              color={newChart.type === 'plotly' ? 'primary' : 'secondary'}
+              label={newChart.type === 'unified' ? 'Chart.js (Modern)' : 'Recharts (Simple)'} 
+              color={newChart.type === 'unified' ? 'primary' : 'secondary'}
               size="small"
             />
           </Box>
@@ -423,8 +426,8 @@ const ChartCreator = ({ uploadedFiles, cleanedData }) => {
             {/* Help Text */}
             <Paper sx={{ p: 2, backgroundColor: '#ffffff', border: '1px solid #e0e0e0' }}>
               <Typography variant="body2" color="text.secondary">
-                💡 <strong>Quick Guide:</strong> Choose Recharts for simple charts or Plotly for advanced 3D visualizations with interactive features.
-                {newChart.type === 'plotly' && ' Plotly supports Z-axis, color coding, and size encoding for complex data exploration.'}
+                💡 <strong>Quick Guide:</strong> Choose Recharts for simple charts or Chart.js for modern, responsive visualizations.
+                {newChart.type === 'unified' && ' Chart.js provides reliable, performant charts with consistent styling.'}
               </Typography>
             </Paper>
 
@@ -457,7 +460,7 @@ const ChartCreator = ({ uploadedFiles, cleanedData }) => {
                 onChange={(e) => setNewChart(prev => ({ ...prev, type: e.target.value }))}
               >
                 <MenuItem value="recharts">Recharts</MenuItem>
-                <MenuItem value="plotly">Plotly</MenuItem>
+                <MenuItem value="unified">Chart.js</MenuItem>
               </Select>
             </FormControl>
 
@@ -512,63 +515,6 @@ const ChartCreator = ({ uploadedFiles, cleanedData }) => {
                 ))}
               </Select>
             </FormControl>
-
-            {/* Additional Plotly Options */}
-            {newChart.type === 'plotly' && (
-              <>
-                {/* Z-Axis for 3D charts */}
-                {chartTypes.plotly.find(t => t.value === newChart.chartType)?.requiresZ && (
-                  <FormControl fullWidth>
-                    <InputLabel>Z-Axis Column (3D)</InputLabel>
-                    <Select
-                      value={newChart.zAxis}
-                      onChange={(e) => setNewChart(prev => ({ ...prev, zAxis: e.target.value }))}
-                    >
-                      <MenuItem value="">None</MenuItem>
-                      {getDataColumns().map((column) => (
-                        <MenuItem key={column} value={column}>
-                          {column}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                )}
-
-                {/* Color By Column */}
-                <FormControl fullWidth>
-                  <InputLabel>Color By (Optional)</InputLabel>
-                  <Select
-                    value={newChart.colorBy}
-                    onChange={(e) => setNewChart(prev => ({ ...prev, colorBy: e.target.value }))}
-                  >
-                    <MenuItem value="">None</MenuItem>
-                    {getDataColumns().map((column) => (
-                      <MenuItem key={column} value={column}>
-                        {column}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-
-                {/* Size By Column */}
-                {['scatter', 'scatter3d', 'bubble'].includes(newChart.chartType) && (
-                  <FormControl fullWidth>
-                    <InputLabel>Size By (Optional)</InputLabel>
-                    <Select
-                      value={newChart.sizeBy}
-                      onChange={(e) => setNewChart(prev => ({ ...prev, sizeBy: e.target.value }))}
-                    >
-                      <MenuItem value="">Fixed Size</MenuItem>
-                      {getDataColumns().map((column) => (
-                        <MenuItem key={column} value={column}>
-                          {column}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                )}
-              </>
-            )}
           </Box>
         </DialogContent>
         <DialogActions>

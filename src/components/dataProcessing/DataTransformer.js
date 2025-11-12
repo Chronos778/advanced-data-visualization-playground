@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import PropTypes from 'prop-types';
 import {
   Box,
   Paper,
@@ -1081,5 +1082,13 @@ const DataTransformer = React.memo(({ data, onTransformedData }) => {
     </Paper>
   );
 });
+
+DataTransformer.propTypes = {
+  data: PropTypes.shape({
+    data: PropTypes.arrayOf(PropTypes.object).isRequired,
+    columns: PropTypes.arrayOf(PropTypes.string)
+  }).isRequired,
+  onTransformedData: PropTypes.func.isRequired
+};
 
 export default DataTransformer;

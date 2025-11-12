@@ -10,11 +10,13 @@ A powerful, modern web application for advanced data visualization, transformati
 ## ✨ Features
 
 ### 📊 **Multi-Format Data Support**
+
 - **File Upload**: Drag-and-drop support for CSV, JSON, and Excel files
 - **Real-time Validation**: Instant data parsing and error detection
 - **Data Preview**: Interactive tables with pagination and search
 
 ### 🔧 **Advanced Data Transformation**
+
 - **Filtering**: Complex multi-column filtering with various operators
 - **Sorting**: Multi-level sorting with custom order
 - **Grouping**: Data aggregation with statistical functions

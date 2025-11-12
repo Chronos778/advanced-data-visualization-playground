@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useCallback } from 'react';
+import PropTypes from 'prop-types';
 import {
   Box,
   Paper,
@@ -637,5 +638,19 @@ const DataPreview = React.memo(({ data, title = "Data Preview" }) => {
     </Box>
   );
 });
+
+DataPreview.propTypes = {
+  data: PropTypes.shape({
+    data: PropTypes.arrayOf(PropTypes.object),
+    columns: PropTypes.arrayOf(PropTypes.string),
+    fileName: PropTypes.string,
+    rowCount: PropTypes.number
+  }),
+  title: PropTypes.string
+};
+
+DataPreview.defaultProps = {
+  title: "Data Preview"
+};
 
 export default DataPreview;
