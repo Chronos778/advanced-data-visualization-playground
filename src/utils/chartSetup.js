@@ -20,8 +20,6 @@ import 'chartjs-adapter-date-fns';
 // Advanced chart plugins
 import { MatrixController, MatrixElement } from 'chartjs-chart-matrix';
 import { TreemapController, TreemapElement } from 'chartjs-chart-treemap';
-import { SankeyController, Flow } from 'chartjs-chart-sankey';
-import { BoxPlotController, BoxAndWiskers, ViolinController, Violin } from '@sgratzl/chartjs-chart-boxplot';
 
 // Register Chart.js components
 ChartJS.register(
@@ -42,13 +40,7 @@ ChartJS.register(
   MatrixController,
   MatrixElement,
   TreemapController,
-  TreemapElement,
-  SankeyController,
-  Flow,
-  BoxPlotController,
-  BoxAndWiskers,
-  ViolinController,
-  Violin
+  TreemapElement
 );
 
 // Set default Chart.js colors to black/white theme
