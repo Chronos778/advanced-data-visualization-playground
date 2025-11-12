@@ -2,75 +2,153 @@
 
 A powerful, modern web application for advanced data visualization, transformation, and analysis. Built with React and featuring an intuitive drag-and-drop interface, AI-powered insights, and comprehensive export capabilities.
 
+**🎨 Beautiful Premium Dark Theme** | **⚡ Lightning-fast Performance** | **🤖 AI-Powered Analysis**
+
 ![React](https://img.shields.io/badge/React-19.1.1-blue?logo=react)
 ![Material-UI](https://img.shields.io/badge/Material--UI-7.3.2-blue?logo=mui)
-![Plotly.js](https://img.shields.io/badge/Plotly.js-3.1.0-green?logo=plotly)
+![Recharts](https://img.shields.io/badge/Recharts-3.2.1-green)
+![Chart.js](https://img.shields.io/badge/Chart.js-4.5.0-orange)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 
-## ✨ Features
+## ✨ Key Features
+
+### 🎨 **Premium Dark Theme with Glassmorphism**
+- Modern dark interface with vibrant gradient accents
+- Smooth animations and transitions
+- Glassmorphic cards with backdrop blur effects
+- Responsive design for all devices
+- Accessible color scheme with high contrast
 
 ### 📊 **Multi-Format Data Support**
-
 - **File Upload**: Drag-and-drop support for CSV, JSON, and Excel files
 - **Real-time Validation**: Instant data parsing and error detection
 - **Data Preview**: Interactive tables with pagination and search
+- **Advanced Filtering**: Complex multi-column filtering with operators
 
 ### 🔧 **Advanced Data Transformation**
-
 - **Filtering**: Complex multi-column filtering with various operators
 - **Sorting**: Multi-level sorting with custom order
 - **Grouping**: Data aggregation with statistical functions
-- **Statistics**: Automatic calculation of mean, median, mode, and more
+- **Statistics**: Automatic calculation of mean, median, mode, percentiles, and more
+- **Data Pivoting**: Cross-tabulation and summary tables
 
 ### 📈 **Comprehensive Visualization Library**
-- **Recharts Integration**: Line, bar, pie, scatter, and area charts
-- **Plotly.js Power**: 3D visualizations, heatmaps, surface plots, and advanced charts
+- **Recharts Integration**: Line, bar, pie, scatter, area, and radar charts
+- **Chart.js Power**: Advanced chart types with rich customization
 - **Interactive Controls**: Real-time chart customization and styling
-- **Responsive Design**: Charts that adapt to different screen sizes
+- **Vibrant Gradients**: Beautiful color palettes with gradient effects
+- **Responsive Design**: Charts adapt seamlessly to screen sizes
+- **Multiple Chart Types**: 10+ chart types including heatmaps, treemaps, and funnels
 
 ### 🎯 **Drag-and-Drop Dashboard**
 - **Grid Layout**: Responsive, resizable chart widgets
 - **Live Editing**: Add, remove, and configure charts in real-time
-- **Layout Persistence**: Save and restore dashboard configurations
+- **Layout Persistence**: Save dashboard configurations locally
 - **Widget Management**: Easy chart creation and customization
+- **Export Dashboard**: Download entire dashboard as image or PDF
 
-### 🤖 **AI-Powered Insights**
+### 🤖 **AI-Powered Insights (Gemini AI)**
 - **Correlation Analysis**: Automatic detection of data relationships
 - **Outlier Identification**: Statistical anomaly detection
-- **Trend Analysis**: Pattern recognition and forecasting suggestions
-- **Smart Recommendations**: AI-generated visualization suggestions
+- **Trend Analysis**: Pattern recognition and insights
+- **Smart Recommendations**: AI-generated analysis and suggestions
+- **Data Summarization**: Automatic data insights generation
 
 ### 💾 **Export & Sharing**
 - **Multiple Formats**: PNG, PDF, JSON, CSV exports
 - **Quality Settings**: Configurable resolution and compression
-- **Batch Export**: Download multiple visualizations at once
+- **Batch Export**: Download multiple visualizations
 - **Data Export**: Transform and export processed datasets
+- **Shareable Links**: Generate shareable dashboard links
 
-## 🛠️ Tech Stack
+## 🎯 Quick Start
+
+### Prerequisites
+- Node.js 16+ 
+- npm or yarn
+
+### Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/Chronos778/advanced-data-visualization-playground.git
+cd advanced-data-visualization-playground
+
+# Install dependencies
+npm install
+
+# Start development server
+npm start
+```
+
+The app will open at `http://localhost:3000`
+
+### Environment Setup
+Create a `.env` file for API keys:
+```bash
+REACT_APP_GEMINI_API_KEY=your_gemini_api_key_here
+```
+
+## � Tech Stack
+
+```
+
+```
+
+## 📦 Tech Stack
 
 - **Frontend**: React 19.1.1 with modern hooks and context
-- **UI Framework**: Material-UI v7 with custom theming
+- **UI Framework**: Material-UI v7 with premium dark theme
 - **Visualization**: 
-  - Plotly.js for advanced 3D and scientific charts
-  - Recharts for standard business charts
+  - Recharts 3.2.1 for responsive business charts
+  - Chart.js 4.5.0 for advanced chart types
+  - Custom gradient color system
 - **Layout**: react-grid-layout for drag-and-drop dashboards
 - **Data Processing**: 
-  - papaparse for CSV handling
-  - simple-statistics for AI insights
+  - papaparse for CSV parsing
+  - simple-statistics for statistical analysis
   - lodash for data manipulation
 - **Export**: html2canvas + jsPDF for image/PDF generation
+- **AI**: Google Gemini AI API for intelligent insights
+- **Testing**: Jest with React Testing Library
+- **Styling**: Custom CSS with CSS variables and animations
+- **Performance**: React.memo, useCallback, and useMemo optimizations
+
+## 🎨 Design System
+
+### Color Palette
+- **Primary Gradient**: #667eea → #764ba2 (Purple-Blue)
+- **Secondary Gradient**: #f093fb → #f5576c (Pink-Coral)
+- **Success Gradient**: #4facfe → #00f2fe (Blue-Cyan)
+- **Warning Gradient**: #fa709a → #fee140 (Rose-Yellow)
+- **Background**: #0f0f23 with radial gradients
+- **Surface**: rgba(255, 255, 255, 0.03) with backdrop blur
+
+## 📊 Chart Types Supported
+
+1. **Line Chart** - Trend analysis
+2. **Bar Chart** - Category comparisons
+3. **Pie Chart** - Proportional data
+4. **Area Chart** - Cumulative visualization
+5. **Scatter Plot** - Correlation analysis
+6. **Radar Chart** - Multi-dimensional data
+7. **Funnel Chart** - Process flows
+8. **Heatmap** - Pattern recognition
+9. **Treemap** - Hierarchical data
+10. **Polar Chart** - Cyclical data
 
 ## 🚀 Getting Started
 
 ### Prerequisites
 - Node.js 16.0 or higher
 - npm or yarn package manager
+- Google Gemini API key (optional, for AI insights)
 
 ### Installation
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/advanced-data-visualization-playground.git
+   git clone https://github.com/Chronos778/advanced-data-visualization-playground.git
    cd advanced-data-visualization-playground
    ```
 
@@ -79,12 +157,18 @@ A powerful, modern web application for advanced data visualization, transformati
    npm install
    ```
 
-3. **Start the development server**
+3. **Set up environment variables** (optional)
+   Create a `.env.local` file:
+   ```
+   REACT_APP_GEMINI_API_KEY=your_gemini_api_key_here
+   ```
+
+4. **Start the development server**
    ```bash
    npm start
    ```
 
-4. **Open your browser**
+5. **Open in browser**
    Navigate to `http://localhost:3000`
 
 ### Build for Production
@@ -93,52 +177,120 @@ A powerful, modern web application for advanced data visualization, transformati
 npm run build
 ```
 
-This creates an optimized production build in the `build` folder.
+### Run Tests
 
-## 📖 Usage Guide
+```bash
+npm test
+```
 
-### 1. **Upload Your Data**
-- Navigate to the **File Upload** tab
-- Drag and drop your CSV, JSON, or Excel file
-- Review the data preview and statistics
+## 📖 Quick Start Guide
 
-### 2. **Transform Your Data**
-- Use the **Data Processing** tab to filter, sort, and group data
-- Apply statistical functions and create calculated columns
-- Preview transformations in real-time
+### 1. **Upload Your Data** 📤
+- Go to **Upload Data** tab
+- Drag & drop CSV, JSON, or Excel file
+- Auto-detection of data types and formats
+- Instant validation with error feedback
 
-### 3. **Create Visualizations**
-- **Charts Tab**: Create standard business charts (line, bar, pie, scatter)
-- **Advanced Charts Tab**: Build 3D visualizations, heatmaps, and surface plots
-- Customize colors, labels, and styling options
+### 2. **Preview Data** 👀
+- Switch to **Preview Data** tab
+- Search and filter your dataset
+- View statistical summaries
+- Check data quality metrics
 
-### 4. **Build Dashboards**
-- Go to the **Dashboard** tab
-- Add chart widgets using the "+" button
-- Drag and resize widgets to create your layout
-- Configure each chart with different data and settings
+### 3. **Transform Data** 🔧
+- Go to **Transform Data** tab
+- Apply filters, sort, and grouping
+- Create calculated columns
+- Perform statistical aggregations
 
-### 5. **Generate AI Insights**
-- Visit the **AI Insights** tab for automatic analysis
-- View correlation matrices and outlier detection
-- Get smart recommendations for data exploration
+### 4. **Create Charts** 📊
+- Switch to **Charts & Dashboard** tab
+- Add visualization widgets
+- Select from 10+ chart types
+- Customize colors, labels, and styling
 
-### 6. **Export Your Work**
-- Use the **Export Manager** to download visualizations
-- Choose from PNG, PDF, JSON, or CSV formats
-- Configure quality settings and batch export options
+### 5. **Get AI Insights** 🤖
+- Navigate to **AI Insights** tab
+- Get automatic analysis from Gemini AI
+- View correlations and patterns
+- Receive smart recommendations
 
-## 🎨 Customization
+### 6. **Export & Share** 💾
+- Download visualizations as PNG/PDF
+- Export data as CSV/JSON
+- Save dashboard configurations
+- Generate shareable reports
 
-### Themes
-The application supports both light and dark themes. Toggle using the theme switcher in the top navigation bar.
+## 🎨 Design Features
 
-### Chart Styling
-Each chart type offers extensive customization options:
-- Colors and gradients
-- Labels and legends
-- Axes configuration
-- Interactive features
+### Premium Dark Theme
+- Modern dark interface (#0f0f23)
+- Glassmorphism with backdrop blur
+- Vibrant gradient accents
+- Smooth animations and transitions
+
+### Responsive Design
+- Mobile-friendly layouts
+- Touch-optimized controls
+- Adaptive chart sizing
+- Flexible grid system
+
+### Accessibility
+- High contrast color scheme
+- Keyboard navigation support
+- ARIA labels and descriptions
+- Focus management
+
+## 🔐 Security & Privacy
+
+- **No Data Storage**: Data is processed locally in your browser
+- **No Tracking**: No analytics or tracking cookies
+- **API Keys**: Store API keys in environment variables only
+- **Open Source**: Full transparency with MIT license
+
+## 📝 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## 🤝 Contributing
+
+Contributions are welcome! Please follow these steps:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## 📞 Support
+
+For issues, questions, or suggestions:
+- Open an issue on [GitHub](https://github.com/Chronos778/advanced-data-visualization-playground/issues)
+- Check existing documentation
+- Review the examples
+
+## 🙏 Acknowledgments
+
+- Material-UI for the excellent component library
+- Recharts for flexible charting
+- Chart.js for advanced visualizations
+- Google Gemini for AI capabilities
+- React community for amazing tools and libraries
+
+## 📈 Roadmap
+
+- [ ] Real-time data streaming support
+- [ ] Collaborative dashboard sharing
+- [ ] Advanced SQL query builder
+- [ ] Custom plugin system
+- [ ] Cloud data source integration
+- [ ] Enhanced mobile app
+- [ ] Team collaboration features
+- [ ] Advanced scheduling for reports
+
+---
+
+**Built with ❤️ for data enthusiasts and analysts**
 
 ### Dashboard Layouts
 - Responsive grid system
