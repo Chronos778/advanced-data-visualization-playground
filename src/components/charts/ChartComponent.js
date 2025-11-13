@@ -1,4 +1,5 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useCallback } from 'react';
+import PropTypes from 'prop-types';
 import {
   LineChart,
   Line,
@@ -45,7 +46,6 @@ import {
   PieChart as PieChartIcon,
   ShowChart
 } from '@mui/icons-material';
-import { useState } from 'react';
 
 const COLORS = [
   '#8884d8', '#82ca9d', '#ffc658', '#ff7c7c', '#8dd1e1',
@@ -53,7 +53,7 @@ const COLORS = [
   '#45b7d1', '#96ceb4', '#ffeaa7', '#fab1a0', '#fd79a8'
 ];
 
-const ChartComponent = ({ 
+const ChartComponent = React.memo(({ 
   data, 
   chartType = 'line',
   title = 'Chart',
@@ -72,7 +72,7 @@ const ChartComponent = ({
     showGrid: true,
     showLegend: true,
     showTooltip: true,
-    animated: true,
+    animated: false, // Disabled for better performance
     strokeWidth: 2,
     opacity: 0.8,
     ...chartConfig
@@ -101,15 +101,34 @@ const ChartComponent = ({
     });
   }, [availableColumns, data]);
 
-  const handleConfigChange = (key, value) => {
+  const handleConfigChange = useCallback((key, value) => {
     const newConfig = { ...config, [key]: value };
     setConfig(newConfig);
     if (onConfigChange) {
       onConfigChange(newConfig);
     }
-  };
+  }, [config, onConfigChange]);
 
-  const getChartIcon = (type) => {
+  const handleMenuClick = useCallback((event) => {
+    setAnchorEl(event.currentTarget);
+  }, []);
+
+  const handleMenuClose = useCallback(() => {
+    setAnchorEl(null);
+  }, []);
+
+  const handleExport = useCallback(() => {
+    if (onExport) {
+      onExport();
+    }
+    setAnchorEl(null);
+  }, [onExport]);
+
+  const toggleSettings = useCallback(() => {
+    setShowSettings(!showSettings);
+  }, [showSettings]);
+
+  const getChartIcon = useCallback((type) => {
     switch (type) {
       case 'line': return <TrendingUp />;
       case 'bar': return <BarChartIcon />;
@@ -118,7 +137,7 @@ const ChartComponent = ({
       case 'area': return <ShowChart />;
       default: return <TrendingUp />;
     }
-  };
+  }, []);
 
   const renderChart = () => {
     if (!processedData.length || !xAxis || !yAxis) {
@@ -442,6 +461,21 @@ const ChartComponent = ({
       </Menu>
     </Paper>
   );
+});
+
+ChartComponent.propTypes = {
+  data: PropTypes.shape({
+    data: PropTypes.arrayOf(PropTypes.object).isRequired,
+    columns: PropTypes.arrayOf(PropTypes.string)
+  }).isRequired,
+  chartType: PropTypes.oneOf(['line', 'bar', 'scatter', 'pie', 'area']),
+  title: PropTypes.string,
+  xAxis: PropTypes.string,
+  yAxis: PropTypes.string,
+  colorBy: PropTypes.string,
+  onExport: PropTypes.func,
+  onConfigChange: PropTypes.func,
+  chartConfig: PropTypes.object
 };
 
 export default ChartComponent;

@@ -1,4 +1,5 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
+import PropTypes from 'prop-types';
 import {
   Box,
   Paper,
@@ -30,38 +31,57 @@ import {
 } from '@mui/icons-material';
 import _ from 'lodash';
 
-const DataPreview = ({ data, title = "Data Preview" }) => {
+const DataPreview = React.memo(({ data, title = "Data Preview" }) => {
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [rowsPerPage, setRowsPerPage] = useState(25); // Increased from 10 for better performance
   const [searchTerm, setSearchTerm] = useState('');
 
-  const { filteredData, stats } = useMemo(() => {
+  // Limit data processing for very large datasets to improve performance
+  const processedData = useMemo(() => {
     if (!data || !data.data || data.data.length === 0) {
+      return { data: [], columns: [] };
+    }
+
+    // For large datasets, limit initial processing
+    const isLargeDataset = data.data.length > 1000;
+    const sampleSize = isLargeDataset ? 1000 : data.data.length;
+    const sampleData = data.data.slice(0, sampleSize);
+
+    return {
+      data: sampleData,
+      columns: data.columns || Object.keys(data.data[0]),
+      isLimited: isLargeDataset,
+      totalRows: data.data.length
+    };
+  }, [data]);
+
+  const { filteredData, stats } = useMemo(() => {
+    if (!processedData.data || processedData.data.length === 0) {
       return { filteredData: [], stats: {} };
     }
 
     // Filter data based on search term
-    let filtered = data.data;
+    let filtered = processedData.data;
     if (searchTerm.trim()) {
-      filtered = data.data.filter(row =>
+      filtered = processedData.data.filter(row =>
         Object.values(row).some(value =>
           String(value).toLowerCase().includes(searchTerm.toLowerCase())
         )
       );
     }
 
-    // Calculate statistics
-    const columns = data.columns || Object.keys(data.data[0]);
+    // Calculate statistics using the processed data
+    const columns = processedData.columns;
     const statistics = {};
 
     columns.forEach(column => {
-      const values = data.data.map(row => row[column]).filter(val => val !== null && val !== undefined && val !== '');
+      const values = processedData.data.map(row => row[column]).filter(val => val !== null && val !== undefined && val !== '');
       const numericValues = values.map(val => parseFloat(val)).filter(val => !isNaN(val));
       
       statistics[column] = {
-        totalCount: data.data.length,
+        totalCount: processedData.data.length,
         nonNullCount: values.length,
-        nullCount: data.data.length - values.length,
+        nullCount: processedData.data.length - values.length,
         uniqueCount: new Set(values).size,
         isNumeric: numericValues.length > values.length * 0.8, // Consider numeric if 80%+ are numbers
         ...(numericValues.length > 0 && {
@@ -78,18 +98,18 @@ const DataPreview = ({ data, title = "Data Preview" }) => {
       filteredData: filtered,
       stats: statistics
     };
-  }, [data, searchTerm]);
+  }, [processedData, searchTerm]);
 
-  const handleChangePage = (event, newPage) => {
+  const handleChangePage = useCallback((event, newPage) => {
     setPage(newPage);
-  };
+  }, []);
 
-  const handleChangeRowsPerPage = (event) => {
+  const handleChangeRowsPerPage = useCallback((event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
-  };
+  }, []);
 
-  const formatCellValue = (value, column) => {
+  const formatCellValue = useCallback((value, column) => {
     if (value === null || value === undefined) {
       return <Chip label="NULL" size="small" variant="outlined" color="default" />;
     }
@@ -119,19 +139,19 @@ const DataPreview = ({ data, title = "Data Preview" }) => {
     }
 
     return stringValue;
-  };
+  }, [stats]);
 
-  const getColumnIcon = (column) => {
+  const getColumnIcon = useCallback((column) => {
     if (stats[column]?.isNumeric) {
       return <Assessment sx={{ fontSize: 16, color: 'primary.main' }} />;
     }
     return <TableChart sx={{ fontSize: 16, color: 'secondary.main' }} />;
-  };
+  }, [stats]);
 
-  const getTrendIcon = (column) => {
+  const getTrendIcon = useCallback((column) => {
     if (!stats[column]?.isNumeric) return null;
     
-    const values = data.data.slice(-10).map(row => parseFloat(row[column])).filter(v => !isNaN(v));
+    const values = processedData.data.slice(-10).map(row => parseFloat(row[column])).filter(v => !isNaN(v));
     if (values.length < 2) return null;
     
     const trend = values[values.length - 1] - values[0];
@@ -139,71 +159,241 @@ const DataPreview = ({ data, title = "Data Preview" }) => {
     return trend > 0 
       ? <TrendingUp sx={{ fontSize: 14, color: 'success.main' }} />
       : <TrendingDown sx={{ fontSize: 14, color: 'error.main' }} />;
-  };
+  }, [processedData, stats]);
 
   if (!data || !data.data) {
     return (
-      <Paper sx={{ p: 3, textAlign: 'center' }}>
-        <Typography variant="h6" color="text.secondary">
-          No data to preview
+      <Paper className="modern-card" sx={{ p: 6, textAlign: 'center' }}>
+        <Box sx={{
+          width: 80,
+          height: 80,
+          borderRadius: '50%',
+          background: '#ffffff',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          mx: 'auto',
+          mb: 3
+        }}>
+          <TableChart sx={{ fontSize: 40, color: '#ffffff' }} />
+        </Box>
+        <Typography variant="h5" sx={{ 
+          fontWeight: 700, 
+          color: 'primary.main',
+          mb: 2
+        }}>
+          No Data Available
         </Typography>
-        <Typography variant="body2" color="text.secondary">
-          Upload a data file to see its contents here
+        <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
+          Upload a data file to see its detailed preview and analysis
         </Typography>
+        <Box sx={{
+          px: 3,
+          py: 1.5,
+          borderRadius: 2,
+          background: '#ffffff 0%, #ffffff 100%)',
+          border: '1px solid #ffffff',
+          display: 'inline-block'
+        }}>
+          <Typography variant="body2" sx={{ fontWeight: 600, color: 'primary.main' }}>
+            Ready to analyze your data
+          </Typography>
+        </Box>
       </Paper>
     );
   }
 
-  const columns = data.columns || Object.keys(data.data[0]);
+  const columns = processedData.columns;
   const paginatedData = filteredData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
   return (
     <Box>
-      {/* Data Summary Cards */}
-      <Grid container spacing={2} sx={{ mb: 3 }}>
+      {/* Enhanced Performance Warning for Large Datasets */}
+      {processedData.isLimited && (
+        <Box sx={{ mb: 3 }}>
+          <Paper className="modern-card" sx={{ 
+            p: 3,
+            background: '#ffffff 0%, #ffffff 100%)',
+            border: '1px solid #ffffff'
+          }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <Box sx={{
+                width: 40,
+                height: 40,
+                borderRadius: '50%',
+                background: '#ffffff',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                <Info sx={{ color: 'white', fontSize: 20 }} />
+              </Box>
+              <Box>
+                <Typography variant="h6" sx={{ fontWeight: 700, color: '#ffffff', mb: 0.5 }}>
+                  Performance Optimization Active
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Showing first {processedData.data.length.toLocaleString()} of {processedData.totalRows.toLocaleString()} rows for optimal performance
+                </Typography>
+              </Box>
+            </Box>
+          </Paper>
+        </Box>
+      )}
+      
+      {/* Enhanced Data Summary Cards */}
+      <Grid container spacing={3} sx={{ mb: 4 }}>
         <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent sx={{ textAlign: 'center' }}>
-              <Typography variant="h4" color="primary">
-                {data.data.length.toLocaleString()}
+          <Card className="modern-card" sx={{ 
+            background: '#ffffff 0%, #ffffff 100%)',
+            border: '1px solid #ffffff',
+            transition: 'transform 0.2s ease',
+            '&:hover': { 
+              transform: 'translateY(-4px)',
+              boxShadow: '0 8px 32px #ffffff'
+            }
+          }}>
+            <CardContent sx={{ textAlign: 'center', p: 3 }}>
+              <Box sx={{
+                width: 56,
+                height: 56,
+                borderRadius: '50%',
+                background: '#ffffff',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                mx: 'auto',
+                mb: 2
+              }}>
+                <TableChart sx={{ color: 'white', fontSize: 28 }} />
+              </Box>
+              <Typography variant="h3" sx={{ 
+                fontWeight: 800,
+                color: '#ffffff',
+                mb: 1
+              }}>
+                {processedData.totalRows.toLocaleString()}
               </Typography>
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body1" sx={{ fontWeight: 600, color: 'text.primary' }}>
                 Total Rows
               </Typography>
+              {processedData.isLimited && (
+                <Typography variant="caption" color="text.secondary">
+                  ({processedData.data.length.toLocaleString()} shown)
+                </Typography>
+              )}
             </CardContent>
           </Card>
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent sx={{ textAlign: 'center' }}>
-              <Typography variant="h4" color="secondary">
+          <Card className="modern-card" sx={{ 
+            background: '#ffffff 0%, #ffffff 100%)',
+            border: '1px solid #ffffff',
+            transition: 'transform 0.2s ease',
+            '&:hover': { 
+              transform: 'translateY(-4px)',
+              boxShadow: '0 8px 32px #ffffff'
+            }
+          }}>
+            <CardContent sx={{ textAlign: 'center', p: 3 }}>
+              <Box sx={{
+                width: 56,
+                height: 56,
+                borderRadius: '50%',
+                background: '#ffffff',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                mx: 'auto',
+                mb: 2
+              }}>
+                <Assessment sx={{ color: 'white', fontSize: 28 }} />
+              </Box>
+              <Typography variant="h3" sx={{ 
+                fontWeight: 800,
+                color: '#ffffff',
+                mb: 1
+              }}>
                 {columns.length}
               </Typography>
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body1" sx={{ fontWeight: 600, color: 'text.primary' }}>
                 Columns
               </Typography>
             </CardContent>
           </Card>
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent sx={{ textAlign: 'center' }}>
-              <Typography variant="h4" color="success.main">
+          <Card className="modern-card" sx={{ 
+            background: '#ffffff 0%, #ffffff 100%)',
+            border: '1px solid #ffffff',
+            transition: 'transform 0.2s ease',
+            '&:hover': { 
+              transform: 'translateY(-4px)',
+              boxShadow: '0 8px 32px #ffffff'
+            }
+          }}>
+            <CardContent sx={{ textAlign: 'center', p: 3 }}>
+              <Box sx={{
+                width: 56,
+                height: 56,
+                borderRadius: '50%',
+                background: '#ffffff',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                mx: 'auto',
+                mb: 2
+              }}>
+                <TrendingUp sx={{ color: 'white', fontSize: 28 }} />
+              </Box>
+              <Typography variant="h3" sx={{ 
+                fontWeight: 800,
+                color: '#ffffff',
+                mb: 1
+              }}>
                 {columns.filter(col => stats[col]?.isNumeric).length}
               </Typography>
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body1" sx={{ fontWeight: 600, color: 'text.primary' }}>
                 Numeric Columns
               </Typography>
             </CardContent>
           </Card>
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent sx={{ textAlign: 'center' }}>
-              <Typography variant="h4" color="info.main">
+          <Card className="modern-card" sx={{ 
+            background: '#ffffff 0%, #ffffff 100%)',
+            border: '1px solid #ffffff',
+            transition: 'transform 0.2s ease',
+            '&:hover': { 
+              transform: 'translateY(-4px)',
+              boxShadow: '0 8px 32px #ffffff'
+            }
+          }}>
+            <CardContent sx={{ textAlign: 'center', p: 3 }}>
+              <Box sx={{
+                width: 56,
+                height: 56,
+                borderRadius: '50%',
+                background: '#ffffff',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                mx: 'auto',
+                mb: 2
+              }}>
+                <Search sx={{ color: 'white', fontSize: 28 }} />
+              </Box>
+              <Typography variant="h3" sx={{ 
+                fontWeight: 800,
+                background: '#ffffff',
+                backgroundClip: 'text',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                mb: 1
+              }}>
                 {Math.round((filteredData.length / data.data.length) * 100)}%
               </Typography>
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body1" sx={{ fontWeight: 600, color: 'text.primary' }}>
                 Visible Data
               </Typography>
             </CardContent>
@@ -211,22 +401,47 @@ const DataPreview = ({ data, title = "Data Preview" }) => {
         </Grid>
       </Grid>
 
-      <Paper>
-        {/* Header */}
-        <Box sx={{ p: 2, borderBottom: '1px solid', borderColor: 'divider' }}>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-            <Typography variant="h6">{title}</Typography>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+      <Paper className="modern-card" sx={{ overflow: 'hidden' }}>
+        {/* Enhanced Header */}
+        <Box sx={{ 
+          p: 4, 
+          borderBottom: '1px solid', 
+          borderColor: 'divider',
+          background: '#ffffff 0%, #ffffff 100%)'
+        }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+            <Box>
+              <Typography variant="h4" sx={{ 
+                fontWeight: 800,
+                background: '#ffffff',
+                backgroundClip: 'text',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                mb: 1
+              }}>
+                {title}
+              </Typography>
+              <Typography variant="body1" color="text.secondary">
+                Explore and analyze your data in detail
+              </Typography>
+            </Box>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               <Chip 
                 label={`${filteredData.length} of ${data.data.length} rows`}
-                size="small"
-                color="primary"
+                sx={{
+                  background: '#ffffff',
+                  color: 'white',
+                  fontWeight: 600
+                }}
               />
               {data.fileName && (
                 <Chip 
                   label={data.fileName}
-                  size="small"
-                  variant="outlined"
+                  sx={{
+                    background: '#ffffff 0%, #ffffff 100%)',
+                    border: '1px solid #ffffff',
+                    fontWeight: 600
+                  }}
                 />
               )}
             </Box>
@@ -234,45 +449,80 @@ const DataPreview = ({ data, title = "Data Preview" }) => {
           
           <TextField
             fullWidth
-            size="small"
-            placeholder="Search in all columns..."
+            placeholder="Search across all columns and data..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                borderRadius: 3,
+                background: 'white',
+                transition: 'all 0.2s ease',
+                '&:hover': {
+                  boxShadow: '0 4px 16px #ffffff'
+                },
+                '&.Mui-focused': {
+                  boxShadow: '0 4px 20px #ffffff',
+                  '& fieldset': {
+                    borderColor: '#ffffff'
+                  }
+                }
+              }
+            }}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <Search />
+                  <Search sx={{ color: '#ffffff' }} />
                 </InputAdornment>
               ),
             }}
           />
         </Box>
 
-        {/* Table */}
+        {/* Enhanced Table */}
         <TableContainer sx={{ maxHeight: 600 }}>
           <Table stickyHeader>
             <TableHead>
               <TableRow>
-                <TableCell sx={{ backgroundColor: 'background.paper', fontWeight: 'bold', minWidth: 50 }}>
-                  #
+                <TableCell sx={{ 
+                  background: '#ffffff',
+                  fontWeight: 'bold', 
+                  minWidth: 60,
+                  borderBottom: '2px solid #ffffff'
+                }}>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 700, color: 'primary.main' }}>
+                    #
+                  </Typography>
                 </TableCell>
                 {columns.map((column) => (
                   <TableCell
                     key={column}
                     sx={{
-                      backgroundColor: 'background.paper',
+                      background: '#ffffff',
                       fontWeight: 'bold',
-                      minWidth: 120,
-                      maxWidth: 200
+                      minWidth: 140,
+                      maxWidth: 220,
+                      borderBottom: '2px solid #ffffff'
                     }}
                   >
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      {getColumnIcon(column)}
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                      <Box sx={{
+                        width: 32,
+                        height: 32,
+                        borderRadius: 2,
+                        background: stats[column]?.isNumeric 
+                          ? '#ffffff'
+                          : '#ffffff',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}>
+                        {getColumnIcon(column)}
+                      </Box>
                       <Box sx={{ flex: 1, minWidth: 0 }}>
-                        <Typography variant="subtitle2" noWrap>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 700, color: 'primary.main' }} noWrap>
                           {column}
                         </Typography>
-                        <Typography variant="caption" color="text.secondary">
+                        <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>
                           {stats[column]?.isNumeric ? 'Numeric' : 'Text'} • 
                           {stats[column]?.uniqueCount} unique
                         </Typography>
@@ -280,7 +530,9 @@ const DataPreview = ({ data, title = "Data Preview" }) => {
                       {getTrendIcon(column)}
                       <Tooltip title={
                         <Box>
-                          <Typography variant="body2">Column Statistics:</Typography>
+                          <Typography variant="body2" sx={{ fontWeight: 600, mb: 1 }}>
+                            Column Statistics:
+                          </Typography>
                           <Typography variant="caption">
                             • Total: {stats[column]?.totalCount}<br/>
                             • Non-null: {stats[column]?.nonNullCount}<br/>
@@ -296,8 +548,18 @@ const DataPreview = ({ data, title = "Data Preview" }) => {
                           </Typography>
                         </Box>
                       }>
-                        <IconButton size="small">
-                          <Info sx={{ fontSize: 14 }} />
+                        <IconButton 
+                          size="small"
+                          sx={{
+                            background: '#ffffff',
+                            '&:hover': {
+                              background: '#ffffff',
+                              transform: 'scale(1.1)'
+                            },
+                            transition: 'all 0.2s ease'
+                          }}
+                        >
+                          <Info sx={{ fontSize: 16, color: '#ffffff' }} />
                         </IconButton>
                       </Tooltip>
                     </Box>
@@ -307,12 +569,27 @@ const DataPreview = ({ data, title = "Data Preview" }) => {
             </TableHead>
             <TableBody>
               {paginatedData.map((row, index) => (
-                <TableRow key={page * rowsPerPage + index} hover>
-                  <TableCell sx={{ fontWeight: 'bold', color: 'text.secondary' }}>
+                <TableRow 
+                  key={page * rowsPerPage + index} 
+                  hover
+                  sx={{
+                    '&:hover': {
+                      background: '#ffffff 0%, #ffffff 100%)'
+                    },
+                    '&:nth-of-type(even)': {
+                      backgroundColor: '#ffffff'
+                    }
+                  }}
+                >
+                  <TableCell sx={{ 
+                    fontWeight: 'bold', 
+                    color: 'primary.main',
+                    background: '#ffffff'
+                  }}>
                     {page * rowsPerPage + index + 1}
                   </TableCell>
                   {columns.map((column) => (
-                    <TableCell key={column} sx={{ maxWidth: 200 }}>
+                    <TableCell key={column} sx={{ maxWidth: 220 }}>
                       {formatCellValue(row[column], column)}
                     </TableCell>
                   ))}
@@ -322,19 +599,58 @@ const DataPreview = ({ data, title = "Data Preview" }) => {
           </Table>
         </TableContainer>
 
-        {/* Pagination */}
-        <TablePagination
-          rowsPerPageOptions={[5, 10, 25, 50, 100]}
-          component="div"
-          count={filteredData.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
+        {/* Enhanced Pagination */}
+        <Box sx={{ 
+          p: 3, 
+          borderTop: '1px solid #ffffff',
+          background: '#ffffff'
+        }}>
+          <TablePagination
+            rowsPerPageOptions={[5, 10, 25, 50, 100]}
+            component="div"
+            count={filteredData.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+            sx={{
+              '& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows': {
+                fontWeight: 600,
+                color: 'primary.main'
+              },
+              '& .MuiTablePagination-select': {
+                borderRadius: 2,
+                border: '1px solid #ffffff',
+                '&:focus': {
+                  borderColor: '#ffffff'
+                }
+              },
+              '& .MuiIconButton-root': {
+                borderRadius: 2,
+                '&:hover': {
+                  background: '#ffffff'
+                }
+              }
+            }}
+          />
+        </Box>
       </Paper>
     </Box>
   );
+});
+
+DataPreview.propTypes = {
+  data: PropTypes.shape({
+    data: PropTypes.arrayOf(PropTypes.object),
+    columns: PropTypes.arrayOf(PropTypes.string),
+    fileName: PropTypes.string,
+    rowCount: PropTypes.number
+  }),
+  title: PropTypes.string
+};
+
+DataPreview.defaultProps = {
+  title: "Data Preview"
 };
 
 export default DataPreview;
