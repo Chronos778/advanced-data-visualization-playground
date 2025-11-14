@@ -163,19 +163,19 @@ const DataPreview = React.memo(({ data, title = "Data Preview" }) => {
 
   if (!data || !data.data) {
     return (
-      <Paper className="modern-card" sx={{ p: 6, textAlign: 'center' }}>
+      <Paper elevation={0} sx={{ p: 6, textAlign: 'center', border: '1px solid', borderColor: 'divider' }}>
         <Box sx={{
           width: 80,
           height: 80,
           borderRadius: '50%',
-          background: '#ffffff',
+          background: 'background.paper',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           mx: 'auto',
           mb: 3
         }}>
-          <TableChart sx={{ fontSize: 40, color: '#ffffff' }} />
+          <TableChart sx={{ fontSize: 40, color: 'text.primary' }} />
         </Box>
         <Typography variant="h5" sx={{ 
           fontWeight: 700, 
@@ -191,8 +191,8 @@ const DataPreview = React.memo(({ data, title = "Data Preview" }) => {
           px: 3,
           py: 1.5,
           borderRadius: 2,
-          background: '#ffffff 0%, #ffffff 100%)',
-          border: '1px solid #ffffff',
+          background: 'background.paper',
+          border: '1px solid', borderColor: 'divider',
           display: 'inline-block'
         }}>
           <Typography variant="body2" sx={{ fontWeight: 600, color: 'primary.main' }}>
@@ -211,17 +211,19 @@ const DataPreview = React.memo(({ data, title = "Data Preview" }) => {
       {/* Enhanced Performance Warning for Large Datasets */}
       {processedData.isLimited && (
         <Box sx={{ mb: 3 }}>
-          <Paper className="modern-card" sx={{ 
+          <Paper elevation={0} sx={{
+            border: '1px solid',
+            borderColor: 'divider', 
             p: 3,
-            background: '#ffffff 0%, #ffffff 100%)',
-            border: '1px solid #ffffff'
+            background: 'background.paper',
+            border: '1px solid', borderColor: 'divider'
           }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               <Box sx={{
                 width: 40,
                 height: 40,
                 borderRadius: '50%',
-                background: '#ffffff',
+                background: 'background.paper',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center'
@@ -229,7 +231,7 @@ const DataPreview = React.memo(({ data, title = "Data Preview" }) => {
                 <Info sx={{ color: 'white', fontSize: 20 }} />
               </Box>
               <Box>
-                <Typography variant="h6" sx={{ fontWeight: 700, color: '#ffffff', mb: 0.5 }}>
+                <Typography variant="h6" sx={{ fontWeight: 700, color: 'text.primary', mb: 0.5 }}>
                   Performance Optimization Active
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
@@ -244,13 +246,13 @@ const DataPreview = React.memo(({ data, title = "Data Preview" }) => {
       {/* Enhanced Data Summary Cards */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
         <Grid item xs={12} sm={6} md={3}>
-          <Card className="modern-card" sx={{ 
-            background: '#ffffff 0%, #ffffff 100%)',
-            border: '1px solid #ffffff',
+          <Card elevation={0} sx={{ 
+            background: 'background.paper',
+            border: '1px solid', borderColor: 'divider',
             transition: 'transform 0.2s ease',
             '&:hover': { 
               transform: 'translateY(-4px)',
-              boxShadow: '0 8px 32px #ffffff'
+              boxShadow: '0 8px 32px rgba(41, 98, 255, 0.2)'
             }
           }}>
             <CardContent sx={{ textAlign: 'center', p: 3 }}>
@@ -258,7 +260,7 @@ const DataPreview = React.memo(({ data, title = "Data Preview" }) => {
                 width: 56,
                 height: 56,
                 borderRadius: '50%',
-                background: '#ffffff',
+                background: 'background.paper',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -269,7 +271,7 @@ const DataPreview = React.memo(({ data, title = "Data Preview" }) => {
               </Box>
               <Typography variant="h3" sx={{ 
                 fontWeight: 800,
-                color: '#ffffff',
+                color: 'text.primary',
                 mb: 1
               }}>
                 {processedData.totalRows.toLocaleString()}
@@ -286,13 +288,13 @@ const DataPreview = React.memo(({ data, title = "Data Preview" }) => {
           </Card>
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <Card className="modern-card" sx={{ 
-            background: '#ffffff 0%, #ffffff 100%)',
-            border: '1px solid #ffffff',
+          <Card elevation={0} sx={{ 
+            background: 'background.paper',
+            border: '1px solid', borderColor: 'divider',
             transition: 'transform 0.2s ease',
             '&:hover': { 
               transform: 'translateY(-4px)',
-              boxShadow: '0 8px 32px #ffffff'
+              boxShadow: '0 8px 32px rgba(41, 98, 255, 0.2)'
             }
           }}>
             <CardContent sx={{ textAlign: 'center', p: 3 }}>
@@ -300,7 +302,7 @@ const DataPreview = React.memo(({ data, title = "Data Preview" }) => {
                 width: 56,
                 height: 56,
                 borderRadius: '50%',
-                background: '#ffffff',
+                background: 'background.paper',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -311,7 +313,7 @@ const DataPreview = React.memo(({ data, title = "Data Preview" }) => {
               </Box>
               <Typography variant="h3" sx={{ 
                 fontWeight: 800,
-                color: '#ffffff',
+                color: 'text.primary',
                 mb: 1
               }}>
                 {columns.length}
@@ -323,13 +325,13 @@ const DataPreview = React.memo(({ data, title = "Data Preview" }) => {
           </Card>
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <Card className="modern-card" sx={{ 
-            background: '#ffffff 0%, #ffffff 100%)',
-            border: '1px solid #ffffff',
+          <Card elevation={0} sx={{ 
+            background: 'background.paper',
+            border: '1px solid', borderColor: 'divider',
             transition: 'transform 0.2s ease',
             '&:hover': { 
               transform: 'translateY(-4px)',
-              boxShadow: '0 8px 32px #ffffff'
+              boxShadow: '0 8px 32px rgba(41, 98, 255, 0.2)'
             }
           }}>
             <CardContent sx={{ textAlign: 'center', p: 3 }}>
@@ -337,7 +339,7 @@ const DataPreview = React.memo(({ data, title = "Data Preview" }) => {
                 width: 56,
                 height: 56,
                 borderRadius: '50%',
-                background: '#ffffff',
+                background: 'background.paper',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -348,7 +350,7 @@ const DataPreview = React.memo(({ data, title = "Data Preview" }) => {
               </Box>
               <Typography variant="h3" sx={{ 
                 fontWeight: 800,
-                color: '#ffffff',
+                color: 'text.primary',
                 mb: 1
               }}>
                 {columns.filter(col => stats[col]?.isNumeric).length}
@@ -360,13 +362,13 @@ const DataPreview = React.memo(({ data, title = "Data Preview" }) => {
           </Card>
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <Card className="modern-card" sx={{ 
-            background: '#ffffff 0%, #ffffff 100%)',
-            border: '1px solid #ffffff',
+          <Card elevation={0} sx={{ 
+            background: 'background.paper',
+            border: '1px solid', borderColor: 'divider',
             transition: 'transform 0.2s ease',
             '&:hover': { 
               transform: 'translateY(-4px)',
-              boxShadow: '0 8px 32px #ffffff'
+              boxShadow: '0 8px 32px rgba(41, 98, 255, 0.2)'
             }
           }}>
             <CardContent sx={{ textAlign: 'center', p: 3 }}>
@@ -374,7 +376,7 @@ const DataPreview = React.memo(({ data, title = "Data Preview" }) => {
                 width: 56,
                 height: 56,
                 borderRadius: '50%',
-                background: '#ffffff',
+                background: 'background.paper',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -385,10 +387,7 @@ const DataPreview = React.memo(({ data, title = "Data Preview" }) => {
               </Box>
               <Typography variant="h3" sx={{ 
                 fontWeight: 800,
-                background: '#ffffff',
-                backgroundClip: 'text',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
+                color: 'text.primary',
                 mb: 1
               }}>
                 {Math.round((filteredData.length / data.data.length) * 100)}%
@@ -401,22 +400,19 @@ const DataPreview = React.memo(({ data, title = "Data Preview" }) => {
         </Grid>
       </Grid>
 
-      <Paper className="modern-card" sx={{ overflow: 'hidden' }}>
+      <Paper elevation={0} sx={{ overflow: 'hidden', border: '1px solid', borderColor: 'divider' }}>
         {/* Enhanced Header */}
         <Box sx={{ 
           p: 4, 
           borderBottom: '1px solid', 
           borderColor: 'divider',
-          background: '#ffffff 0%, #ffffff 100%)'
+          background: 'background.paper'
         }}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
             <Box>
               <Typography variant="h4" sx={{ 
                 fontWeight: 800,
-                background: '#ffffff',
-                backgroundClip: 'text',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
+                color: 'text.primary',
                 mb: 1
               }}>
                 {title}
@@ -429,7 +425,7 @@ const DataPreview = React.memo(({ data, title = "Data Preview" }) => {
               <Chip 
                 label={`${filteredData.length} of ${data.data.length} rows`}
                 sx={{
-                  background: '#ffffff',
+                  background: 'background.paper',
                   color: 'white',
                   fontWeight: 600
                 }}
@@ -438,8 +434,8 @@ const DataPreview = React.memo(({ data, title = "Data Preview" }) => {
                 <Chip 
                   label={data.fileName}
                   sx={{
-                    background: '#ffffff 0%, #ffffff 100%)',
-                    border: '1px solid #ffffff',
+                    background: 'background.paper',
+                    border: '1px solid', borderColor: 'divider',
                     fontWeight: 600
                   }}
                 />
@@ -455,15 +451,15 @@ const DataPreview = React.memo(({ data, title = "Data Preview" }) => {
             sx={{
               '& .MuiOutlinedInput-root': {
                 borderRadius: 3,
-                background: 'white',
+                background: 'background.default',
                 transition: 'all 0.2s ease',
                 '&:hover': {
-                  boxShadow: '0 4px 16px #ffffff'
+                  boxShadow: '0 4px 16px rgba(41, 98, 255, 0.2)'
                 },
                 '&.Mui-focused': {
-                  boxShadow: '0 4px 20px #ffffff',
+                  boxShadow: '0 4px 20px rgba(41, 98, 255, 0.3)',
                   '& fieldset': {
-                    borderColor: '#ffffff'
+                    bordercolor: 'text.primary'
                   }
                 }
               }
@@ -471,7 +467,7 @@ const DataPreview = React.memo(({ data, title = "Data Preview" }) => {
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <Search sx={{ color: '#ffffff' }} />
+                  <Search sx={{ color: 'text.primary' }} />
                 </InputAdornment>
               ),
             }}
@@ -484,10 +480,10 @@ const DataPreview = React.memo(({ data, title = "Data Preview" }) => {
             <TableHead>
               <TableRow>
                 <TableCell sx={{ 
-                  background: '#ffffff',
+                  background: 'background.paper',
                   fontWeight: 'bold', 
                   minWidth: 60,
-                  borderBottom: '2px solid #ffffff'
+                  borderBottom: '2px solid', borderColor: 'divider'
                 }}>
                   <Typography variant="subtitle2" sx={{ fontWeight: 700, color: 'primary.main' }}>
                     #
@@ -497,11 +493,11 @@ const DataPreview = React.memo(({ data, title = "Data Preview" }) => {
                   <TableCell
                     key={column}
                     sx={{
-                      background: '#ffffff',
+                      background: 'background.paper',
                       fontWeight: 'bold',
                       minWidth: 140,
                       maxWidth: 220,
-                      borderBottom: '2px solid #ffffff'
+                      borderBottom: '2px solid', borderColor: 'divider'
                     }}
                   >
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
@@ -551,15 +547,15 @@ const DataPreview = React.memo(({ data, title = "Data Preview" }) => {
                         <IconButton 
                           size="small"
                           sx={{
-                            background: '#ffffff',
+                            background: 'background.paper',
                             '&:hover': {
-                              background: '#ffffff',
+                              background: 'background.paper',
                               transform: 'scale(1.1)'
                             },
                             transition: 'all 0.2s ease'
                           }}
                         >
-                          <Info sx={{ fontSize: 16, color: '#ffffff' }} />
+                          <Info sx={{ fontSize: 16, color: 'text.primary' }} />
                         </IconButton>
                       </Tooltip>
                     </Box>
@@ -574,17 +570,17 @@ const DataPreview = React.memo(({ data, title = "Data Preview" }) => {
                   hover
                   sx={{
                     '&:hover': {
-                      background: '#ffffff 0%, #ffffff 100%)'
+                      background: 'background.paper'
                     },
                     '&:nth-of-type(even)': {
-                      backgroundColor: '#ffffff'
+                      backgroundcolor: 'text.primary'
                     }
                   }}
                 >
                   <TableCell sx={{ 
                     fontWeight: 'bold', 
                     color: 'primary.main',
-                    background: '#ffffff'
+                    background: 'background.paper'
                   }}>
                     {page * rowsPerPage + index + 1}
                   </TableCell>
@@ -602,8 +598,8 @@ const DataPreview = React.memo(({ data, title = "Data Preview" }) => {
         {/* Enhanced Pagination */}
         <Box sx={{ 
           p: 3, 
-          borderTop: '1px solid #ffffff',
-          background: '#ffffff'
+          borderTop: '1px solid', borderColor: 'divider',
+          background: 'background.paper'
         }}>
           <TablePagination
             rowsPerPageOptions={[5, 10, 25, 50, 100]}
@@ -620,15 +616,15 @@ const DataPreview = React.memo(({ data, title = "Data Preview" }) => {
               },
               '& .MuiTablePagination-select': {
                 borderRadius: 2,
-                border: '1px solid #ffffff',
+                border: '1px solid', borderColor: 'divider',
                 '&:focus': {
-                  borderColor: '#ffffff'
+                  bordercolor: 'text.primary'
                 }
               },
               '& .MuiIconButton-root': {
                 borderRadius: 2,
                 '&:hover': {
-                  background: '#ffffff'
+                  background: 'background.paper'
                 }
               }
             }}

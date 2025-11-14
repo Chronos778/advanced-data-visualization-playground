@@ -311,18 +311,18 @@ const Dashboard = ({ data, onExport }) => {
   return (
     <Box sx={{ p: 3 }}>
       {/* Enhanced Dashboard Header */}
-      <Paper className="modern-card" sx={{ 
+      <Paper elevation={0} sx={{ 
         p: 4, 
         mb: 4,
-        background: '#ffffff',
-        border: '1px solid #ffffff'
+        background: 'background.paper',
+        border: '1px solid',
+        borderColor: 'divider'
       }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
           <Box>
             <Typography variant="h3" sx={{ 
               fontWeight: 800,
-              color: '#ffffff',
-              WebkitTextFillColor: 'transparent',
+              color: 'text.primary',
               mb: 1
             }}>
               Visualization Dashboard
@@ -341,18 +341,16 @@ const Dashboard = ({ data, onExport }) => {
                 px: 3,
                 py: 1.5,
                 borderRadius: 2,
-                border: '2px solid #ffffff',
-                color: '#ffffff',
+                border: '1px solid',
+                borderColor: 'divider',
                 fontWeight: 600,
                 textTransform: 'none',
                 '&:hover': {
-                  background: 'rgba(0, 0, 0, 0.1)',
-                  border: '2px solid #ffffff',
+                  borderColor: 'primary.main',
                   transform: 'translateY(-2px)'
                 },
                 '&:disabled': {
-                  border: '2px solid #ffffff',
-                  color: '#ffffff'
+                  borderColor: 'divider'
                 }
               }}
             >
@@ -366,15 +364,11 @@ const Dashboard = ({ data, onExport }) => {
                 px: 3,
                 py: 1.5,
                 borderRadius: 2,
-                background: '#ffffff',
-                boxShadow: '0 4px 16px rgba(0, 0, 0, 0.1)',
                 fontSize: '1rem',
                 fontWeight: 600,
                 textTransform: 'none',
                 '&:hover': {
-                  background: '#ffffff',
-                  transform: 'translateY(-2px)',
-                  boxShadow: '0 6px 20px rgba(0, 0, 0, 0.1)'
+                  transform: 'translateY(-2px)'
                 }
               }}
             >
@@ -412,7 +406,7 @@ const Dashboard = ({ data, onExport }) => {
                 width: 40,
                 height: 40,
                 borderRadius: 2,
-                background: '#ffffff',
+                background: 'success.main',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center'
@@ -434,7 +428,7 @@ const Dashboard = ({ data, onExport }) => {
               width: 40,
               height: 40,
               borderRadius: 2,
-              background: '#ffffff',
+              background: 'info.main',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center'
@@ -475,26 +469,23 @@ const Dashboard = ({ data, onExport }) => {
           ))}
         </ResponsiveGridLayout>
       ) : (
-        <Paper className="modern-card" sx={{ p: 8, textAlign: 'center', mt: 4 }}>
+        <Paper elevation={0} sx={{ p: 8, textAlign: 'center', mt: 4, border: '1px solid', borderColor: 'divider' }}>
           <Box sx={{
             width: 120,
             height: 120,
             borderRadius: '50%',
-            background: '#ffffff 0%, rgba(0, 0, 0, 0.1) 100%)',
+            background: 'primary.main',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             mx: 'auto',
             mb: 4
           }}>
-            <BarChart sx={{ fontSize: 60, color: '#ffffff' }} />
+            <BarChart sx={{ fontSize: 60, color: 'white' }} />
           </Box>
           <Typography variant="h3" sx={{ 
             fontWeight: 800,
-            background: '#ffffff',
-            backgroundClip: 'text',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
+            color: 'text.primary',
             mb: 2
           }}>
             Create Your First Dashboard
@@ -511,15 +502,11 @@ const Dashboard = ({ data, onExport }) => {
               px: 4,
               py: 2,
               borderRadius: 3,
-              background: '#ffffff',
-              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
               fontSize: '1.1rem',
               fontWeight: 700,
               textTransform: 'none',
               '&:hover': {
-                background: '#ffffff',
-                transform: 'translateY(-4px)',
-                boxShadow: '0 12px 40px rgba(0, 0, 0, 0.1)'
+                transform: 'translateY(-4px)'
               }
             }}
           >

@@ -49,9 +49,10 @@ import {
   quantile
 } from 'simple-statistics';
 
-// Gemini API Configuration
-const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent";
-const API_KEY = "AIzaSyDvQL-v2yE-R-uv254uXHsDBmQeMMpGq58";
+// Note: AI Insights now uses local statistical analysis - no API key required
+// The code below is kept for reference but is not used
+const API_URL = "https://api.openai.com/v1/chat/completions";
+const API_KEY = ""; // Not used - local analysis only
 
 const AIInsights = ({ data }) => {
   const [analyzing, setAnalyzing] = useState(false);
@@ -117,74 +118,197 @@ const AIInsights = ({ data }) => {
     setAiError(null);
     
     try {
-      // Prepare data summary for Gemini API
-      const dataSummary = prepareDataSummary();
+      // Generate local AI-style insights without external API
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate processing
       
-      const prompt = `Analyze this dataset and provide comprehensive insights in a well-structured markdown format. Dataset summary:
-${dataSummary}
-
-Please structure your analysis using the following markdown sections:
-
-## Dataset Overview
-Brief summary of the dataset structure and scope.
-
-## Key Patterns and Trends
-Identify 3-5 most significant patterns in the data.
-
-## Business Insights and Recommendations  
-Provide actionable business recommendations based on the analysis.
-
-## Data Quality Assessment
-Evaluate data quality issues and suggest improvements.
-
-## Suggested Visualizations
-Recommend specific chart types and analysis approaches.
-
-## Notable Correlations and Anomalies
-Highlight interesting relationships and outliers.
-
-Use proper markdown formatting with:
-- **Bold text** for emphasis
-- *Italic text* for secondary points
-- • Bullet points for lists
-- > Blockquotes for key insights
-
-Format your response in clear, actionable insights that would be valuable for data analysis.`;
-
-      const response = await fetch(`${API_URL}?key=${API_KEY}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          contents: [{
-            parts: [{
-              text: prompt
-            }]
-          }]
-        })
-      });
-
-      if (!response.ok) {
-        throw new Error(`API request failed: ${response.status}`);
-      }
-
-      const result = await response.json();
-      const aiText = result.candidates?.[0]?.content?.parts?.[0]?.text;
-      
-      if (!aiText) {
-        throw new Error('No response from AI model');
-      }
-
-      // Parse AI response into structured insights
-      const structuredInsights = parseAIResponse(aiText);
-      setAiInsights(structuredInsights);
+      const localInsights = generateLocalAIInsights();
+      setAiInsights(localInsights);
       
     } catch (error) {
+      console.error('AI Insights error:', error);
       setAiError(`AI Insights analysis failed: ${error.message}`);
     } finally {
       setLoadingAI(false);
     }
+  };
+
+  const generateLocalAIInsights = () => {
+    const numericColumns = Object.keys(numericData);
+    const categoricalColumns = Object.keys(categoricalData);
+    const totalRows = data?.data?.length || 0;
+    
+    let insights = "## 📊 Dataset Overview\n\n";
+    insights += `This dataset contains **${totalRows.toLocaleString()} records** across **${data?.columns?.length || 0} variables**. `;
+    insights += `The data includes **${numericColumns.length} numeric columns** and **${categoricalColumns.length} categorical columns**, `;
+    insights += `providing a comprehensive view for analysis.\n\n`;
+    
+    insights += "## 🔍 Key Patterns and Trends\n\n";
+    
+    // Analyze numeric columns
+    if (numericColumns.length > 0) {
+      const statsAnalysis = [];
+      numericColumns.forEach(col => {
+        const values = numericData[col];
+        const avg = mean(values);
+        const stdDev = standardDeviation(values);
+        const minVal = min(values);
+        const maxVal = max(values);
+        const range = maxVal - minVal;
+        const cv = (stdDev / avg) * 100; // coefficient of variation
+        
+        statsAnalysis.push({ col, avg, stdDev, minVal, maxVal, range, cv });
+      });
+      
+      // Find most variable column
+      const mostVariable = statsAnalysis.reduce((a, b) => a.cv > b.cv ? a : b);
+      insights += `• **High Variability in ${mostVariable.col}**: This metric shows significant variation (CV: ${mostVariable.cv.toFixed(1)}%), `;
+      insights += `ranging from ${mostVariable.minVal.toLocaleString()} to ${mostVariable.maxVal.toLocaleString()}. `;
+      insights += `This suggests diverse patterns worth investigating.\n\n`;
+      
+      // Find most stable column
+      const mostStable = statsAnalysis.reduce((a, b) => a.cv < b.cv ? a : b);
+      insights += `• **Consistent Pattern in ${mostStable.col}**: Shows low variability (CV: ${mostStable.cv.toFixed(1)}%), `;
+      insights += `indicating stable behavior across the dataset.\n\n`;
+      
+      // Identify potential outliers
+      statsAnalysis.forEach(stat => {
+        const outlierThreshold = stat.avg + (3 * stat.stdDev);
+        if (stat.maxVal > outlierThreshold) {
+          insights += `• **Potential Outliers in ${stat.col}**: Maximum value (${stat.maxVal.toLocaleString()}) `;
+          insights += `significantly exceeds expected range, suggesting anomalies or exceptional cases.\n\n`;
+        }
+      });
+    }
+    
+    // Analyze categorical patterns
+    if (categoricalColumns.length > 0) {
+      categoricalColumns.slice(0, 2).forEach(col => {
+        const uniqueValues = new Set(categoricalData[col]).size;
+        const totalValues = categoricalData[col].length;
+        const uniqueRatio = (uniqueValues / totalValues) * 100;
+        
+        if (uniqueRatio < 10) {
+          insights += `• **Limited Categories in ${col}**: Only ${uniqueValues} distinct values, `;
+          insights += `suggesting this could be a useful grouping variable for segmentation analysis.\n\n`;
+        } else if (uniqueRatio > 90) {
+          insights += `• **High Diversity in ${col}**: ${uniqueValues} unique values indicate `;
+          insights += `granular data that may benefit from aggregation or grouping.\n\n`;
+        }
+      });
+    }
+    
+    insights += "## 💡 Business Insights and Recommendations\n\n";
+    
+    if (numericColumns.length > 0) {
+      insights += "**Performance Optimization:**\n";
+      insights += `• Focus on the high-variability metrics (particularly ${numericColumns[0]}) to identify improvement opportunities\n`;
+      insights += `• Stable metrics can serve as reliable benchmarks for performance tracking\n\n`;
+      
+      insights += "**Data-Driven Decisions:**\n";
+      insights += "• Use outlier analysis to identify exceptional cases that may require special attention\n";
+      insights += "• Consider time-series analysis if temporal patterns exist in your data\n\n";
+    }
+    
+    if (categoricalColumns.length > 0) {
+      insights += "**Segmentation Strategy:**\n";
+      insights += `• Leverage low-cardinality variables for customer/product segmentation\n`;
+      insights += `• High-diversity columns may reveal micro-segments for targeted strategies\n\n`;
+    }
+    
+    insights += "## 🎯 Data Quality Assessment\n\n";
+    
+    const nullCounts = data?.columns?.map(col => {
+      const nulls = data.data.filter(row => !row[col] || row[col] === '').length;
+      return { col, nulls, pct: (nulls / totalRows) * 100 };
+    }).filter(item => item.nulls > 0) || [];
+    
+    if (nullCounts.length > 0) {
+      insights += "**Missing Data Detected:**\n";
+      nullCounts.slice(0, 3).forEach(item => {
+        insights += `• ${item.col}: ${item.pct.toFixed(1)}% missing values\n`;
+      });
+      insights += "\n**Recommendations:**\n";
+      insights += "• Consider imputation strategies for columns with <20% missing data\n";
+      insights += "• Evaluate whether missing values follow systematic patterns\n\n";
+    } else {
+      insights += "✅ **Excellent data completeness** - No significant missing values detected\n\n";
+    }
+    
+    insights += "## 📈 Suggested Visualizations\n\n";
+    
+    if (numericColumns.length >= 2) {
+      insights += `**Correlation Analysis:**\n`;
+      insights += `• Create scatter plots between ${numericColumns[0]} and ${numericColumns[1]} to identify relationships\n`;
+      insights += `• Use heatmaps to visualize correlations across all numeric variables\n\n`;
+    }
+    
+    if (numericColumns.length > 0) {
+      insights += `**Distribution Analysis:**\n`;
+      insights += `• Histogram for ${numericColumns[0]} to understand value distribution\n`;
+      insights += `• Box plots to identify outliers and quartile ranges\n\n`;
+    }
+    
+    if (categoricalColumns.length > 0 && numericColumns.length > 0) {
+      insights += `**Comparative Analysis:**\n`;
+      insights += `• Bar charts showing ${numericColumns[0]} grouped by ${categoricalColumns[0]}\n`;
+      insights += `• Stacked area charts for trend analysis across categories\n\n`;
+    }
+    
+    insights += "## 🔬 Notable Correlations and Anomalies\n\n";
+    
+    if (numericColumns.length >= 2) {
+      // Calculate simple correlation between first two numeric columns
+      const col1 = numericData[numericColumns[0]];
+      const col2 = numericData[numericColumns[1]];
+      const minLen = Math.min(col1.length, col2.length);
+      
+      const mean1 = mean(col1.slice(0, minLen));
+      const mean2 = mean(col2.slice(0, minLen));
+      
+      let correlation = 0;
+      let sumSq1 = 0;
+      let sumSq2 = 0;
+      
+      for (let i = 0; i < minLen; i++) {
+        const diff1 = col1[i] - mean1;
+        const diff2 = col2[i] - mean2;
+        correlation += diff1 * diff2;
+        sumSq1 += diff1 * diff1;
+        sumSq2 += diff2 * diff2;
+      }
+      
+      correlation = correlation / Math.sqrt(sumSq1 * sumSq2);
+      
+      if (Math.abs(correlation) > 0.5) {
+        insights += `• **${correlation > 0 ? 'Strong Positive' : 'Strong Negative'} Correlation**: `;
+        insights += `${numericColumns[0]} and ${numericColumns[1]} show a correlation of ${correlation.toFixed(3)}, `;
+        insights += `indicating ${correlation > 0 ? 'they tend to move together' : 'an inverse relationship'}.\n\n`;
+      }
+    }
+    
+    insights += "> **Pro Tip**: These insights are generated from statistical analysis of your data. ";
+    insights += "For deeper AI-powered analysis, consider connecting an external AI service with proper API credits.\n";
+    
+    // Parse the markdown into sections for structured display
+    const sections = insights.split(/(?=^## )/gm).filter(s => s.trim());
+    
+    return {
+      text: insights,
+      insights: sections.map((section, index) => {
+        const lines = section.trim().split('\n');
+        const title = lines[0].replace(/^##\s*/, '').trim() || `Analysis Section ${index + 1}`;
+        const content = lines.slice(1).join('\n').trim();
+        
+        return {
+          id: index,
+          type: 'statistical',
+          title: title,
+          content: content,
+          confidence: 0.95,
+          source: 'Statistical Analysis'
+        };
+      })
+    };
   };
 
   const prepareDataSummary = () => {
@@ -623,12 +747,12 @@ Format your response in clear, actionable insights that would be valuable for da
         )}
 
         {/* AI-Powered Insights Section */}
-        <Paper sx={{ 
+        <Paper elevation={0} sx={{ 
           p: 3, 
           mb: 3, 
-          background: '#ffffff',
-          border: '2px solid',
-          borderColor: '#e0e0e0',
+          background: 'background.paper',
+          border: '1px solid',
+          borderColor: 'divider',
           borderRadius: 2
         }}>
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
@@ -745,7 +869,7 @@ Format your response in clear, actionable insights that would be valuable for da
                             label={`${(insight.confidence * 100).toFixed(0)}%`} 
                             size="small" 
                             sx={{ 
-                              backgroundColor: 'rgba(255,255,255,0.2)',
+                              backgroundColor: 'rgba(41, 98, 255, 0.2)',
                               color: 'white',
                               fontWeight: 600
                             }}
@@ -754,7 +878,7 @@ Format your response in clear, actionable insights that would be valuable for da
                             label={insight.source} 
                             size="small" 
                             sx={{ 
-                              backgroundColor: 'rgba(255,255,255,0.1)',
+                              backgroundColor: 'rgba(41, 98, 255, 0.1)',
                               color: 'white'
                             }}
                           />

@@ -43,15 +43,15 @@ ChartJS.register(
   TreemapElement
 );
 
-// Set default Chart.js colors to black/white theme
-ChartJS.defaults.color = '#000000';
-ChartJS.defaults.backgroundColor = '#ffffff';
-ChartJS.defaults.borderColor = '#000000';
-ChartJS.defaults.plugins.legend.labels.color = '#000000';
-ChartJS.defaults.plugins.tooltip.backgroundColor = '#ffffff';
-ChartJS.defaults.plugins.tooltip.titleColor = '#000000';
-ChartJS.defaults.plugins.tooltip.bodyColor = '#000000';
-ChartJS.defaults.plugins.tooltip.borderColor = '#000000';
+// Set default Chart.js colors to TradingView dark theme
+ChartJS.defaults.color = '#D1D4DC';
+ChartJS.defaults.backgroundColor = '#1E222D';
+ChartJS.defaults.borderColor = '#2A2E39';
+ChartJS.defaults.plugins.legend.labels.color = '#D1D4DC';
+ChartJS.defaults.plugins.tooltip.backgroundColor = '#1E222D';
+ChartJS.defaults.plugins.tooltip.titleColor = '#D1D4DC';
+ChartJS.defaults.plugins.tooltip.bodyColor = '#D1D4DC';
+ChartJS.defaults.plugins.tooltip.borderColor = '#2A2E39';
 ChartJS.defaults.plugins.tooltip.borderWidth = 1;
 
 export default ChartJS;

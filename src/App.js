@@ -34,6 +34,8 @@ import DataPreview from './components/dataProcessing/DataPreview';
 import DataTransformer from './components/dataProcessing/DataTransformer';
 import Dashboard from './components/dashboard/Dashboard';
 import AIInsights from './components/insights/AIInsights';
+import AdvancedAnalytics from './components/insights/AdvancedAnalytics';
+import RealTimeDataStream from './components/dataProcessing/RealTimeDataStream';
 import ErrorBoundary from './components/common/ErrorBoundary';
 
 // Memoize TabPanel to prevent unnecessary re-renders
@@ -91,6 +93,8 @@ function App() {
     { label: 'Transform Data', icon: <Transform />, disabled: !data },
     { label: 'Charts & Dashboard', icon: <DashboardIcon />, disabled: !data },
     { label: 'AI Insights', icon: <AutoAwesome />, disabled: !data },
+    { label: 'Advanced Analytics', icon: <Assessment />, disabled: !data },
+    { label: 'Real-Time Stream', icon: <Timeline />, disabled: false },
   ];
 
   return (
@@ -98,37 +102,37 @@ function App() {
       <CssBaseline />
       <div className="App">
         <Box className="app-content">
-        {/* Simple App Bar with minimalistic design */}
+        {/* TradingView-style App Bar */}
         <AppBar 
           position="sticky" 
           elevation={0}
           role="banner"
         >
-          <Toolbar sx={{ justifyContent: 'space-between', py: 1 }}>
+          <Toolbar sx={{ justifyContent: 'space-between', py: 1.5, minHeight: 56 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               <Box 
                 sx={{ 
-                  p: 1.5, 
-                  borderRadius: '12px', 
-                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  p: 1, 
+                  borderRadius: '4px', 
+                  background: '#2962FF',
                   color: 'white',
-                  boxShadow: '0 4px 12px rgba(102, 126, 234, 0.3)'
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
                 }}
                 aria-label="DataViz Pro Logo"
-                className="glow-animation"
               >
-                <Assessment sx={{ fontSize: 28 }} />
+                <Assessment sx={{ fontSize: 24 }} />
               </Box>
               <Box>
                 <Typography 
-                  variant="h5" 
+                  variant="h6" 
                   component="h1"
                   sx={{ 
-                    fontWeight: 700, 
+                    fontWeight: 500, 
                     color: 'text.primary',
-                    background: 'linear-gradient(135deg, #ffffff 0%, #b4b4c6 100%)',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent'
+                    fontSize: '16px',
+                    lineHeight: 1.2
                   }}
                 >
                   DataViz Pro
@@ -136,7 +140,7 @@ function App() {
                 <Typography 
                   variant="caption" 
                   color="text.secondary" 
-                  sx={{ fontWeight: 500 }}
+                  sx={{ fontWeight: 400, fontSize: '11px' }}
                   component="p"
                 >
                   Advanced Analytics Platform
@@ -152,13 +156,6 @@ function App() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="View source code on GitHub"
-                  sx={{ 
-                    border: '1px solid rgba(255, 255, 255, 0.1)',
-                    '&:hover': { 
-                      backgroundColor: 'rgba(102, 126, 234, 0.1)',
-                      borderColor: 'rgba(102, 126, 234, 0.4)'
-                    }
-                  }}
                 >
                   <GitHub />
                 </IconButton>
@@ -166,9 +163,10 @@ function App() {
             </Box>
           </Toolbar>
           
-          {/* Simple Tabs */}
+          {/* TradingView-style Tabs */}
           <Box sx={{ 
-            borderTop: '1px solid rgba(255, 255, 255, 0.1)'
+            borderTop: '1px solid',
+            borderColor: 'divider'
           }}
           role="navigation"
           aria-label="Main navigation tabs"
@@ -179,28 +177,22 @@ function App() {
               variant="scrollable"
               scrollButtons="auto"
               sx={{
+                minHeight: 48,
                 '& .MuiTab-root': {
-                  minHeight: 64,
-                  fontWeight: 500,
+                  minHeight: 48,
+                  fontWeight: 400,
                   textTransform: 'none',
-                  borderRadius: '4px 4px 0 0',
-                  margin: '0 2px',
-                  transition: 'all 0.3s ease',
+                  fontSize: '13px',
+                  px: 3,
+                  transition: 'color 0.2s ease',
                   color: 'text.secondary',
                   '&.Mui-selected': {
-                    background: 'rgba(102, 126, 234, 0.1)',
                     color: 'text.primary',
-                    fontWeight: 600,
-                    boxShadow: '0 2px 8px rgba(102, 126, 234, 0.2)'
+                    fontWeight: 500
                   },
                   '&:hover:not(.Mui-selected)': {
-                    background: 'rgba(255, 255, 255, 0.05)',
                     color: 'text.primary'
                   }
-                },
-                '& .MuiTabs-indicator': {
-                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                  height: 3
                 }
               }}
             >
@@ -226,12 +218,11 @@ function App() {
           </Box>
         </AppBar>
 
-          {/* Enhanced Tab Content with animations */}
-          <Container maxWidth="xl" sx={{ mt: 3, mb: 4 }}>
-            {/* Tab Panels with minimalist styling */}
+          {/* Tab Content */}
+          <Container maxWidth="xl" sx={{ mt: 2, mb: 4 }}>
             <TabPanel value={currentTab} index={0}>
               <ErrorBoundary>
-                <Paper className="card">
+                <Paper elevation={0}>
                   <FileUploader
                     onDataLoaded={handleDataLoaded}
                     onError={handleError}
@@ -242,7 +233,7 @@ function App() {
 
             <TabPanel value={currentTab} index={1}>
               <ErrorBoundary>
-                <Paper className="card">
+                <Paper elevation={0}>
                   <DataPreview
                     data={getCurrentData()}
                     title={transformedData ? "Transformed Data Preview" : "Data Preview"}
@@ -253,7 +244,7 @@ function App() {
 
             <TabPanel value={currentTab} index={2}>
               <ErrorBoundary>
-                <Paper className="card">
+                <Paper elevation={0}>
                   <DataTransformer
                     data={data}
                     onTransformedData={handleDataTransformed}
@@ -264,195 +255,225 @@ function App() {
 
             <TabPanel value={currentTab} index={3}>
               <ErrorBoundary>
-                <div className="card">
+                <Paper elevation={0} sx={{ p: 0 }}>
                   <Dashboard
                     data={getCurrentData()}
                     onExport={(widgetId, format) => {
                       setSuccess(`Exporting widget ${widgetId} as ${format}`);
                     }}
                   />
-                </div>
+                </Paper>
               </ErrorBoundary>
             </TabPanel>
 
             <TabPanel value={currentTab} index={4}>
               <ErrorBoundary>
-                <Paper className="card">
+                <Paper elevation={0}>
                   <AIInsights data={getCurrentData()} />
                 </Paper>
               </ErrorBoundary>
             </TabPanel>
 
-            {/* Enhanced Welcome Message with modern design */}
+            <TabPanel value={currentTab} index={5}>
+              <ErrorBoundary>
+                <Paper elevation={0}>
+                  <AdvancedAnalytics data={getCurrentData()} />
+                </Paper>
+              </ErrorBoundary>
+            </TabPanel>
+
+            <TabPanel value={currentTab} index={6}>
+              <ErrorBoundary>
+                <Paper elevation={0}>
+                  <RealTimeDataStream 
+                    onDataUpdate={(newData) => {
+                      // Merge real-time data with existing data
+                      if (data) {
+                        const updatedData = {
+                          ...data,
+                          data: [...data.data, newData],
+                          rowCount: data.rowCount + 1
+                        };
+                        setData(updatedData);
+                      }
+                    }}
+                  />
+                </Paper>
+              </ErrorBoundary>
+            </TabPanel>
+
+            {/* Welcome Message */}
             {!data && currentTab === 0 && (
               <Box sx={{ mt: 8, textAlign: 'center' }}>
-                <Box className="float-animation" sx={{ mb: 6 }}>
+                <Box sx={{ mb: 4, display: 'flex', justifyContent: 'center' }}>
                   <Box sx={{ 
-                    display: 'inline-block',
                     p: 3,
-                    borderRadius: '50%',
-                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                    boxShadow: '0 8px 32px rgba(102, 126, 234, 0.4)'
-                  }}
-                  className="glow-animation"
-                  >
-                    <AutoAwesome sx={{ fontSize: 64, color: 'white' }} />
+                    borderRadius: '8px',
+                    background: '#2962FF',
+                    display: 'inline-flex'
+                  }}>
+                    <AutoAwesome sx={{ fontSize: 48, color: 'white' }} />
                   </Box>
                 </Box>
                 
                 <Typography 
-                  variant="h2" 
-                  className="glass-text"
+                  variant="h3" 
                   sx={{ 
-                    mb: 3,
-                    fontWeight: 900,
-                    letterSpacing: '-0.025em',
-                    background: 'linear-gradient(135deg, #ffffff 0%, #b4b4c6 100%)',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent'
+                    mb: 2,
+                    fontWeight: 500,
+                    color: 'text.primary'
                   }}
                 >
                   Welcome to DataViz Pro
                 </Typography>
                 
                 <Typography 
-                  variant="h5" 
-                  className="glass-text-secondary"
+                  variant="body1" 
                   sx={{ 
-                    mb: 6, 
-                    maxWidth: 700, 
+                    mb: 4, 
+                    maxWidth: 600, 
                     mx: 'auto',
-                    fontWeight: 400,
-                    lineHeight: 1.6,
-                    color: 'text.secondary'
+                    color: 'text.secondary',
+                    lineHeight: 1.6
                   }}
                 >
                   Transform your data into stunning visualizations with AI-powered insights and advanced analytics
                 </Typography>
                 
                 <Paper 
-                  className="modern-card" 
+                  elevation={0}
                   sx={{ 
-                    p: 6, 
+                    p: 4, 
                     maxWidth: 900, 
                     mx: 'auto',
-                    borderRadius: 4
+                    mt: 4
                   }}
                 >
                   <Typography 
-                    variant="h5" 
+                    variant="h6" 
                     sx={{ 
-                      mb: 4,
-                      fontWeight: 700,
-                      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                      WebkitBackgroundClip: 'text',
-                      WebkitTextFillColor: 'transparent',
+                      mb: 3,
+                      fontWeight: 500,
+                      color: 'text.primary',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      gap: 2
+                      gap: 1
                     }}
                   >
-                    <AutoAwesome />
+                    <AutoAwesome sx={{ color: 'primary.main' }} />
                     Platform Features
                   </Typography>
                   
                   <Box sx={{ 
                     display: 'grid', 
                     gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, 
-                    gap: 4,
+                    gap: 2,
                     textAlign: 'left'
                   }}>
-                    <Box className="modern-card" sx={{ 
+                    <Box sx={{ 
                       p: 3, 
-                      background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%)',
-                      border: '1px solid rgba(102, 126, 234, 0.3)',
-                      color: 'white' 
+                      border: '1px solid',
+                      borderColor: 'divider',
+                      borderRadius: '4px',
+                      background: 'background.paper'
                     }}>
-                      <Typography variant="h6" sx={{ fontWeight: 700, mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <Assessment />
+                      <Typography variant="subtitle1" sx={{ fontWeight: 500, mb: 1, display: 'flex', alignItems: 'center', gap: 1, color: 'text.primary' }}>
+                        <Assessment sx={{ fontSize: 20 }} />
                         Advanced Visualizations
                       </Typography>
-                      <Typography variant="body1" sx={{ lineHeight: 1.6, color: 'text.secondary' }}>
+                      <Typography variant="body2" sx={{ lineHeight: 1.6, color: 'text.secondary' }}>
                         Create stunning charts with Plotly.js and Recharts in one unified dashboard with drag-and-drop functionality
                       </Typography>
                     </Box>
                     
-                    <Box className="modern-card" sx={{ 
+                    <Box sx={{ 
                       p: 3, 
-                      background: 'linear-gradient(135deg, rgba(240, 147, 251, 0.2) 0%, rgba(245, 87, 108, 0.2) 100%)',
-                      border: '1px solid rgba(240, 147, 251, 0.3)',
-                      color: 'white' 
+                      border: '1px solid',
+                      borderColor: 'divider',
+                      borderRadius: '4px',
+                      background: 'background.paper'
                     }}>
-                      <Typography variant="h6" sx={{ fontWeight: 700, mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <AutoAwesome />
+                      <Typography variant="subtitle1" sx={{ fontWeight: 500, mb: 1, display: 'flex', alignItems: 'center', gap: 1, color: 'text.primary' }}>
+                        <AutoAwesome sx={{ fontSize: 20 }} />
                         AI-Powered Insights
                       </Typography>
-                      <Typography variant="body1" sx={{ lineHeight: 1.6, color: 'text.secondary' }}>
+                      <Typography variant="body2" sx={{ lineHeight: 1.6, color: 'text.secondary' }}>
                         Discover patterns and correlations automatically with Google's Gemini AI integration
                       </Typography>
                     </Box>
                     
-                    <Box className="modern-card" sx={{ 
+                    <Box sx={{ 
                       p: 3, 
-                      background: 'linear-gradient(135deg, rgba(79, 172, 254, 0.2) 0%, rgba(0, 242, 254, 0.2) 100%)',
-                      border: '1px solid rgba(79, 172, 254, 0.3)',
-                      color: 'white' 
+                      border: '1px solid',
+                      borderColor: 'divider',
+                      borderRadius: '4px',
+                      background: 'background.paper'
                     }}>
-                      <Typography variant="h6" sx={{ fontWeight: 700, mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <Timeline />
+                      <Typography variant="subtitle1" sx={{ fontWeight: 500, mb: 1, display: 'flex', alignItems: 'center', gap: 1, color: 'text.primary' }}>
+                        <Timeline sx={{ fontSize: 20 }} />
                         Interactive Dashboard
                       </Typography>
-                      <Typography variant="body1" sx={{ lineHeight: 1.6, color: 'text.secondary' }}>
+                      <Typography variant="body2" sx={{ lineHeight: 1.6, color: 'text.secondary' }}>
                         Drag, drop, and resize charts in a flexible grid layout with real-time data transformations
                       </Typography>
                     </Box>
                     
-                    <Box className="modern-card" sx={{ 
+                    <Box sx={{ 
                       p: 3, 
-                      background: 'linear-gradient(135deg, rgba(250, 112, 154, 0.2) 0%, rgba(254, 225, 64, 0.2) 100%)',
-                      border: '1px solid rgba(250, 112, 154, 0.3)',
-                      color: 'white' 
+                      border: '1px solid',
+                      borderColor: 'divider',
+                      borderRadius: '4px',
+                      background: 'background.paper'
                     }}>
-                      <Typography variant="h6" sx={{ fontWeight: 700, mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <Upload />
+                      <Typography variant="subtitle1" sx={{ fontWeight: 500, mb: 1, display: 'flex', alignItems: 'center', gap: 1, color: 'text.primary' }}>
+                        <Upload sx={{ fontSize: 20 }} />
                         Multiple Formats
                       </Typography>
-                      <Typography variant="body1" sx={{ lineHeight: 1.6, color: 'text.secondary' }}>
+                      <Typography variant="body2" sx={{ lineHeight: 1.6, color: 'text.secondary' }}>
                         Support for CSV, JSON, Excel files and more with advanced data processing capabilities
                       </Typography>
                     </Box>
                   </Box>
                   
-                  <Box sx={{ mt: 6, textAlign: 'center' }}>
-                    <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
+                  <Box sx={{ mt: 4, textAlign: 'center' }}>
+                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
                       Ready to start? Upload your data file to begin exploring!
                     </Typography>
                     <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, flexWrap: 'wrap' }}>
-                      <Box className="modern-card" sx={{ 
-                        p: 1.5, 
-                        background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%)',
-                        border: '1px solid rgba(102, 126, 234, 0.3)'
+                      <Box sx={{ 
+                        px: 2,
+                        py: 0.5,
+                        border: '1px solid',
+                        borderColor: 'divider',
+                        borderRadius: '4px',
+                        background: 'background.paper'
                       }}>
-                        <Typography variant="body2" sx={{ fontWeight: 600, color: '#667eea' }}>
+                        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
                           📊 CSV Files
                         </Typography>
                       </Box>
-                      <Box className="modern-card" sx={{ 
-                        p: 1.5, 
-                        background: 'linear-gradient(135deg, rgba(79, 172, 254, 0.15) 0%, rgba(0, 242, 254, 0.15) 100%)',
-                        border: '1px solid rgba(79, 172, 254, 0.3)'
+                      <Box sx={{ 
+                        px: 2,
+                        py: 0.5,
+                        border: '1px solid',
+                        borderColor: 'divider',
+                        borderRadius: '4px',
+                        background: 'background.paper'
                       }}>
-                        <Typography variant="body2" sx={{ fontWeight: 600, color: '#4facfe' }}>
+                        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
                           📋 Excel Files
                         </Typography>
                       </Box>
-                      <Box className="modern-card" sx={{ 
-                        p: 1.5, 
-                        background: 'linear-gradient(135deg, rgba(240, 147, 251, 0.15) 0%, rgba(245, 87, 108, 0.15) 100%)',
-                        border: '1px solid rgba(240, 147, 251, 0.3)'
+                      <Box sx={{ 
+                        px: 2,
+                        py: 0.5,
+                        border: '1px solid',
+                        borderColor: 'divider',
+                        borderRadius: '4px',
+                        background: 'background.paper'
                       }}>
-                        <Typography variant="body2" sx={{ fontWeight: 600, color: '#f093fb' }}>
+                        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
                           🔗 JSON Data
                         </Typography>
                       </Box>
@@ -463,23 +484,16 @@ function App() {
             )}
           </Container>
 
-          {/* Enhanced Notifications */}
+          {/* Notifications */}
           <Snackbar
             open={!!success}
-            autoHideDuration={6000}
+            autoHideDuration={4000}
             onClose={() => setSuccess('')}
             anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
           >
             <Alert 
               onClose={() => setSuccess('')} 
-              severity="success" 
-              sx={{ 
-                width: '100%',
-                background: 'linear-gradient(135deg, rgba(79, 172, 254, 0.2) 0%, rgba(0, 242, 254, 0.2) 100%)',
-                backdropFilter: 'blur(10px)',
-                border: '1px solid rgba(79, 172, 254, 0.3)',
-                color: 'white'
-              }}
+              severity="success"
             >
               {success}
             </Alert>
@@ -487,20 +501,13 @@ function App() {
 
           <Snackbar
             open={!!error}
-            autoHideDuration={6000}
+            autoHideDuration={5000}
             onClose={() => setError('')}
             anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
           >
             <Alert 
               onClose={() => setError('')} 
-              severity="error" 
-              sx={{ 
-                width: '100%',
-                background: 'linear-gradient(135deg, rgba(245, 87, 108, 0.2) 0%, rgba(240, 147, 251, 0.2) 100%)',
-                backdropFilter: 'blur(10px)',
-                border: '1px solid rgba(245, 87, 108, 0.3)',
-                color: 'white'
-              }}
+              severity="error"
             >
               {error}
             </Alert>

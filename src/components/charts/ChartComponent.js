@@ -287,7 +287,7 @@ const ChartComponent = React.memo(({
   };
 
   return (
-    <Paper sx={{ p: 2, height: '100%' }}>
+    <Paper elevation={0} sx={{ p: 2, height: '100%', background: 'background.paper', border: '1px solid', borderColor: 'divider' }}>
       {/* Header */}
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
         {getChartIcon(chartType)}

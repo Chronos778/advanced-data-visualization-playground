@@ -174,11 +174,11 @@ const FileUploader = ({ onDataLoaded, onError }) => {
   const getFileIcon = (fileType) => {
     switch (fileType) {
       case 'CSV':
-        return <TableChart sx={{ color: '#000000' }} />;
+        return <TableChart sx={{ color: 'text.primary' }} />;
       case 'Excel':
         return <InsertDriveFile color="success" />;
       case 'JSON':
-        return <DataObject sx={{ color: '#000000' }} />;
+        return <DataObject sx={{ color: 'text.primary' }} />;
       default:
         return <InsertDriveFile />;
     }
@@ -218,10 +218,11 @@ const FileUploader = ({ onDataLoaded, onError }) => {
       {/* Modern Upload Zone */}
       <Paper
         {...getRootProps()}
-        className="modern-card"
+        elevation={0}
         sx={{
           p: 6,
-          border: isDragActive ? '3px solid #000000' : '2px dashed #e0e0e0',
+          border: isDragActive ? '3px solid' : '2px dashed',
+          borderColor: isDragActive ? 'primary.main' : 'divider',
           cursor: 'pointer',
           textAlign: 'center',
           mb: 4,
@@ -232,9 +233,7 @@ const FileUploader = ({ onDataLoaded, onError }) => {
           flexDirection: 'column',
           justifyContent: 'center',
           alignItems: 'center',
-          background: isDragActive 
-            ? '#f5f5f5'
-            : '#ffffff',
+          background: 'background.paper',
           borderRadius: 3,
           position: 'relative',
           overflow: 'hidden',
@@ -251,12 +250,13 @@ const FileUploader = ({ onDataLoaded, onError }) => {
             width: 80,
             height: 80,
             borderRadius: '50%',
-            background: '#000000',
+            background: 'primary.main',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            boxShadow: '0 4px 16px rgba(0, 0, 0, 0.1)',
-            border: '2px solid #ffffff',
+            boxShadow: '0 4px 16px rgba(41, 98, 255, 0.3)',
+            border: '2px solid',
+            borderColor: 'divider',
           }}>
             <CloudUpload sx={{ fontSize: 36, color: 'white' }} />
           </Box>
@@ -267,7 +267,7 @@ const FileUploader = ({ onDataLoaded, onError }) => {
           sx={{ 
             mb: 2, 
             fontWeight: 800,
-            color: '#000000',
+            color: 'text.primary',
             letterSpacing: '-0.025em'
           }}
         >
@@ -293,9 +293,9 @@ const FileUploader = ({ onDataLoaded, onError }) => {
         {/* Enhanced File Type Indicators */}
         <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', justifyContent: 'center', mb: 3 }}>
           {[
-            { label: 'CSV Files', icon: <TableChart />, color: '#000000' },
-            { label: 'JSON Data', icon: <DataObject />, color: '#000000' },
-            { label: 'Excel Files', icon: <InsertDriveFile />, color: '#000000' }
+            { label: 'CSV Files', icon: <TableChart />, color: 'text.primary' },
+            { label: 'JSON Data', icon: <DataObject />, color: 'text.primary' },
+            { label: 'Excel Files', icon: <InsertDriveFile />, color: 'text.primary' }
           ].map((type) => (
             <Box
               key={type.label}
@@ -306,7 +306,7 @@ const FileUploader = ({ onDataLoaded, onError }) => {
                 px: 2,
                 py: 1,
                 borderRadius: 2,
-                background: type.color,
+                background: 'primary.main',
                 color: 'white',
                 fontSize: '0.875rem',
                 fontWeight: 600,
@@ -331,13 +331,12 @@ const FileUploader = ({ onDataLoaded, onError }) => {
             px: 4,
             py: 1.5,
             borderRadius: 2,
-            background: '#000000',
-            boxShadow: '0 4px 16px rgba(0, 0, 0, 0.1)',
+            boxShadow: '0 4px 16px rgba(41, 98, 255, 0.3)',
             fontSize: '1rem',
             fontWeight: 600,
             textTransform: 'none',
             '&:hover': {
-              background: '#000000',
+              background: 'primary.main',
               transform: 'translateY(-2px)',
               boxShadow: '0 6px 20px rgba(0, 0, 0, 0.15)'
             }
@@ -349,13 +348,13 @@ const FileUploader = ({ onDataLoaded, onError }) => {
 
       {/* Enhanced Loading State */}
       {uploading && (
-        <Paper className="modern-card" sx={{ p: 4, mb: 4, overflow: 'hidden' }}>
+        <Paper elevation={0} sx={{ p: 4, mb: 4, overflow: 'hidden', border: '1px solid', borderColor: 'divider' }}>
           <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
             <Box sx={{
               width: 48,
               height: 48,
               borderRadius: '50%',
-              background: '#000000',
+              background: 'primary.main',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -376,9 +375,9 @@ const FileUploader = ({ onDataLoaded, onError }) => {
             sx={{
               height: 8,
               borderRadius: 4,
-              backgroundColor: '#f5f5f5',
+              backgroundColor: 'background.default',
               '& .MuiLinearProgress-bar': {
-                background: '#000000',
+                background: 'primary.main',
                 borderRadius: 4,
               }
             }}
@@ -388,7 +387,7 @@ const FileUploader = ({ onDataLoaded, onError }) => {
 
       {/* Enhanced File List */}
       {uploadedFiles.length > 0 && (
-        <Paper className="modern-card" sx={{ p: 4 }}>
+        <Paper elevation={0} sx={{ p: 4, border: '1px solid', borderColor: 'divider' }}>
           <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
             <CheckCircle sx={{ color: 'success.main', mr: 2, fontSize: 28 }} />
             <Box>
@@ -405,15 +404,15 @@ const FileUploader = ({ onDataLoaded, onError }) => {
             {uploadedFiles.map((file) => (
               <Box 
                 key={file.id}
-                className="modern-card"
                 sx={{ 
                   p: 3, 
                   mb: 2,
                   display: 'flex',
                   alignItems: 'center',
                   transition: 'all 0.2s ease',
-                  background: '#ffffff',
-                  border: '1px solid #e0e0e0',
+                  background: 'background.paper',
+                  border: '1px solid',
+                  borderColor: 'divider',
                   '&:hover': { 
                     transform: 'translateX(4px)',
                     boxShadow: '0 6px 20px rgba(0, 0, 0, 0.1)'
@@ -452,8 +451,8 @@ const FileUploader = ({ onDataLoaded, onError }) => {
                       label={`${file.rowCount.toLocaleString()} rows`}
                       size="small"
                       sx={{ 
-                        backgroundColor: '#f5f5f5',
-                        color: '#000000',
+                        backgroundColor: 'background.default',
+                        color: 'text.primary',
                         fontWeight: 600,
                         fontSize: '0.75rem'
                       }}
@@ -462,8 +461,8 @@ const FileUploader = ({ onDataLoaded, onError }) => {
                       label={`${file.columns.length} columns`}
                       size="small"
                       sx={{ 
-                        backgroundColor: '#f5f5f5',
-                        color: '#000000',
+                        backgroundColor: 'background.default',
+                        color: 'text.primary',
                         fontWeight: 600,
                         fontSize: '0.75rem'
                       }}
@@ -474,10 +473,10 @@ const FileUploader = ({ onDataLoaded, onError }) => {
                 <IconButton
                   onClick={() => removeFile(file.id)}
                   sx={{ 
-                    color: '#000000',
-                    background: '#f5f5f5',
+                    color: 'text.primary',
+                    background: 'background.default',
                     '&:hover': {
-                      background: '#e0e0e0',
+                      background: 'action.hover',
                       transform: 'scale(1.1)'
                     },
                     transition: 'all 0.2s ease'
@@ -493,12 +492,12 @@ const FileUploader = ({ onDataLoaded, onError }) => {
 
       {/* Enhanced Empty State */}
       {uploadedFiles.length === 0 && !uploading && (
-        <Paper className="modern-card" sx={{ p: 6, textAlign: 'center', background: '#ffffff' }}>
+        <Paper elevation={0} sx={{ p: 6, textAlign: 'center', background: 'background.paper', border: '1px solid', borderColor: 'divider' }}>
           <Box sx={{
             width: 64,
             height: 64,
             borderRadius: '50%',
-            background: '#f5f5f5',
+            background: 'background.default',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',

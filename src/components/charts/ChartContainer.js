@@ -73,7 +73,8 @@ const EnhancedChartHeader = memo(({
       alignItems: 'center', 
       justifyContent: 'space-between',
       p: 1,
-      borderBottom: '1px solid #e0e0e0',
+      borderBottom: '1px solid',
+      borderColor: 'divider',
       minHeight: 48
     }}>
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -373,9 +374,12 @@ const ChartContainer = memo(({
           display: 'flex', 
           flexDirection: 'column',
           position: 'relative',
-          overflow: 'hidden'
+          overflow: 'hidden',
+          background: 'background.paper',
+          border: '1px solid',
+          borderColor: 'divider'
         }}
-        elevation={1}
+        elevation={0}
       >
         <EnhancedChartHeader
           title={title}

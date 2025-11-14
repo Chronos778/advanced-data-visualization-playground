@@ -103,7 +103,7 @@ const ExportManager = ({ dashboardRef, widgets, data, layout }) => {
         scale: scale,
         useCORS: true,
         allowTaint: true,
-        backgroundColor: '#ffffff',
+        backgroundColor: '#131722',
         width: dashboardRef.current.scrollWidth,
         height: dashboardRef.current.scrollHeight
       });
@@ -133,7 +133,7 @@ const ExportManager = ({ dashboardRef, widgets, data, layout }) => {
         scale: 2,
         useCORS: true,
         allowTaint: true,
-        backgroundColor: '#ffffff'
+        backgroundColor: '#131722'
       });
 
       const paperSize = paperSizes.find(p => p.value === exportConfig.paperSize);
@@ -275,7 +275,7 @@ const ExportManager = ({ dashboardRef, widgets, data, layout }) => {
         if (element) {
           const canvas = await html2canvas(element, {
             scale: 2,
-            backgroundColor: '#ffffff'
+            backgroundColor: '#131722'
           });
 
           const link = document.createElement('a');

@@ -59,8 +59,8 @@ const UnifiedChart = React.memo(({
     maintainAspectRatio: false,
     borderWidth: 2,
     pointRadius: 4,
-    backgroundColor: '#ffffff',
-    borderColor: '#000000',
+    backgroundColor: '#1E222D',
+    borderColor: '#2962FF',
     ...config
   });
 
@@ -111,14 +111,14 @@ const UnifiedChart = React.memo(({
             datasets: [{
               label: yAxis || 'Data',
               data: values,
-              backgroundColor: chartType === 'bar' ? 'rgba(0, 0, 0, 0.8)' : 'transparent',
-              borderColor: '#000000',
+              backgroundColor: chartType === 'bar' ? 'rgba(41, 98, 255, 0.8)' : 'transparent',
+              borderColor: '#2962FF',
               borderWidth: chartConfig.borderWidth,
               fill: chartType === 'line' ? false : true,
               tension: chartType === 'line' ? 0.1 : 0,
               pointRadius: chartType === 'line' ? chartConfig.pointRadius : 0,
-              pointBackgroundColor: '#000000',
-              pointBorderColor: '#ffffff'
+              pointBackgroundColor: '#2962FF',
+              pointBorderColor: '#D1D4DC'
             }]
           };
 
@@ -139,7 +139,7 @@ const UnifiedChart = React.memo(({
             datasets: [{
               data: pieValues,
               backgroundColor: gradientColors.slice(0, pieValues.length),
-              borderColor: 'rgba(255, 255, 255, 0.2)',
+              borderColor: 'rgba(209, 212, 220, 0.2)',
               borderWidth: 2,
               hoverBorderWidth: 3
             }]
@@ -153,10 +153,10 @@ const UnifiedChart = React.memo(({
                 x: parseFloat(row[xAxis]) || 0,
                 y: parseFloat(row[yAxis]) || 0
               })),
-              backgroundColor: 'rgba(0, 0, 0, 0.8)',
-              borderColor: '#000000',
+              backgroundColor: 'rgba(41, 98, 255, 0.8)',
+              borderColor: '#2962FF',
               pointRadius: chartConfig.pointRadius,
-              pointBorderColor: '#ffffff',
+              pointBorderColor: '#D1D4DC',
               pointBorderWidth: 1
             }]
           };
@@ -180,12 +180,12 @@ const UnifiedChart = React.memo(({
             datasets: [{
               label: yAxis || 'Data',
               data: radarCategories.map(row => parseFloat(row[yAxis]) || 0),
-              backgroundColor: 'rgba(0, 0, 0, 0.2)',
-              borderColor: '#000000',
+              backgroundColor: 'rgba(41, 98, 255, 0.2)',
+              borderColor: '#2962FF',
               borderWidth: 2,
               pointRadius: chartConfig.pointRadius,
-              pointBackgroundColor: '#000000',
-              pointBorderColor: '#ffffff'
+              pointBackgroundColor: '#2962FF',
+              pointBorderColor: '#D1D4DC'
             }]
           };
 
@@ -215,8 +215,8 @@ const UnifiedChart = React.memo(({
             datasets: [{
               label: 'Frequency',
               data: binCounts,
-              backgroundColor: 'rgba(0, 0, 0, 0.7)',
-              borderColor: '#000000',
+              backgroundColor: 'rgba(41, 98, 255, 0.7)',
+              borderColor: '#2962FF',
               borderWidth: 1
             }]
           };
@@ -241,8 +241,8 @@ const UnifiedChart = React.memo(({
                 q3: q3,
                 max: maxVal
               }],
-              backgroundColor: 'rgba(0, 0, 0, 0.5)',
-              borderColor: '#000000',
+              backgroundColor: 'rgba(41, 98, 255, 0.5)',
+              borderColor: '#2962FF',
               borderWidth: 1
             }]
           };
@@ -254,8 +254,8 @@ const UnifiedChart = React.memo(({
             datasets: [{
               label: yAxis || 'Data',
               data: plotData.map(row => parseFloat(row[yAxis]) || 0).filter(v => !isNaN(v)),
-              backgroundColor: 'rgba(0, 0, 0, 0.3)',
-              borderColor: '#000000',
+              backgroundColor: 'rgba(41, 98, 255, 0.3)',
+              borderColor: '#2962FF',
               borderWidth: 1
             }]
           };
@@ -288,7 +288,7 @@ const UnifiedChart = React.memo(({
                 const intensity = value / max;
                 return `rgba(0, 0, 0, ${intensity})`;
               },
-              borderColor: '#ffffff',
+              borderColor: '#D1D4DC',
               borderWidth: 1,
               width: ({chart}) => (chart.chartArea || {}).width / uniqueX.length,
               height: ({chart}) => (chart.chartArea || {}).height / uniqueY.length,
@@ -311,7 +311,7 @@ const UnifiedChart = React.memo(({
                 const index = context.dataIndex % gradientColors.length;
                 return gradientColors[index];
               },
-              borderColor: 'rgba(255, 255, 255, 0.2)',
+              borderColor: 'rgba(209, 212, 220, 0.2)',
               borderWidth: 2
             }]
           };
@@ -331,8 +331,8 @@ const UnifiedChart = React.memo(({
             datasets: [{
               label: 'Cumulative',
               data: waterfallData,
-              backgroundColor: waterfallValues.map(v => v >= 0 ? 'rgba(0, 0, 0, 0.7)' : 'rgba(128, 128, 128, 0.7)'),
-              borderColor: '#000000',
+              backgroundColor: waterfallValues.map(v => v >= 0 ? 'rgba(41, 98, 255, 0.7)' : 'rgba(128, 128, 128, 0.7)'),
+              borderColor: '#2962FF',
               borderWidth: 1
             }]
           };
@@ -349,7 +349,7 @@ const UnifiedChart = React.memo(({
             datasets: [{
               data: funnelData.map(d => d.value),
               backgroundColor: gradientColors.slice(0, funnelData.length),
-              borderColor: 'rgba(255, 255, 255, 0.2)',
+              borderColor: 'rgba(209, 212, 220, 0.2)',
               borderWidth: 2
             }]
           };
@@ -362,8 +362,8 @@ const UnifiedChart = React.memo(({
           return {
             datasets: [{
               data: [gaugeValue, maxGaugeValue - gaugeValue],
-              backgroundColor: ['#000000', 'rgba(200, 200, 200, 0.3)'],
-              borderColor: '#000000',
+              backgroundColor: ['#2962FF', 'rgba(41, 98, 255, 0.3)'],
+              borderColor: '#2962FF',
               borderWidth: 2,
               circumference: 180,
               rotation: 270
@@ -385,8 +385,8 @@ const UnifiedChart = React.memo(({
             datasets: [{
               label: 'Price',
               data: candlestickData,
-              borderColor: '#000000',
-              backgroundColor: 'rgba(0, 0, 0, 0.1)'
+              borderColor: '#2962FF',
+              backgroundColor: 'rgba(41, 98, 255, 0.1)'
             }]
           };
 
@@ -400,14 +400,14 @@ const UnifiedChart = React.memo(({
             datasets: [{
               label: yAxis || 'Data',
               data: areaValues,
-              backgroundColor: 'rgba(0, 0, 0, 0.3)',
-              borderColor: '#000000',
+              backgroundColor: 'rgba(41, 98, 255, 0.3)',
+              borderColor: '#2962FF',
               borderWidth: 2,
               fill: true,
               tension: 0.3,
               pointRadius: 3,
-              pointBackgroundColor: '#000000',
-              pointBorderColor: '#ffffff'
+              pointBackgroundColor: '#2962FF',
+              pointBorderColor: '#D1D4DC'
             }]
           };
 
@@ -423,8 +423,8 @@ const UnifiedChart = React.memo(({
             datasets: [{
               label: 'Bubble Data',
               data: bubbleData,
-              backgroundColor: 'rgba(0, 0, 0, 0.6)',
-              borderColor: '#000000',
+              backgroundColor: 'rgba(41, 98, 255, 0.6)',
+              borderColor: '#2962FF',
               borderWidth: 1
             }]
           };
@@ -451,21 +451,21 @@ const UnifiedChart = React.memo(({
             size: 16,
             weight: 'bold'
           },
-          color: '#000000'
+          color: '#D1D4DC'
         },
         legend: {
           display: chartConfig.showLegend,
           labels: {
-            color: '#000000',
+            color: '#D1D4DC',
             boxWidth: 12,
             padding: 20
           }
         },
         tooltip: {
-          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+          backgroundColor: 'rgba(41, 98, 255, 0.8)',
           titleColor: '#ffffff',
           bodyColor: '#ffffff',
-          borderColor: '#000000',
+          borderColor: '#2962FF',
           borderWidth: 1
         }
       },
@@ -482,13 +482,13 @@ const UnifiedChart = React.memo(({
           title: {
             display: !!xAxis,
             text: xAxis,
-            color: '#000000'
+            color: '#D1D4DC'
           },
           grid: {
-            color: 'rgba(0, 0, 0, 0.1)'
+            color: 'rgba(41, 98, 255, 0.1)'
           },
           ticks: {
-            color: '#000000'
+            color: '#D1D4DC'
           }
         },
         y: {
@@ -496,13 +496,13 @@ const UnifiedChart = React.memo(({
           title: {
             display: !!yAxis,
             text: yAxis,
-            color: '#000000'
+            color: '#D1D4DC'
           },
           grid: {
-            color: 'rgba(0, 0, 0, 0.1)'
+            color: 'rgba(41, 98, 255, 0.1)'
           },
           ticks: {
-            color: '#000000'
+            color: '#D1D4DC'
           }
         }
       };
@@ -514,16 +514,16 @@ const UnifiedChart = React.memo(({
         r: {
           beginAtZero: true,
           grid: {
-            color: 'rgba(0, 0, 0, 0.1)'
+            color: 'rgba(41, 98, 255, 0.1)'
           },
           angleLines: {
-            color: 'rgba(0, 0, 0, 0.1)'
+            color: 'rgba(41, 98, 255, 0.1)'
           },
           pointLabels: {
-            color: '#000000'
+            color: '#D1D4DC'
           },
           ticks: {
-            color: '#000000'
+            color: '#D1D4DC'
           }
         }
       };
@@ -553,7 +553,7 @@ const UnifiedChart = React.memo(({
 
   if (!ChartComponent) {
     return (
-      <Paper sx={{ p: 3, textAlign: 'center', height: '100%', backgroundColor: '#ffffff' }}>
+      <Paper elevation={0} sx={{ p: 3, textAlign: 'center', height: '100%', background: 'background.paper', border: '1px solid', borderColor: 'divider' }}>
         <Typography variant="h6" color="error">
           Unsupported chart type: {chartType}
         </Typography>
@@ -562,9 +562,9 @@ const UnifiedChart = React.memo(({
   }
 
   return (
-    <Paper sx={{ p: 2, height: '100%', backgroundColor: '#ffffff', border: '1px solid #e0e0e0' }}>
+    <Paper elevation={0} sx={{ p: 2, height: '100%', background: 'background.paper', border: '1px solid', borderColor: 'divider' }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-        <Typography variant="h6" component="h3" sx={{ fontWeight: 600, color: '#000000' }}>
+        <Typography variant="h6" component="h3" sx={{ fontWeight: 600, color: 'text.primary' }}>
           {title || `${chartType.charAt(0).toUpperCase() + chartType.slice(1)} Chart`}
         </Typography>
         <Box>
@@ -585,7 +585,7 @@ const UnifiedChart = React.memo(({
       </Box>
 
       {showSettings && (
-        <Box sx={{ mb: 2, p: 2, backgroundColor: '#f9f9f9', borderRadius: 1 }}>
+        <Box sx={{ mb: 2, p: 2, backgroundColor: 'background.default', borderRadius: 1 }}>
           <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600 }}>Chart Settings</Typography>
           <Grid container spacing={2}>
             <Grid item xs={6}>
@@ -597,10 +597,10 @@ const UnifiedChart = React.memo(({
                     sx={{
                       '& .MuiSwitch-switchBase.Mui-checked': {
                         color: '#ffffff',
-                        backgroundColor: '#000000',
+                        backgroundcolor: '#D1D4DC',
                       },
                       '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
-                        backgroundColor: '#000000',
+                        backgroundcolor: '#D1D4DC',
                       },
                     }}
                   />
@@ -617,10 +617,10 @@ const UnifiedChart = React.memo(({
                     sx={{
                       '& .MuiSwitch-switchBase.Mui-checked': {
                         color: '#ffffff',
-                        backgroundColor: '#000000',
+                        backgroundcolor: '#D1D4DC',
                       },
                       '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
-                        backgroundColor: '#000000',
+                        backgroundcolor: '#D1D4DC',
                       },
                     }}
                   />
@@ -638,12 +638,12 @@ const UnifiedChart = React.memo(({
                   max={10}
                   step={1}
                   sx={{
-                    color: '#000000',
+                    color: '#D1D4DC',
                     '& .MuiSlider-thumb': {
-                      backgroundColor: '#000000',
+                      backgroundcolor: '#D1D4DC',
                     },
                     '& .MuiSlider-track': {
-                      backgroundColor: '#000000',
+                      backgroundcolor: '#D1D4DC',
                     },
                   }}
                 />

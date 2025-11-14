@@ -142,8 +142,8 @@ const UnifiedChartComponent = React.memo(({
             borderColor: COLORS[index],
             borderWidth: 2,
             pointBackgroundColor: COLORS[index],
-            pointBorderColor: '#fff',
-            pointHoverBackgroundColor: '#fff',
+            pointBorderColor: '#D1D4DC',
+            pointHoverBackgroundColor: '#D1D4DC',
             pointHoverBorderColor: COLORS[index]
           }))
         };
