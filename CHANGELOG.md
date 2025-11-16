@@ -54,8 +54,12 @@ All notable changes to the Advanced Data Visualization Playground project will b
 ### 🤖 Enhanced AI Insights
 
 #### Changed
-- **Switched from external API to local statistical analysis**
-  - No external API required (removed Gemini/OpenAI dependency)
+- **Integrated Hugging Face API with smart fallback**
+  - Using Meta Llama 3.3 70B Instruct model for powerful AI analysis
+  - Environment variable configuration (REACT_APP_HUGGINGFACE_API_KEY)
+  - Free tier available at https://huggingface.co
+  - Automatic fallback to local statistical analysis if API unavailable
+  - No external API required for basic functionality
   - Comprehensive pattern recognition using simple-statistics
   - Automated correlation detection
   - Business recommendations engine
@@ -115,6 +119,7 @@ All notable changes to the Advanced Data Visualization Playground project will b
 - Enhanced export capabilities
 - Web Worker support
 - Improved statistical analysis
+- Hugging Face API integration (optional)
 
 ### 📚 Documentation
 
@@ -124,6 +129,7 @@ All notable changes to the Advanced Data Visualization Playground project will b
   - TradingView theme documentation
   - New component descriptions
   - Enhanced quick start guide
+  - Hugging Face API setup instructions
   - Performance benchmarks
   - Use case examples
 
@@ -131,6 +137,7 @@ All notable changes to the Advanced Data Visualization Playground project will b
 - **CHANGELOG.md** - Version history tracking
 - **IMPROVEMENTS_V2.md** - Technical implementation details
 - **README_V2.md** - Alternative documentation format
+- **.env.example** - Environment variable template
 
 ### 🐛 Bug Fixes
 
@@ -138,7 +145,7 @@ All notable changes to the Advanced Data Visualization Playground project will b
 - Chart text visibility on dark backgrounds
 - White background artifacts in chart widgets
 - Gradient code causing theme override issues
-- AI Insights API quota errors (switched to local analysis)
+- AI Insights now has smart fallback (no more API errors)
 - Performance issues with large datasets
 - Export quality on dark themed charts
 
@@ -150,6 +157,7 @@ All notable changes to the Advanced Data Visualization Playground project will b
 - Enhanced error boundaries
 - Better state management patterns
 - Cleaner component architecture
+- Environment variable support for API keys
 
 ### 📊 Statistics
 
@@ -159,11 +167,13 @@ All notable changes to the Advanced Data Visualization Playground project will b
 - **New Components**: 4 (RealTimeDataStream, AdvancedAnalytics, DashboardTemplateSelector, enhanced AIInsights)
 - **Theme Colors Changed**: 100% (complete TradingView conversion)
 - **Performance Improvement**: ~40% faster chart rendering
+- **AI Models**: Hugging Face Llama 3.3 70B
 
 ### 🚀 Breaking Changes
 
 #### Changed
-- AI Insights no longer requires external API keys
+- AI Insights now uses Hugging Face API (with local fallback)
+- Environment variable REACT_APP_HUGGINGFACE_API_KEY for AI features
 - Theme colors completely changed (migration from gradient to TradingView)
 - Some gradient-based custom styles may need updates
 - Default chart colors follow TradingView palette
@@ -171,10 +181,12 @@ All notable changes to the Advanced Data Visualization Playground project will b
 ### ⚠️ Migration Notes
 
 If upgrading from v1.x:
-1. Remove any `REACT_APP_GEMINI_API_KEY` or `REACT_APP_OPENAI_API_KEY` from `.env`
-2. AI Insights now work automatically with local statistical analysis
-3. Custom theme overrides may need adjustment for new color palette
-4. Charts will automatically use new TradingView colors
+1. Copy `.env.example` to `.env`
+2. (Optional) Add your Hugging Face API key to `.env`
+3. AI Insights work automatically with local statistical analysis
+4. For enhanced AI analysis, get free API key at https://huggingface.co/settings/tokens
+5. Custom theme overrides may need adjustment for new color palette
+6. Charts will automatically use new TradingView colors
 
 ---
 

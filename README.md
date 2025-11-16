@@ -88,13 +88,15 @@ A powerful, modern web application for advanced data visualization, transformati
 - **Multi-Dashboard**: Create and switch between dashboards
 
 ### 🤖 **Intelligent AI Insights**
-- **Statistical Analysis**: No external API required
+- **Hugging Face Integration**: Meta Llama 3.3 70B model
+- **Local Fallback**: Statistical analysis without API
 - **Pattern Recognition**: Automatic trend detection
 - **Correlation Analysis**: Multi-variable relationships
 - **Outlier Detection**: Anomaly identification
 - **Business Recommendations**: Actionable insights
 - **Data Quality Checks**: Missing values, completeness analysis
 - **Visualization Suggestions**: Smart chart recommendations
+- **No API Required**: Works offline with statistical engine
 
 ### 📡 **Real-Time Data Capabilities**
 - **Live Streaming**: Continuous data updates
@@ -207,6 +209,7 @@ REACT_APP_GEMINI_API_KEY=your_gemini_api_key_here
 ### Prerequisites
 - Node.js 16.0 or higher
 - npm or yarn package manager
+- (Optional) Hugging Face API key for AI insights
 
 ### Installation
 
@@ -221,7 +224,21 @@ REACT_APP_GEMINI_API_KEY=your_gemini_api_key_here
    npm install
    ```
 
-3. **Start the development server**
+3. **Configure environment variables** (Optional - for AI Insights)
+   ```bash
+   cp .env.example .env
+   ```
+   
+   Edit `.env` and add your Hugging Face API key:
+   ```
+   REACT_APP_HUGGINGFACE_API_KEY=your_huggingface_api_key_here
+   ```
+   
+   Get your free API key at: https://huggingface.co/settings/tokens
+   
+   **Note**: AI Insights will work with local statistical analysis even without an API key.
+
+4. **Start the development server**
    ```bash
    npm start
    ```

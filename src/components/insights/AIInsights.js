@@ -49,10 +49,9 @@ import {
   quantile
 } from 'simple-statistics';
 
-// Note: AI Insights now uses local statistical analysis - no API key required
-// The code below is kept for reference but is not used
-const API_URL = "https://api.openai.com/v1/chat/completions";
-const API_KEY = ""; // Not used - local analysis only
+// Hugging Face API Configuration
+const API_URL = "https://router.huggingface.co/v1/chat/completions";
+const API_KEY = process.env.REACT_APP_HUGGINGFACE_API_KEY || "";
 
 const AIInsights = ({ data }) => {
   const [analyzing, setAnalyzing] = useState(false);
@@ -118,11 +117,81 @@ const AIInsights = ({ data }) => {
     setAiError(null);
     
     try {
-      // Generate local AI-style insights without external API
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate processing
+      // Prepare data summary for AI API
+      const dataSummary = prepareDataSummary();
       
-      const localInsights = generateLocalAIInsights();
-      setAiInsights(localInsights);
+      const prompt = `Analyze this dataset and provide comprehensive insights in a well-structured markdown format. Dataset summary:
+${dataSummary}
+
+Please structure your analysis using the following markdown sections:
+
+## Dataset Overview
+Brief summary of the dataset structure and scope.
+
+## Key Patterns and Trends
+Identify 3-5 most significant patterns in the data.
+
+## Business Insights and Recommendations  
+Provide actionable business recommendations based on the analysis.
+
+## Data Quality Assessment
+Evaluate data quality issues and suggest improvements.
+
+## Suggested Visualizations
+Recommend specific chart types and analysis approaches.
+
+## Notable Correlations and Anomalies
+Highlight interesting relationships and outliers.
+
+Use proper markdown formatting with:
+- **Bold text** for emphasis
+- *Italic text* for secondary points
+- Bullet points for lists
+- Clear section headers
+
+Format your response in clear, actionable insights that would be valuable for data analysis.`;
+
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${API_KEY}`
+        },
+        body: JSON.stringify({
+          model: "meta-llama/Llama-3.3-70B-Instruct",
+          messages: [{
+            role: "user",
+            content: prompt
+          }],
+          temperature: 0.7,
+          max_tokens: 2000
+        })
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('API Error response:', errorText);
+        
+        // Fallback to local analysis if API fails
+        console.log('API failed, using local statistical analysis...');
+        const localInsights = generateLocalAIInsights();
+        setAiInsights(localInsights);
+        return;
+      }
+
+      const result = await response.json();
+      const aiText = result.choices?.[0]?.message?.content;
+      
+      if (!aiText) {
+        console.error('No AI text in response, using local analysis');
+        const localInsights = generateLocalAIInsights();
+        setAiInsights(localInsights);
+        return;
+      }
+
+      // Parse AI response into structured insights
+      const structuredInsights = parseAIResponse(aiText);
+      setAiInsights(structuredInsights);
       
     } catch (error) {
       console.error('AI Insights error:', error);
@@ -353,8 +422,8 @@ const AIInsights = ({ data }) => {
   const parseAIResponse = (aiText) => {
     // Clean up the text by removing redundant confidence tags and fixing markdown
     let cleanedText = aiText
-      .replace(/\*\*\s*Confidence: \d+%\s*Gemini AI\s*\*\*/g, '') // Remove redundant confidence tags
-      .replace(/Confidence: \d+%\s*Gemini AI/g, '') // Remove plain confidence tags
+      .replace(/\*\*\s*Confidence: \d+%\s*Hugging Face AI\s*\*\*/g, '') // Remove redundant confidence tags
+      .replace(/Confidence: \d+%\s*Hugging Face AI/g, '') // Remove plain confidence tags
       .replace(/\n\s*\n\s*\n/g, '\n\n') // Clean up excessive line breaks
       .trim();
 
@@ -372,7 +441,7 @@ const AIInsights = ({ data }) => {
           title: `Insight ${index + 1}`,
           content: section.trim(),
           confidence: 0.85,
-          source: 'Gemini AI'
+          source: 'Hugging Face AI'
         }))
       };
     }
@@ -390,7 +459,7 @@ const AIInsights = ({ data }) => {
           title: title,
           content: content,
           confidence: 0.85,
-          source: 'Gemini AI'
+          source: 'Hugging Face AI'
         };
       })
     };
@@ -767,14 +836,14 @@ const AIInsights = ({ data }) => {
               </Box>
               <Box>
                 <Typography variant="h5" color="secondary" sx={{ fontWeight: 700 }}>
-                  Gemini AI Analysis
+                  Hugging Face AI Analysis
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  Advanced insights powered by Google AI
+                  Advanced insights powered by Meta Llama 3.3
                 </Typography>
               </Box>
               <Chip 
-                label="Powered by Google AI" 
+                label="Powered by Hugging Face" 
                 size="small" 
                 color="secondary" 
                 variant="filled"
@@ -947,7 +1016,7 @@ const AIInsights = ({ data }) => {
               <Box sx={{ mt: 3, p: 2, bgcolor: 'grey.50', borderRadius: 1 }}>
                 <Typography variant="caption" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                   <Info fontSize="small" />
-                  AI analysis is generated by Google's Gemini AI and should be validated with domain expertise.
+                  AI analysis is generated by Hugging Face's Llama 3.3 70B and should be validated with domain expertise.
                 </Typography>
               </Box>
             </Box>
