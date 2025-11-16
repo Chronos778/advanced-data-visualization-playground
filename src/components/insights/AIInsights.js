@@ -355,8 +355,8 @@ Format your response in clear, actionable insights that would be valuable for da
       }
     }
     
-    insights += "> **Pro Tip**: These insights are generated from statistical analysis of your data. ";
-    insights += "For deeper AI-powered analysis, consider connecting an external AI service with proper API credits.\n";
+    insights += "> **Note**: These insights are generated using local statistical analysis. ";
+    insights += "The Hugging Face AI service is currently unavailable or not configured. Check browser console for details.\n";
     
     // Parse the markdown into sections for structured display
     const sections = insights.split(/(?=^## )/gm).filter(s => s.trim());
