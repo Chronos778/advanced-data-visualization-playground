@@ -2,7 +2,6 @@ import React, { useState, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import {
   Box,
-  Paper,
   Typography,
   Accordion,
   AccordionSummary,
@@ -35,6 +34,97 @@ import {
 } from '@mui/icons-material';
 import _ from 'lodash';
 
+// --- Swiss Grid Styles ---
+const accordionStyle = {
+  border: '2px solid black',
+  borderBottom: 0,
+  '&:last-of-type': { borderBottom: '2px solid black' },
+  '&:before': { display: 'none' },
+  borderRadius: 0,
+  boxShadow: 'none',
+  backgroundColor: 'white',
+  '&.Mui-expanded': { margin: 0 }
+};
+
+const accordionSummaryStyle = {
+  backgroundColor: 'white',
+  borderBottom: '2px solid black',
+  minHeight: 48,
+  '&.Mui-expanded': {
+    minHeight: 48,
+    borderBottom: '2px solid black',
+    margin: 0
+  },
+  '& .MuiAccordionSummary-content.Mui-expanded': {
+    margin: '12px 0'
+  }
+};
+
+const accordionDetailsStyle = {
+  p: 3,
+  backgroundColor: '#F7F7F5'
+};
+
+const inputStyle = {
+  '& .MuiOutlinedInput-root': {
+    borderRadius: 0,
+    backgroundColor: 'white',
+    '& fieldset': { border: '1px solid black' },
+    '&:hover fieldset': { borderColor: 'black', borderWidth: '2px' },
+    '&.Mui-focused fieldset': { borderColor: 'black', borderWidth: '2px' }
+  },
+  '& .MuiInputLabel-root': {
+    color: 'black',
+    fontFamily: '"IBM Plex Mono", monospace',
+    textTransform: 'uppercase',
+    letterSpacing: '0.05em',
+    fontSize: '0.8rem',
+    fontWeight: 'bold',
+    background: 'white',
+    padding: '0 4px'
+  }
+};
+
+const starkButtonStyle = {
+  borderRadius: 0,
+  border: '2px solid black',
+  color: 'black',
+  backgroundColor: 'transparent',
+  fontWeight: 'bold',
+  textTransform: 'uppercase',
+  boxShadow: 'none',
+  '&:hover': {
+    backgroundColor: 'black',
+    color: 'white',
+    boxShadow: 'none',
+    border: '2px solid black'
+  }
+};
+
+const actionButtonStyle = {
+  borderRadius: 0,
+  border: '2px solid black',
+  backgroundColor: 'black',
+  color: 'white',
+  fontWeight: 'bold',
+  textTransform: 'uppercase',
+  boxShadow: 'none',
+  '&:hover': {
+    backgroundColor: 'transparent',
+    color: 'black',
+    boxShadow: 'none',
+    border: '2px solid black'
+  }
+};
+
+const filterBlockStyle = {
+  mb: 2,
+  p: 2,
+  border: '2px solid black',
+  backgroundColor: 'white'
+};
+// ------------------------
+
 const DataTransformer = React.memo(({ data, onTransformedData }) => {
   const [filters, setFilters] = useState([]);
   const [groupBy, setGroupBy] = useState('');
@@ -42,7 +132,7 @@ const DataTransformer = React.memo(({ data, onTransformedData }) => {
   const [sortBy, setSortBy] = useState('');
   const [sortOrder, setSortOrder] = useState('asc');
   const [searchTerm, setSearchTerm] = useState('');
-  
+
   // New enhanced features
   const [calculatedColumns, setCalculatedColumns] = useState([]);
   const [dataTypeConversions, setDataTypeConversions] = useState([]);
@@ -80,7 +170,7 @@ const DataTransformer = React.memo(({ data, onTransformedData }) => {
   };
 
   const updateFilter = (id, field, value) => {
-    setFilters(filters.map(filter => 
+    setFilters(filters.map(filter =>
       filter.id === id ? { ...filter, [field]: value } : filter
     ));
   };
@@ -99,7 +189,7 @@ const DataTransformer = React.memo(({ data, onTransformedData }) => {
   };
 
   const updateAggregation = (id, field, value) => {
-    setAggregations(aggregations.map(agg => 
+    setAggregations(aggregations.map(agg =>
       agg.id === id ? { ...agg, [field]: value } : agg
     ));
   };
@@ -119,7 +209,7 @@ const DataTransformer = React.memo(({ data, onTransformedData }) => {
   };
 
   const updateCalculatedColumn = (id, field, value) => {
-    setCalculatedColumns(calculatedColumns.map(col => 
+    setCalculatedColumns(calculatedColumns.map(col =>
       col.id === id ? { ...col, [field]: value } : col
     ));
   };
@@ -139,7 +229,7 @@ const DataTransformer = React.memo(({ data, onTransformedData }) => {
   };
 
   const updateDataTypeConversion = (id, field, value) => {
-    setDataTypeConversions(dataTypeConversions.map(conv => 
+    setDataTypeConversions(dataTypeConversions.map(conv =>
       conv.id === id ? { ...conv, [field]: value } : conv
     ));
   };
@@ -160,7 +250,7 @@ const DataTransformer = React.memo(({ data, onTransformedData }) => {
   };
 
   const updateValidationRule = (id, field, value) => {
-    setValidationRules(validationRules.map(rule => 
+    setValidationRules(validationRules.map(rule =>
       rule.id === id ? { ...rule, [field]: value } : rule
     ));
   };
@@ -189,7 +279,7 @@ const DataTransformer = React.memo(({ data, onTransformedData }) => {
         setSortOrder('asc');
         break;
       case 'deduplicate':
-        // Add logic for removing duplicates
+        // Logic for deduplication could be added
         break;
       default:
         break;
@@ -201,8 +291,8 @@ const DataTransformer = React.memo(({ data, onTransformedData }) => {
 
     // Apply text search
     if (searchTerm.trim()) {
-      filtered = filtered.filter(row => 
-        Object.values(row).some(value => 
+      filtered = filtered.filter(row =>
+        Object.values(row).some(value =>
           String(value).toLowerCase().includes(searchTerm.toLowerCase())
         )
       );
@@ -307,11 +397,11 @@ const DataTransformer = React.memo(({ data, onTransformedData }) => {
     // Apply data type conversions first
     dataTypeConversions.forEach(conv => {
       if (!conv.enabled || !conv.column) return;
-      
+
       result = result.map(row => {
         const newRow = { ...row };
         const value = row[conv.column];
-        
+
         try {
           switch (conv.toType) {
             case 'number':
@@ -339,18 +429,16 @@ const DataTransformer = React.memo(({ data, onTransformedData }) => {
     // Add calculated columns
     calculatedColumns.forEach(calc => {
       if (!calc.enabled || !calc.name || !calc.formula) return;
-      
+
       result = result.map(row => {
         const newRow = { ...row };
         try {
-          // Simple formula evaluation (basic math operations)
           let formula = calc.formula;
           columns.forEach(col => {
             const value = parseFloat(row[col]) || 0;
             formula = formula.replace(new RegExp(`\\b${col}\\b`, 'g'), value);
           });
-          
-          // Evaluate simple mathematical expressions
+
           // eslint-disable-next-line no-new-func
           const evalResult = Function(`"use strict"; return (${formula})`)();
           newRow[calc.name] = evalResult;
@@ -361,14 +449,14 @@ const DataTransformer = React.memo(({ data, onTransformedData }) => {
       });
     });
 
-    // Apply validation rules and flag/remove invalid data
+    // Apply validation rules
     validationRules.forEach(rule => {
       if (!rule.enabled || !rule.column) return;
-      
+
       result = result.filter(row => {
         const value = row[rule.column];
         let isValid = true;
-        
+
         switch (rule.rule) {
           case 'not_empty':
             isValid = value !== null && value !== undefined && value !== '';
@@ -392,35 +480,27 @@ const DataTransformer = React.memo(({ data, onTransformedData }) => {
           default:
             break;
         }
-        
+
         if (!isValid && rule.action === 'remove') {
           return false;
         }
-        
+
         if (!isValid && rule.action === 'flag') {
           row[`${rule.column}_valid`] = false;
         }
-        
+
         return true;
       });
     });
 
-    // Apply filters
     result = applyFilters(result);
-    
-    // Apply grouping
     result = applyGrouping(result);
-    
-    // Apply sorting
     result = applySorting(result);
 
-    // Apply sampling if specified
     if (sampleSize && sampleSize > 0 && result.length > sampleSize) {
       if (sortBy) {
-        // Take top/bottom N if sorted
         result = result.slice(0, sampleSize);
       } else {
-        // Random sampling
         result = _.sampleSize(result, sampleSize);
       }
     }
@@ -446,8 +526,8 @@ const DataTransformer = React.memo(({ data, onTransformedData }) => {
         sampleSize
       }
     };
-  }, [data, filters, groupBy, aggregations, sortBy, sortOrder, searchTerm, columns, 
-      calculatedColumns, dataTypeConversions, validationRules, sampleSize]);
+  }, [data, filters, groupBy, aggregations, sortBy, sortOrder, searchTerm, columns,
+    calculatedColumns, dataTypeConversions, validationRules, sampleSize]);
 
   const applyTransformations = () => {
     if (transformedData) {
@@ -499,594 +579,497 @@ const DataTransformer = React.memo(({ data, onTransformedData }) => {
 
   if (!data || !data.data) {
     return (
-      <Paper sx={{ p: 3, textAlign: 'center' }}>
-        <Typography variant="h6" color="text.secondary">
-          No data available for transformation
+      <Box sx={{ p: 6, textAlign: 'center', border: '2px solid black', backgroundColor: 'white' }}>
+        <Box sx={{
+          width: 80,
+          height: 80,
+          border: '2px solid black',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          mx: 'auto',
+          mb: 3
+        }}>
+          <Functions sx={{ fontSize: 40, color: 'black' }} />
+        </Box>
+        <Typography variant="h3" sx={{ mb: 2, letterSpacing: '0.05em' }}>
+          NO_DATA_AVAILABLE
         </Typography>
-        <Typography variant="body2" color="text.secondary">
-          Upload a data file to start applying transformations
+        <Typography variant="subtitle1" sx={{ mb: 3 }}>
+          Upload a data file to start applying transformations.
         </Typography>
-      </Paper>
+      </Box>
     );
   }
 
   return (
-    <Paper sx={{ p: 2 }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-        <Functions sx={{ mr: 1 }} />
-        <Typography variant="h6">Data Transformation</Typography>
-        <Box sx={{ ml: 'auto' }}>
+    <Box sx={{ p: 0, backgroundColor: 'transparent' }}>
+
+      <Box sx={{ display: 'flex', alignItems: 'center', p: 3, border: '2px solid black', backgroundColor: 'white', mb: 4 }}>
+        <Functions sx={{ mr: 2, fontSize: 32 }} />
+        <Typography variant="h3" sx={{ textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+          Data Transformation
+        </Typography>
+        <Box sx={{ ml: 'auto', display: 'flex', gap: 2 }}>
           <Button
             variant="outlined"
-            size="small"
             onClick={clearAllTransformations}
             startIcon={<Clear />}
-            sx={{ mr: 1 }}
+            sx={starkButtonStyle}
           >
             Clear All
           </Button>
           <Button
             variant="contained"
-            size="small"
             onClick={applyTransformations}
             startIcon={<TrendingUp />}
+            sx={actionButtonStyle}
           >
-            Apply
+            Apply Transform
           </Button>
         </Box>
       </Box>
 
       {transformedData && (
-        <Box sx={{ mb: 2 }}>
-          <Chip 
-            label={`${transformedData.filteredRowCount} of ${transformedData.originalRowCount} rows`}
-            color="primary"
-            size="small"
+        <Box sx={{ mb: 4 }}>
+          <Chip
+            label={`PREVIEW: ${transformedData.filteredRowCount} OF ${transformedData.originalRowCount} ROWS`}
+            sx={{ borderRadius: 0, border: '2px solid black', backgroundColor: 'black', color: 'white', fontWeight: 'bold' }}
           />
         </Box>
       )}
 
-      {/* Quick Presets */}
-      <Accordion>
-        <AccordionSummary expandIcon={<ExpandMore />}>
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <AutoFixHigh sx={{ mr: 1 }} />
-            <Typography>Quick Transformations</Typography>
-          </Box>
-        </AccordionSummary>
-        <AccordionDetails>
-          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2 }}>
-            <Button
-              size="small"
-              variant="outlined"
-              startIcon={<Clear />}
-              onClick={() => applyPreset('remove_empty')}
-            >
-              Remove Empty Rows
-            </Button>
-            <Button
-              size="small"
-              variant="outlined"
-              startIcon={<TrendingUp />}
-              onClick={() => applyPreset('top_10')}
-            >
-              Top 10 Rows
-            </Button>
-            <Button
-              size="small"
-              variant="outlined"
-              startIcon={<Speed />}
-              onClick={() => applyPreset('bottom_10')}
-            >
-              Bottom 10 Rows
-            </Button>
-            <Button
-              size="small"
-              variant="outlined"
-              startIcon={<Refresh />}
-              onClick={() => applyPreset('deduplicate')}
-            >
-              Remove Duplicates
-            </Button>
-          </Box>
-          
-          <Box sx={{ mt: 2 }}>
-            <Typography variant="subtitle2" sx={{ mb: 1 }}>Data Sampling</Typography>
-            <TextField
-              type="number"
-              label="Sample Size"
-              value={sampleSize || ''}
-              onChange={(e) => setSampleSize(e.target.value ? parseInt(e.target.value) : null)}
-              size="small"
-              sx={{ width: 150 }}
-              inputProps={{ min: 1 }}
-            />
-          </Box>
-        </AccordionDetails>
-      </Accordion>
-
-      {/* Global Search */}
-      <Accordion defaultExpanded>
-        <AccordionSummary expandIcon={<ExpandMore />}>
-          <Typography>Search & Filter</Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          <TextField
-            fullWidth
-            label="Search all columns"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Enter search term..."
-            sx={{ mb: 2 }}
-          />
-
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-            <Typography variant="subtitle1">Column Filters</Typography>
-            <Button
-              size="small"
-              startIcon={<Add />}
-              onClick={addFilter}
-            >
-              Add Filter
-            </Button>
-          </Box>
-
-          {filters.map((filter) => (
-            <Box key={filter.id} sx={{ mb: 2, p: 2, border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
-              <Grid container spacing={2} alignItems="center">
-                <Grid item xs={12} sm={3}>
-                  <FormControl fullWidth size="small">
-                    <InputLabel>Column</InputLabel>
-                    <Select
-                      value={filter.column}
-                      label="Column"
-                      onChange={(e) => updateFilter(filter.id, 'column', e.target.value)}
-                    >
-                      {columns.map(col => (
-                        <MenuItem key={col} value={col}>{col}</MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                </Grid>
-                <Grid item xs={12} sm={3}>
-                  <FormControl fullWidth size="small">
-                    <InputLabel>Operator</InputLabel>
-                    <Select
-                      value={filter.operator}
-                      label="Operator"
-                      onChange={(e) => updateFilter(filter.id, 'operator', e.target.value)}
-                    >
-                      {filterOperators.map(op => (
-                        <MenuItem key={op.value} value={op.value}>{op.label}</MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                </Grid>
-                <Grid item xs={12} sm={3}>
-                  <TextField
-                    fullWidth
-                    size="small"
-                    label="Value"
-                    value={filter.value}
-                    onChange={(e) => updateFilter(filter.id, 'value', e.target.value)}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={3}>
-                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    <FormControlLabel
-                      control={
-                        <Switch
-                          checked={filter.enabled}
-                          onChange={(e) => updateFilter(filter.id, 'enabled', e.target.checked)}
-                          size="small"
-                        />
-                      }
-                      label="Enabled"
-                    />
-                    <IconButton
-                      size="small"
-                      onClick={() => removeFilter(filter.id)}
-                      sx={{ ml: 1 }}
-                    >
-                      <Delete />
-                    </IconButton>
-                  </Box>
-                </Grid>
-              </Grid>
+      {/* Accordions Wrapper */}
+      <Box sx={{ borderBottom: '2px solid black', mb: 6 }}>
+        {/* Quick Presets */}
+        <Accordion sx={accordionStyle} defaultExpanded>
+          <AccordionSummary expandIcon={<ExpandMore sx={{ color: 'black' }} />} sx={accordionSummaryStyle}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <AutoFixHigh />
+              <Typography variant="h6" sx={{ textTransform: 'uppercase', fontWeight: 700 }}>Quick Transformations</Typography>
             </Box>
-          ))}
-        </AccordionDetails>
-      </Accordion>
-
-      {/* Grouping & Aggregation */}
-      <Accordion>
-        <AccordionSummary expandIcon={<ExpandMore />}>
-          <Typography>Grouping & Aggregation</Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={6}>
-              <FormControl fullWidth>
-                <InputLabel>Group By Column</InputLabel>
-                <Select
-                  value={groupBy}
-                  label="Group By Column"
-                  onChange={(e) => setGroupBy(e.target.value)}
-                >
-                  <MenuItem value="">None</MenuItem>
-                  {columns.map(col => (
-                    <MenuItem key={col} value={col}>{col}</MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Button
-                fullWidth
-                variant="outlined"
-                startIcon={<Add />}
-                onClick={addAggregation}
-                disabled={!groupBy}
-              >
-                Add Aggregation
+          </AccordionSummary>
+          <AccordionDetails sx={accordionDetailsStyle}>
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mb: 3 }}>
+              <Button size="small" variant="outlined" startIcon={<Clear />} onClick={() => applyPreset('remove_empty')} sx={starkButtonStyle}>
+                Remove Empty Rows
               </Button>
-            </Grid>
-          </Grid>
+              <Button size="small" variant="outlined" startIcon={<TrendingUp />} onClick={() => applyPreset('top_10')} sx={starkButtonStyle}>
+                Top 10 Rows
+              </Button>
+              <Button size="small" variant="outlined" startIcon={<Speed />} onClick={() => applyPreset('bottom_10')} sx={starkButtonStyle}>
+                Bottom 10 Rows
+              </Button>
+              <Button size="small" variant="outlined" startIcon={<Refresh />} onClick={() => applyPreset('deduplicate')} sx={starkButtonStyle}>
+                Remove Duplicates
+              </Button>
+            </Box>
 
-          {aggregations.map((agg) => (
-            <Box key={agg.id} sx={{ mt: 2, p: 2, border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
-              <Grid container spacing={2} alignItems="center">
-                <Grid item xs={12} sm={3}>
-                  <FormControl fullWidth size="small">
-                    <InputLabel>Column</InputLabel>
-                    <Select
-                      value={agg.column}
-                      label="Column"
-                      onChange={(e) => updateAggregation(agg.id, 'column', e.target.value)}
-                    >
-                      {numericColumns.map(col => (
-                        <MenuItem key={col} value={col}>{col}</MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
+            <Box sx={{ mt: 3 }}>
+              <Typography variant="subtitle2" sx={{ mb: 1, textTransform: 'uppercase', fontWeight: 'bold' }}>Data Sampling</Typography>
+              <TextField
+                type="number"
+                label="Sample Size"
+                value={sampleSize || ''}
+                onChange={(e) => setSampleSize(e.target.value ? parseInt(e.target.value) : null)}
+                size="small"
+                sx={{ width: 200, ...inputStyle }}
+                inputProps={{ min: 1 }}
+              />
+            </Box>
+          </AccordionDetails>
+        </Accordion>
+
+        {/* Global Search & Filters */}
+        <Accordion sx={accordionStyle}>
+          <AccordionSummary expandIcon={<ExpandMore sx={{ color: 'black' }} />} sx={accordionSummaryStyle}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <SearchIconPlaceholder />
+              <Typography variant="h6" sx={{ textTransform: 'uppercase', fontWeight: 700 }}>Search & Filter</Typography>
+            </Box>
+          </AccordionSummary>
+          <AccordionDetails sx={accordionDetailsStyle}>
+            <TextField
+              fullWidth
+              label="Global Search"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="ENTER SEARCH TERM..."
+              sx={{ mb: 4, ...inputStyle }}
+            />
+
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+              <Typography variant="h6" sx={{ textTransform: 'uppercase', fontWeight: 'bold' }}>Column Filters</Typography>
+              <Button size="small" startIcon={<Add />} onClick={addFilter} sx={starkButtonStyle}>
+                Add Filter
+              </Button>
+            </Box>
+
+            {filters.map((filter) => (
+              <Box key={filter.id} sx={filterBlockStyle}>
+                <Grid container spacing={2} alignItems="center">
+                  <Grid item xs={12} sm={3}>
+                    <FormControl fullWidth size="small" sx={inputStyle}>
+                      <InputLabel>Column</InputLabel>
+                      <Select
+                        value={filter.column}
+                        label="Column"
+                        onChange={(e) => updateFilter(filter.id, 'column', e.target.value)}
+                      >
+                        {columns.map(col => <MenuItem key={col} value={col}>{col}</MenuItem>)}
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={12} sm={3}>
+                    <FormControl fullWidth size="small" sx={inputStyle}>
+                      <InputLabel>Operator</InputLabel>
+                      <Select
+                        value={filter.operator}
+                        label="Operator"
+                        onChange={(e) => updateFilter(filter.id, 'operator', e.target.value)}
+                      >
+                        {filterOperators.map(op => <MenuItem key={op.value} value={op.value}>{op.label}</MenuItem>)}
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={12} sm={3}>
+                    <TextField
+                      fullWidth
+                      size="small"
+                      label="Value"
+                      value={filter.value}
+                      onChange={(e) => updateFilter(filter.id, 'value', e.target.value)}
+                      sx={inputStyle}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={3}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 2 }}>
+                      <FormControlLabel
+                        control={
+                          <Switch
+                            checked={filter.enabled}
+                            onChange={(e) => updateFilter(filter.id, 'enabled', e.target.checked)}
+                            color="default"
+                          />
+                        }
+                        label={<Typography sx={{ fontFamily: '"IBM Plex Mono", monospace', fontWeight: 'bold' }}>ACT</Typography>}
+                      />
+                      <IconButton size="small" onClick={() => removeFilter(filter.id)} sx={{ border: '2px solid black', borderRadius: 0, '&:hover': { backgroundColor: 'black', color: 'white' } }}>
+                        <Delete />
+                      </IconButton>
+                    </Box>
+                  </Grid>
                 </Grid>
-                <Grid item xs={12} sm={3}>
-                  <FormControl fullWidth size="small">
-                    <InputLabel>Function</InputLabel>
-                    <Select
-                      value={agg.function}
-                      label="Function"
-                      onChange={(e) => updateAggregation(agg.id, 'function', e.target.value)}
-                    >
-                      {aggregationFunctions.map(func => (
-                        <MenuItem key={func.value} value={func.value}>{func.label}</MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                </Grid>
-                <Grid item xs={12} sm={4}>
-                  <TextField
-                    fullWidth
-                    size="small"
-                    label="Alias (optional)"
-                    value={agg.alias}
-                    onChange={(e) => updateAggregation(agg.id, 'alias', e.target.value)}
-                    placeholder={`${agg.function}_${agg.column}`}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={2}>
-                  <IconButton
-                    size="small"
-                    onClick={() => removeAggregation(agg.id)}
+              </Box>
+            ))}
+          </AccordionDetails>
+        </Accordion>
+
+        {/* Grouping & Aggregation */}
+        <Accordion sx={accordionStyle}>
+          <AccordionSummary expandIcon={<ExpandMore sx={{ color: 'black' }} />} sx={accordionSummaryStyle}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Functions />
+              <Typography variant="h6" sx={{ textTransform: 'uppercase', fontWeight: 700 }}>Grouping & Aggregation</Typography>
+            </Box>
+          </AccordionSummary>
+          <AccordionDetails sx={accordionDetailsStyle}>
+            <Grid container spacing={3} sx={{ mb: 3 }}>
+              <Grid item xs={12} sm={6}>
+                <FormControl fullWidth sx={inputStyle}>
+                  <InputLabel>Group By Column</InputLabel>
+                  <Select
+                    value={groupBy}
+                    label="Group By Column"
+                    onChange={(e) => setGroupBy(e.target.value)}
                   >
-                    <Delete />
-                  </IconButton>
-                </Grid>
+                    <MenuItem value="">NONE</MenuItem>
+                    {columns.map(col => <MenuItem key={col} value={col}>{col}</MenuItem>)}
+                  </Select>
+                </FormControl>
               </Grid>
-            </Box>
-          ))}
-        </AccordionDetails>
-      </Accordion>
-
-      {/* Sorting */}
-      <Accordion>
-        <AccordionSummary expandIcon={<ExpandMore />}>
-          <Typography>Sorting</Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={6}>
-              <FormControl fullWidth>
-                <InputLabel>Sort By Column</InputLabel>
-                <Select
-                  value={sortBy}
-                  label="Sort By Column"
-                  onChange={(e) => setSortBy(e.target.value)}
-                >
-                  <MenuItem value="">None</MenuItem>
-                  {transformedData && transformedData.columns.map(col => (
-                    <MenuItem key={col} value={col}>{col}</MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
+              <Grid item xs={12} sm={6}>
+                <Button fullWidth variant="outlined" startIcon={<Add />} onClick={addAggregation} disabled={!groupBy} sx={{ ...starkButtonStyle, height: '100%' }}>
+                  Add Aggregation
+                </Button>
+              </Grid>
             </Grid>
-            <Grid item xs={12} sm={6}>
-              <FormControl fullWidth>
-                <InputLabel>Sort Order</InputLabel>
-                <Select
-                  value={sortOrder}
-                  label="Sort Order"
-                  onChange={(e) => setSortOrder(e.target.value)}
-                  disabled={!sortBy}
-                >
-                  <MenuItem value="asc">Ascending</MenuItem>
-                  <MenuItem value="desc">Descending</MenuItem>
-                </Select>
-              </FormControl>
+
+            {aggregations.map((agg) => (
+              <Box key={agg.id} sx={filterBlockStyle}>
+                <Grid container spacing={3} alignItems="center">
+                  <Grid item xs={12} sm={3}>
+                    <FormControl fullWidth size="small" sx={inputStyle}>
+                      <InputLabel>Column</InputLabel>
+                      <Select
+                        value={agg.column}
+                        label="Column"
+                        onChange={(e) => updateAggregation(agg.id, 'column', e.target.value)}
+                      >
+                        {numericColumns.map(col => <MenuItem key={col} value={col}>{col}</MenuItem>)}
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={12} sm={3}>
+                    <FormControl fullWidth size="small" sx={inputStyle}>
+                      <InputLabel>Function</InputLabel>
+                      <Select
+                        value={agg.function}
+                        label="Function"
+                        onChange={(e) => updateAggregation(agg.id, 'function', e.target.value)}
+                      >
+                        {aggregationFunctions.map(func => <MenuItem key={func.value} value={func.value}>{func.label}</MenuItem>)}
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={12} sm={4}>
+                    <TextField
+                      fullWidth
+                      size="small"
+                      label="Alias (Optional)"
+                      value={agg.alias}
+                      onChange={(e) => updateAggregation(agg.id, 'alias', e.target.value)}
+                      placeholder={`${agg.function}_${agg.column}`}
+                      sx={inputStyle}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={2} sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                    <IconButton size="small" onClick={() => removeAggregation(agg.id)} sx={{ border: '2px solid black', borderRadius: 0, '&:hover': { backgroundColor: 'black', color: 'white' } }}>
+                      <Delete />
+                    </IconButton>
+                  </Grid>
+                </Grid>
+              </Box>
+            ))}
+          </AccordionDetails>
+        </Accordion>
+
+        {/* Sorting */}
+        <Accordion sx={accordionStyle}>
+          <AccordionSummary expandIcon={<ExpandMore sx={{ color: 'black' }} />} sx={accordionSummaryStyle}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <TrendingUp />
+              <Typography variant="h6" sx={{ textTransform: 'uppercase', fontWeight: 700 }}>Sorting</Typography>
+            </Box>
+          </AccordionSummary>
+          <AccordionDetails sx={accordionDetailsStyle}>
+            <Grid container spacing={3}>
+              <Grid item xs={12} sm={6}>
+                <FormControl fullWidth sx={inputStyle}>
+                  <InputLabel>Sort By Column</InputLabel>
+                  <Select
+                    value={sortBy}
+                    label="Sort By Column"
+                    onChange={(e) => setSortBy(e.target.value)}
+                  >
+                    <MenuItem value="">NONE</MenuItem>
+                    {transformedData && transformedData.columns.map(col => <MenuItem key={col} value={col}>{col}</MenuItem>)}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <FormControl fullWidth sx={inputStyle}>
+                  <InputLabel>Sort Order</InputLabel>
+                  <Select
+                    value={sortOrder}
+                    label="Sort Order"
+                    onChange={(e) => setSortOrder(e.target.value)}
+                    disabled={!sortBy}
+                  >
+                    <MenuItem value="asc">ASCENDING</MenuItem>
+                    <MenuItem value="desc">DESCENDING</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
             </Grid>
-          </Grid>
-        </AccordionDetails>
-      </Accordion>
+          </AccordionDetails>
+        </Accordion>
 
-      {/* Data Type Conversion */}
-      <Accordion>
-        <AccordionSummary expandIcon={<ExpandMore />}>
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <Transform sx={{ mr: 1 }} />
-            <Typography>Data Type Conversion</Typography>
-          </Box>
-        </AccordionSummary>
-        <AccordionDetails>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-            <Typography variant="subtitle1">Type Conversions</Typography>
-            <Button
-              size="small"
-              startIcon={<Add />}
-              onClick={addDataTypeConversion}
-            >
-              Add Conversion
-            </Button>
-          </Box>
-
-          {dataTypeConversions.map((conv) => (
-            <Box key={conv.id} sx={{ mb: 2, p: 2, border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
-              <Grid container spacing={2} alignItems="center">
-                <Grid item xs={12} sm={3}>
-                  <FormControl fullWidth size="small">
-                    <InputLabel>Column</InputLabel>
-                    <Select
-                      value={conv.column}
-                      label="Column"
-                      onChange={(e) => updateDataTypeConversion(conv.id, 'column', e.target.value)}
-                    >
-                      {columns.map(col => (
-                        <MenuItem key={col} value={col}>{col}</MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                </Grid>
-                <Grid item xs={12} sm={3}>
-                  <FormControl fullWidth size="small">
-                    <InputLabel>To Type</InputLabel>
-                    <Select
-                      value={conv.toType}
-                      label="To Type"
-                      onChange={(e) => updateDataTypeConversion(conv.id, 'toType', e.target.value)}
-                    >
-                      <MenuItem value="number">Number</MenuItem>
-                      <MenuItem value="string">String</MenuItem>
-                      <MenuItem value="date">Date</MenuItem>
-                      <MenuItem value="boolean">Boolean</MenuItem>
-                    </Select>
-                  </FormControl>
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    <FormControlLabel
-                      control={
-                        <Switch
-                          checked={conv.enabled}
-                          onChange={(e) => updateDataTypeConversion(conv.id, 'enabled', e.target.checked)}
-                          size="small"
-                        />
-                      }
-                      label="Enabled"
-                    />
-                    <IconButton
-                      size="small"
-                      onClick={() => removeDataTypeConversion(conv.id)}
-                      sx={{ ml: 1 }}
-                    >
-                      <Delete />
-                    </IconButton>
-                  </Box>
-                </Grid>
-              </Grid>
+        {/* Data Type Conversion */}
+        <Accordion sx={accordionStyle}>
+          <AccordionSummary expandIcon={<ExpandMore sx={{ color: 'black' }} />} sx={accordionSummaryStyle}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Transform />
+              <Typography variant="h6" sx={{ textTransform: 'uppercase', fontWeight: 700 }}>Data Type Conversion</Typography>
             </Box>
-          ))}
-        </AccordionDetails>
-      </Accordion>
-
-      {/* Calculated Columns */}
-      <Accordion>
-        <AccordionSummary expandIcon={<ExpandMore />}>
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <Calculate sx={{ mr: 1 }} />
-            <Typography>Calculated Columns</Typography>
-          </Box>
-        </AccordionSummary>
-        <AccordionDetails>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-            <Typography variant="subtitle1">Formula Columns</Typography>
-            <Button
-              size="small"
-              startIcon={<Add />}
-              onClick={addCalculatedColumn}
-            >
-              Add Column
-            </Button>
-          </Box>
-
-          {calculatedColumns.map((calc) => (
-            <Box key={calc.id} sx={{ mb: 2, p: 2, border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
-              <Grid container spacing={2} alignItems="center">
-                <Grid item xs={12} sm={3}>
-                  <TextField
-                    fullWidth
-                    size="small"
-                    label="Column Name"
-                    value={calc.name}
-                    onChange={(e) => updateCalculatedColumn(calc.id, 'name', e.target.value)}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    fullWidth
-                    size="small"
-                    label="Formula (e.g., column1 + column2 * 2)"
-                    value={calc.formula}
-                    onChange={(e) => updateCalculatedColumn(calc.id, 'formula', e.target.value)}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={3}>
-                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    <FormControlLabel
-                      control={
-                        <Switch
-                          checked={calc.enabled}
-                          onChange={(e) => updateCalculatedColumn(calc.id, 'enabled', e.target.checked)}
-                          size="small"
-                        />
-                      }
-                      label="Enabled"
-                    />
-                    <IconButton
-                      size="small"
-                      onClick={() => removeCalculatedColumn(calc.id)}
-                      sx={{ ml: 1 }}
-                    >
-                      <Delete />
-                    </IconButton>
-                  </Box>
-                </Grid>
-              </Grid>
-              <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
-                Use column names in formulas. Supports +, -, *, /, (), and basic math functions.
-              </Typography>
+          </AccordionSummary>
+          <AccordionDetails sx={accordionDetailsStyle}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+              <Typography variant="h6" sx={{ textTransform: 'uppercase', fontWeight: 'bold' }}>Type Conversions</Typography>
+              <Button size="small" startIcon={<Add />} onClick={addDataTypeConversion} sx={starkButtonStyle}>
+                Add Conversion
+              </Button>
             </Box>
-          ))}
-        </AccordionDetails>
-      </Accordion>
 
-      {/* Data Validation */}
-      <Accordion>
-        <AccordionSummary expandIcon={<ExpandMore />}>
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <CheckCircle sx={{ mr: 1 }} />
-            <Typography>Data Validation</Typography>
-          </Box>
-        </AccordionSummary>
-        <AccordionDetails>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-            <Typography variant="subtitle1">Validation Rules</Typography>
-            <Button
-              size="small"
-              startIcon={<Add />}
-              onClick={addValidationRule}
-            >
-              Add Rule
-            </Button>
-          </Box>
+            {dataTypeConversions.map((conv) => (
+              <Box key={conv.id} sx={filterBlockStyle}>
+                <Grid container spacing={3} alignItems="center">
+                  <Grid item xs={12} sm={4}>
+                    <FormControl fullWidth size="small" sx={inputStyle}>
+                      <InputLabel>Column</InputLabel>
+                      <Select value={conv.column} label="Column" onChange={(e) => updateDataTypeConversion(conv.id, 'column', e.target.value)}>
+                        {columns.map(col => <MenuItem key={col} value={col}>{col}</MenuItem>)}
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={12} sm={4}>
+                    <FormControl fullWidth size="small" sx={inputStyle}>
+                      <InputLabel>To Type</InputLabel>
+                      <Select value={conv.toType} label="To Type" onChange={(e) => updateDataTypeConversion(conv.id, 'toType', e.target.value)}>
+                        <MenuItem value="number">NUMBER</MenuItem>
+                        <MenuItem value="string">STRING</MenuItem>
+                        <MenuItem value="date">DATE</MenuItem>
+                        <MenuItem value="boolean">BOOLEAN</MenuItem>
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={12} sm={4}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 2 }}>
+                      <FormControlLabel
+                        control={<Switch checked={conv.enabled} onChange={(e) => updateDataTypeConversion(conv.id, 'enabled', e.target.checked)} color="default" />}
+                        label={<Typography sx={{ fontFamily: '"IBM Plex Mono", monospace', fontWeight: 'bold' }}>ACT</Typography>}
+                      />
+                      <IconButton size="small" onClick={() => removeDataTypeConversion(conv.id)} sx={{ border: '2px solid black', borderRadius: 0, '&:hover': { backgroundColor: 'black', color: 'white' } }}>
+                        <Delete />
+                      </IconButton>
+                    </Box>
+                  </Grid>
+                </Grid>
+              </Box>
+            ))}
+          </AccordionDetails>
+        </Accordion>
 
-          {validationRules.map((rule) => (
-            <Box key={rule.id} sx={{ mb: 2, p: 2, border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
-              <Grid container spacing={2} alignItems="center">
-                <Grid item xs={12} sm={3}>
-                  <FormControl fullWidth size="small">
-                    <InputLabel>Column</InputLabel>
-                    <Select
-                      value={rule.column}
-                      label="Column"
-                      onChange={(e) => updateValidationRule(rule.id, 'column', e.target.value)}
-                    >
-                      {columns.map(col => (
-                        <MenuItem key={col} value={col}>{col}</MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                </Grid>
-                <Grid item xs={12} sm={3}>
-                  <FormControl fullWidth size="small">
-                    <InputLabel>Rule</InputLabel>
-                    <Select
-                      value={rule.rule}
-                      label="Rule"
-                      onChange={(e) => updateValidationRule(rule.id, 'rule', e.target.value)}
-                    >
-                      <MenuItem value="not_empty">Not Empty</MenuItem>
-                      <MenuItem value="is_number">Is Number</MenuItem>
-                      <MenuItem value="min_length">Min Length</MenuItem>
-                      <MenuItem value="max_length">Max Length</MenuItem>
-                      <MenuItem value="regex">Regex Pattern</MenuItem>
-                    </Select>
-                  </FormControl>
-                </Grid>
-                <Grid item xs={12} sm={2}>
-                  <TextField
-                    fullWidth
-                    size="small"
-                    label="Value"
-                    value={rule.value}
-                    onChange={(e) => updateValidationRule(rule.id, 'value', e.target.value)}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={2}>
-                  <FormControl fullWidth size="small">
-                    <InputLabel>Action</InputLabel>
-                    <Select
-                      value={rule.action}
-                      label="Action"
-                      onChange={(e) => updateValidationRule(rule.id, 'action', e.target.value)}
-                    >
-                      <MenuItem value="flag">Flag Invalid</MenuItem>
-                      <MenuItem value="remove">Remove Row</MenuItem>
-                    </Select>
-                  </FormControl>
-                </Grid>
-                <Grid item xs={12} sm={2}>
-                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    <FormControlLabel
-                      control={
-                        <Switch
-                          checked={rule.enabled}
-                          onChange={(e) => updateValidationRule(rule.id, 'enabled', e.target.checked)}
-                          size="small"
-                        />
-                      }
-                      label=""
-                    />
-                    <IconButton
-                      size="small"
-                      onClick={() => removeValidationRule(rule.id)}
-                      sx={{ ml: 1 }}
-                    >
-                      <Delete />
-                    </IconButton>
-                  </Box>
-                </Grid>
-              </Grid>
+        {/* Calculated Columns */}
+        <Accordion sx={accordionStyle}>
+          <AccordionSummary expandIcon={<ExpandMore sx={{ color: 'black' }} />} sx={accordionSummaryStyle}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Calculate />
+              <Typography variant="h6" sx={{ textTransform: 'uppercase', fontWeight: 700 }}>Calculated Columns</Typography>
             </Box>
-          ))}
-        </AccordionDetails>
-      </Accordion>
-    </Paper>
+          </AccordionSummary>
+          <AccordionDetails sx={accordionDetailsStyle}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+              <Typography variant="h6" sx={{ textTransform: 'uppercase', fontWeight: 'bold' }}>Formula Columns</Typography>
+              <Button size="small" startIcon={<Add />} onClick={addCalculatedColumn} sx={starkButtonStyle}>
+                Add Column
+              </Button>
+            </Box>
+
+            {calculatedColumns.map((calc) => (
+              <Box key={calc.id} sx={filterBlockStyle}>
+                <Grid container spacing={3} alignItems="center">
+                  <Grid item xs={12} sm={4}>
+                    <TextField fullWidth size="small" label="COL NAME" value={calc.name} onChange={(e) => updateCalculatedColumn(calc.id, 'name', e.target.value)} sx={inputStyle} />
+                  </Grid>
+                  <Grid item xs={12} sm={5}>
+                    <TextField fullWidth size="small" label="FORMULA (E.G. COL1 + COL2)" value={calc.formula} onChange={(e) => updateCalculatedColumn(calc.id, 'formula', e.target.value)} sx={inputStyle} />
+                  </Grid>
+                  <Grid item xs={12} sm={3}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 2 }}>
+                      <FormControlLabel
+                        control={<Switch checked={calc.enabled} onChange={(e) => updateCalculatedColumn(calc.id, 'enabled', e.target.checked)} color="default" />}
+                        label={<Typography sx={{ fontFamily: '"IBM Plex Mono", monospace', fontWeight: 'bold' }}>ACT</Typography>}
+                      />
+                      <IconButton size="small" onClick={() => removeCalculatedColumn(calc.id)} sx={{ border: '2px solid black', borderRadius: 0, '&:hover': { backgroundColor: 'black', color: 'white' } }}>
+                        <Delete />
+                      </IconButton>
+                    </Box>
+                  </Grid>
+                </Grid>
+                <Typography variant="caption" sx={{ mt: 1, display: 'block', fontWeight: 'bold', fontFamily: '"IBM Plex Mono", monospace' }}>
+                  * Use column names exactly. Supported: +, -, *, /, ().
+                </Typography>
+              </Box>
+            ))}
+          </AccordionDetails>
+        </Accordion>
+
+        {/* Data Validation */}
+        <Accordion sx={accordionStyle}>
+          <AccordionSummary expandIcon={<ExpandMore sx={{ color: 'black' }} />} sx={accordionSummaryStyle}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <CheckCircle />
+              <Typography variant="h6" sx={{ textTransform: 'uppercase', fontWeight: 700 }}>Data Validation</Typography>
+            </Box>
+          </AccordionSummary>
+          <AccordionDetails sx={accordionDetailsStyle}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+              <Typography variant="h6" sx={{ textTransform: 'uppercase', fontWeight: 'bold' }}>Validation Rules</Typography>
+              <Button size="small" startIcon={<Add />} onClick={addValidationRule} sx={starkButtonStyle}>
+                Add Rule
+              </Button>
+            </Box>
+
+            {validationRules.map((rule) => (
+              <Box key={rule.id} sx={filterBlockStyle}>
+                <Grid container spacing={2} alignItems="center">
+                  <Grid item xs={12} sm={3}>
+                    <FormControl fullWidth size="small" sx={inputStyle}>
+                      <InputLabel>Column</InputLabel>
+                      <Select value={rule.column} label="Column" onChange={(e) => updateValidationRule(rule.id, 'column', e.target.value)}>
+                        {columns.map(col => <MenuItem key={col} value={col}>{col}</MenuItem>)}
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={12} sm={3}>
+                    <FormControl fullWidth size="small" sx={inputStyle}>
+                      <InputLabel>Rule</InputLabel>
+                      <Select value={rule.rule} label="Rule" onChange={(e) => updateValidationRule(rule.id, 'rule', e.target.value)}>
+                        <MenuItem value="not_empty">NOT EMPTY</MenuItem>
+                        <MenuItem value="is_number">IS NUMBER</MenuItem>
+                        <MenuItem value="min_length">MIN LENGTH</MenuItem>
+                        <MenuItem value="max_length">MAX LENGTH</MenuItem>
+                        <MenuItem value="regex">REGEX MATCH</MenuItem>
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={12} sm={2}>
+                    <TextField fullWidth size="small" label="VAL" value={rule.value} onChange={(e) => updateValidationRule(rule.id, 'value', e.target.value)} sx={inputStyle} />
+                  </Grid>
+                  <Grid item xs={12} sm={2}>
+                    <FormControl fullWidth size="small" sx={inputStyle}>
+                      <InputLabel>Action</InputLabel>
+                      <Select value={rule.action} label="Action" onChange={(e) => updateValidationRule(rule.id, 'action', e.target.value)}>
+                        <MenuItem value="flag">FLAG INVALID</MenuItem>
+                        <MenuItem value="remove">DROP ROW</MenuItem>
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={12} sm={2}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 2 }}>
+                      <FormControlLabel
+                        control={<Switch checked={rule.enabled} onChange={(e) => updateValidationRule(rule.id, 'enabled', e.target.checked)} color="default" />}
+                        label={<Typography sx={{ fontFamily: '"IBM Plex Mono", monospace', fontWeight: 'bold' }}>ACT</Typography>}
+                      />
+                      <IconButton size="small" onClick={() => removeValidationRule(rule.id)} sx={{ border: '2px solid black', borderRadius: 0, '&:hover': { backgroundColor: 'black', color: 'white' } }}>
+                        <Delete />
+                      </IconButton>
+                    </Box>
+                  </Grid>
+                </Grid>
+              </Box>
+            ))}
+          </AccordionDetails>
+        </Accordion>
+      </Box>
+    </Box>
   );
 });
+
+// Simple placeholder icon if Search is missing
+const SearchIconPlaceholder = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square" strokeLinejoin="miter">
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+  </svg>
+);
 
 DataTransformer.propTypes = {
   data: PropTypes.shape({
     data: PropTypes.arrayOf(PropTypes.object).isRequired,
-    columns: PropTypes.arrayOf(PropTypes.string)
+    columns: PropTypes.arrayOf(PropTypes.string),
+    originalRowCount: PropTypes.number
   }).isRequired,
   onTransformedData: PropTypes.func.isRequired
 };

@@ -53,8 +53,8 @@ const COLORS = [
   '#45b7d1', '#96ceb4', '#ffeaa7', '#fab1a0', '#fd79a8'
 ];
 
-const ChartComponent = React.memo(({ 
-  data, 
+const ChartComponent = React.memo(({
+  data,
   chartType = 'line',
   title = 'Chart',
   xAxis = '',
@@ -80,7 +80,7 @@ const ChartComponent = React.memo(({
 
   const processedData = useMemo(() => {
     if (!data || !data.data || data.data.length === 0) return [];
-    
+
     return data.data.map((item, index) => ({
       ...item,
       _index: index,
@@ -142,11 +142,11 @@ const ChartComponent = React.memo(({
   const renderChart = () => {
     if (!processedData.length || !xAxis || !yAxis) {
       return (
-        <Box 
-          sx={{ 
-            height: config.height, 
-            display: 'flex', 
-            alignItems: 'center', 
+        <Box
+          sx={{
+            height: config.height,
+            display: 'flex',
+            alignItems: 'center',
             justifyContent: 'center',
             flexDirection: 'column',
             color: 'text.secondary'
@@ -287,29 +287,31 @@ const ChartComponent = React.memo(({
   };
 
   return (
-    <Paper elevation={0} sx={{ p: 2, height: '100%', background: 'background.paper', border: '1px solid', borderColor: 'divider' }}>
+    <Box sx={{ p: 2, height: '100%', backgroundColor: 'white', border: '2px solid black' }}>
       {/* Header */}
-      <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-        {getChartIcon(chartType)}
-        <Typography variant="h6" sx={{ ml: 1, flex: 1 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', mb: 2, pb: 2, borderBottom: '2px solid black' }}>
+        <Box sx={{ border: '2px solid black', p: 0.5, display: 'flex', backgroundColor: 'black', color: 'white' }}>{getChartIcon(chartType)}</Box>
+        <Typography variant="h6" sx={{ ml: 2, flex: 1, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
           {title}
         </Typography>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <Chip 
-            label={chartType.toUpperCase()} 
-            size="small" 
-            variant="outlined" 
-            color="primary"
+          <Chip
+            label={chartType.toUpperCase()}
+            size="small"
+            variant="outlined"
+            sx={{ borderRadius: 0, border: '2px solid black', fontWeight: 'bold', color: 'black' }}
           />
           <IconButton
             size="small"
             onClick={() => setShowSettings(!showSettings)}
+            sx={{ borderRadius: 0, border: '2px solid black', backgroundColor: showSettings ? 'black' : 'white', color: showSettings ? 'white' : 'black', '&:hover': { backgroundColor: showSettings ? 'black' : '#f0f0f0' } }}
           >
             <Settings />
           </IconButton>
           <IconButton
             size="small"
             onClick={(e) => setAnchorEl(e.currentTarget)}
+            sx={{ borderRadius: 0, border: '2px solid black', backgroundColor: 'white', color: 'black', '&:hover': { backgroundColor: '#f0f0f0' } }}
           >
             <MoreVert />
           </IconButton>
@@ -318,8 +320,8 @@ const ChartComponent = React.memo(({
 
       {/* Settings Panel */}
       {showSettings && (
-        <Box sx={{ mb: 2, p: 2, bgcolor: 'background.default', borderRadius: 1 }}>
-          <Typography variant="subtitle2" gutterBottom>Chart Configuration</Typography>
+        <Box sx={{ mb: 3, p: 3, backgroundColor: '#F7F7F5', border: '2px solid black' }}>
+          <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 800, textTransform: 'uppercase' }}>CHART_CONFIGURATION</Typography>
           <Grid container spacing={2}>
             <Grid item xs={12} sm={6} md={3}>
               <FormControl fullWidth size="small">
@@ -379,7 +381,7 @@ const ChartComponent = React.memo(({
               />
             </Grid>
           </Grid>
-          
+
           <Box sx={{ mt: 2, display: 'flex', flexWrap: 'wrap', gap: 2 }}>
             <FormControlLabel
               control={
@@ -435,31 +437,34 @@ const ChartComponent = React.memo(({
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
         onClose={() => setAnchorEl(null)}
+        PaperProps={{
+          sx: { borderRadius: 0, border: '2px solid black', boxShadow: '4px 4px 0px 0px rgba(0,0,0,1)' }
+        }}
       >
         <MenuItem onClick={() => {
           if (onExport) onExport('png');
           setAnchorEl(null);
-        }}>
+        }} sx={{ fontWeight: 'bold', textTransform: 'uppercase' }}>
           <Download sx={{ mr: 1 }} />
-          Export as PNG
+          EXPORT_AS_PNG
         </MenuItem>
         <MenuItem onClick={() => {
           if (onExport) onExport('pdf');
           setAnchorEl(null);
-        }}>
+        }} sx={{ fontWeight: 'bold', textTransform: 'uppercase' }}>
           <Download sx={{ mr: 1 }} />
-          Export as PDF
+          EXPORT_AS_PDF
         </MenuItem>
-        <Divider />
+        <Divider sx={{ borderColor: 'black' }} />
         <MenuItem onClick={() => {
           setShowSettings(!showSettings);
           setAnchorEl(null);
-        }}>
+        }} sx={{ fontWeight: 'bold', textTransform: 'uppercase' }}>
           <Settings sx={{ mr: 1 }} />
-          Chart Settings
+          CHART_SETTINGS
         </MenuItem>
       </Menu>
-    </Paper>
+    </Box>
   );
 });
 

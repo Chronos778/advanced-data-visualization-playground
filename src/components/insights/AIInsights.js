@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import ReactMarkdown from 'react-markdown';
 import {
   Box,
-  Paper,
   Typography,
   Card,
   CardContent,
@@ -36,10 +35,10 @@ import {
   AutoAwesome,
   SmartToy
 } from '@mui/icons-material';
-import { 
-  variance, 
-  standardDeviation, 
-  sampleCorrelation, 
+import {
+  variance,
+  standardDeviation,
+  sampleCorrelation,
   linearRegression,
   rSquared,
   mean,
@@ -62,24 +61,24 @@ const AIInsights = ({ data }) => {
 
   const numericData = useMemo(() => {
     if (!data || !data.data || data.data.length === 0) return {};
-    
+
     const numeric = {};
     data.columns.forEach(column => {
       const values = data.data
         .map(row => parseFloat(row[column]))
         .filter(val => !isNaN(val) && isFinite(val));
-      
+
       if (values.length > data.data.length * 0.5) { // At least 50% numeric
         numeric[column] = values;
       }
     });
-    
+
     return numeric;
   }, [data]);
 
   const categoricalData = useMemo(() => {
     if (!data || !data.data || data.data.length === 0) return {};
-    
+
     const categorical = {};
     data.columns.forEach(column => {
       if (!numericData[column]) {
@@ -89,16 +88,16 @@ const AIInsights = ({ data }) => {
         categorical[column] = values;
       }
     });
-    
+
     return categorical;
   }, [data, numericData]);
 
   const generateInsights = async () => {
     setAnalyzing(true);
-    
+
     // Simulate processing time
     await new Promise(resolve => setTimeout(resolve, 1500));
-    
+
     const generatedInsights = {
       summary: generateSummaryInsights(),
       distributions: generateDistributionInsights(),
@@ -107,7 +106,7 @@ const AIInsights = ({ data }) => {
       trends: generateTrendInsights(),
       recommendations: generateRecommendations()
     };
-    
+
     setInsights(generatedInsights);
     setAnalyzing(false);
   };
@@ -115,11 +114,11 @@ const AIInsights = ({ data }) => {
   const generateAIInsights = async () => {
     setLoadingAI(true);
     setAiError(null);
-    
+
     try {
       // Prepare data summary for AI API
       const dataSummary = prepareDataSummary();
-      
+
       const prompt = `Analyze this dataset and provide comprehensive insights in a well-structured markdown format. Dataset summary:
 ${dataSummary}
 
@@ -171,7 +170,7 @@ Format your response in clear, actionable insights that would be valuable for da
       if (!response.ok) {
         const errorText = await response.text();
         console.error('API Error response:', errorText);
-        
+
         // Fallback to local analysis if API fails
         console.log('API failed, using local statistical analysis...');
         const localInsights = generateLocalAIInsights();
@@ -181,7 +180,7 @@ Format your response in clear, actionable insights that would be valuable for da
 
       const result = await response.json();
       const aiText = result.choices?.[0]?.message?.content;
-      
+
       if (!aiText) {
         console.error('No AI text in response, using local analysis');
         const localInsights = generateLocalAIInsights();
@@ -192,7 +191,7 @@ Format your response in clear, actionable insights that would be valuable for da
       // Parse AI response into structured insights
       const structuredInsights = parseAIResponse(aiText);
       setAiInsights(structuredInsights);
-      
+
     } catch (error) {
       console.error('AI Insights error:', error);
       setAiError(`AI Insights analysis failed: ${error.message}`);
@@ -205,14 +204,14 @@ Format your response in clear, actionable insights that would be valuable for da
     const numericColumns = Object.keys(numericData);
     const categoricalColumns = Object.keys(categoricalData);
     const totalRows = data?.data?.length || 0;
-    
+
     let insights = "## 📊 Dataset Overview\n\n";
     insights += `This dataset contains **${totalRows.toLocaleString()} records** across **${data?.columns?.length || 0} variables**. `;
     insights += `The data includes **${numericColumns.length} numeric columns** and **${categoricalColumns.length} categorical columns**, `;
     insights += `providing a comprehensive view for analysis.\n\n`;
-    
+
     insights += "## 🔍 Key Patterns and Trends\n\n";
-    
+
     // Analyze numeric columns
     if (numericColumns.length > 0) {
       const statsAnalysis = [];
@@ -224,21 +223,21 @@ Format your response in clear, actionable insights that would be valuable for da
         const maxVal = max(values);
         const range = maxVal - minVal;
         const cv = (stdDev / avg) * 100; // coefficient of variation
-        
+
         statsAnalysis.push({ col, avg, stdDev, minVal, maxVal, range, cv });
       });
-      
+
       // Find most variable column
       const mostVariable = statsAnalysis.reduce((a, b) => a.cv > b.cv ? a : b);
       insights += `• **High Variability in ${mostVariable.col}**: This metric shows significant variation (CV: ${mostVariable.cv.toFixed(1)}%), `;
       insights += `ranging from ${mostVariable.minVal.toLocaleString()} to ${mostVariable.maxVal.toLocaleString()}. `;
       insights += `This suggests diverse patterns worth investigating.\n\n`;
-      
+
       // Find most stable column
       const mostStable = statsAnalysis.reduce((a, b) => a.cv < b.cv ? a : b);
       insights += `• **Consistent Pattern in ${mostStable.col}**: Shows low variability (CV: ${mostStable.cv.toFixed(1)}%), `;
       insights += `indicating stable behavior across the dataset.\n\n`;
-      
+
       // Identify potential outliers
       statsAnalysis.forEach(stat => {
         const outlierThreshold = stat.avg + (3 * stat.stdDev);
@@ -248,14 +247,14 @@ Format your response in clear, actionable insights that would be valuable for da
         }
       });
     }
-    
+
     // Analyze categorical patterns
     if (categoricalColumns.length > 0) {
       categoricalColumns.slice(0, 2).forEach(col => {
         const uniqueValues = new Set(categoricalData[col]).size;
         const totalValues = categoricalData[col].length;
         const uniqueRatio = (uniqueValues / totalValues) * 100;
-        
+
         if (uniqueRatio < 10) {
           insights += `• **Limited Categories in ${col}**: Only ${uniqueValues} distinct values, `;
           insights += `suggesting this could be a useful grouping variable for segmentation analysis.\n\n`;
@@ -265,32 +264,32 @@ Format your response in clear, actionable insights that would be valuable for da
         }
       });
     }
-    
+
     insights += "## 💡 Business Insights and Recommendations\n\n";
-    
+
     if (numericColumns.length > 0) {
       insights += "**Performance Optimization:**\n";
       insights += `• Focus on the high-variability metrics (particularly ${numericColumns[0]}) to identify improvement opportunities\n`;
       insights += `• Stable metrics can serve as reliable benchmarks for performance tracking\n\n`;
-      
+
       insights += "**Data-Driven Decisions:**\n";
       insights += "• Use outlier analysis to identify exceptional cases that may require special attention\n";
       insights += "• Consider time-series analysis if temporal patterns exist in your data\n\n";
     }
-    
+
     if (categoricalColumns.length > 0) {
       insights += "**Segmentation Strategy:**\n";
       insights += `• Leverage low-cardinality variables for customer/product segmentation\n`;
       insights += `• High-diversity columns may reveal micro-segments for targeted strategies\n\n`;
     }
-    
+
     insights += "## 🎯 Data Quality Assessment\n\n";
-    
+
     const nullCounts = data?.columns?.map(col => {
       const nulls = data.data.filter(row => !row[col] || row[col] === '').length;
       return { col, nulls, pct: (nulls / totalRows) * 100 };
     }).filter(item => item.nulls > 0) || [];
-    
+
     if (nullCounts.length > 0) {
       insights += "**Missing Data Detected:**\n";
       nullCounts.slice(0, 3).forEach(item => {
@@ -302,42 +301,42 @@ Format your response in clear, actionable insights that would be valuable for da
     } else {
       insights += "✅ **Excellent data completeness** - No significant missing values detected\n\n";
     }
-    
+
     insights += "## 📈 Suggested Visualizations\n\n";
-    
+
     if (numericColumns.length >= 2) {
       insights += `**Correlation Analysis:**\n`;
       insights += `• Create scatter plots between ${numericColumns[0]} and ${numericColumns[1]} to identify relationships\n`;
       insights += `• Use heatmaps to visualize correlations across all numeric variables\n\n`;
     }
-    
+
     if (numericColumns.length > 0) {
       insights += `**Distribution Analysis:**\n`;
       insights += `• Histogram for ${numericColumns[0]} to understand value distribution\n`;
       insights += `• Box plots to identify outliers and quartile ranges\n\n`;
     }
-    
+
     if (categoricalColumns.length > 0 && numericColumns.length > 0) {
       insights += `**Comparative Analysis:**\n`;
       insights += `• Bar charts showing ${numericColumns[0]} grouped by ${categoricalColumns[0]}\n`;
       insights += `• Stacked area charts for trend analysis across categories\n\n`;
     }
-    
+
     insights += "## 🔬 Notable Correlations and Anomalies\n\n";
-    
+
     if (numericColumns.length >= 2) {
       // Calculate simple correlation between first two numeric columns
       const col1 = numericData[numericColumns[0]];
       const col2 = numericData[numericColumns[1]];
       const minLen = Math.min(col1.length, col2.length);
-      
+
       const mean1 = mean(col1.slice(0, minLen));
       const mean2 = mean(col2.slice(0, minLen));
-      
+
       let correlation = 0;
       let sumSq1 = 0;
       let sumSq2 = 0;
-      
+
       for (let i = 0; i < minLen; i++) {
         const diff1 = col1[i] - mean1;
         const diff2 = col2[i] - mean2;
@@ -345,29 +344,29 @@ Format your response in clear, actionable insights that would be valuable for da
         sumSq1 += diff1 * diff1;
         sumSq2 += diff2 * diff2;
       }
-      
+
       correlation = correlation / Math.sqrt(sumSq1 * sumSq2);
-      
+
       if (Math.abs(correlation) > 0.5) {
         insights += `• **${correlation > 0 ? 'Strong Positive' : 'Strong Negative'} Correlation**: `;
         insights += `${numericColumns[0]} and ${numericColumns[1]} show a correlation of ${correlation.toFixed(3)}, `;
         insights += `indicating ${correlation > 0 ? 'they tend to move together' : 'an inverse relationship'}.\n\n`;
       }
     }
-    
+
     insights += "> **Note**: These insights are generated using local statistical analysis. ";
     insights += "The Hugging Face AI service is currently unavailable or not configured. Check browser console for details.\n";
-    
+
     // Parse the markdown into sections for structured display
     const sections = insights.split(/(?=^## )/gm).filter(s => s.trim());
-    
+
     return {
       text: insights,
       insights: sections.map((section, index) => {
         const lines = section.trim().split('\n');
         const title = lines[0].replace(/^##\s*/, '').trim() || `Analysis Section ${index + 1}`;
         const content = lines.slice(1).join('\n').trim();
-        
+
         return {
           id: index,
           type: 'statistical',
@@ -382,7 +381,7 @@ Format your response in clear, actionable insights that would be valuable for da
 
   const prepareDataSummary = () => {
     if (!data || !data.data) return "No data available";
-    
+
     const summary = {
       totalRows: data.data.length,
       totalColumns: data.columns.length,
@@ -429,7 +428,7 @@ Format your response in clear, actionable insights that would be valuable for da
 
     // Split by main sections (marked with ##)
     const sections = cleanedText.split(/(?=##\s)/).filter(section => section.trim());
-    
+
     if (sections.length === 0) {
       // Fallback: split by numbered sections if no ## headers found
       const fallbackSections = cleanedText.split(/\d+\.\s+/).filter(section => section.trim());
@@ -452,7 +451,7 @@ Format your response in clear, actionable insights that would be valuable for da
         const lines = section.trim().split('\n');
         const title = lines[0].replace(/^##\s*/, '').trim() || `Analysis Section ${index + 1}`;
         const content = lines.slice(1).join('\n').trim();
-        
+
         return {
           id: index,
           type: 'ai',
@@ -467,7 +466,7 @@ Format your response in clear, actionable insights that would be valuable for da
 
   const generateSummaryInsights = () => {
     const insights = [];
-    
+
     // Dataset overview
     insights.push({
       type: 'info',
@@ -499,15 +498,15 @@ Format your response in clear, actionable insights that would be valuable for da
 
   const generateDistributionInsights = () => {
     const insights = [];
-    
+
     Object.entries(numericData).forEach(([column, values]) => {
       if (values.length < 10) return;
-      
+
       const meanVal = mean(values);
       const medianVal = median(values);
       const stdDev = standardDeviation(values);
       const skewness = (meanVal - medianVal) / stdDev;
-      
+
       // Distribution shape
       if (Math.abs(skewness) > 1) {
         insights.push({
@@ -518,7 +517,7 @@ Format your response in clear, actionable insights that would be valuable for da
           column
         });
       }
-      
+
       // Potential normal distribution
       if (Math.abs(skewness) < 0.5) {
         insights.push({
@@ -530,40 +529,40 @@ Format your response in clear, actionable insights that would be valuable for da
         });
       }
     });
-    
+
     return insights;
   };
 
   const generateCorrelationInsights = () => {
     const insights = [];
     const numColumns = Object.keys(numericData);
-    
+
     if (numColumns.length < 2) return insights;
-    
+
     const correlations = [];
-    
+
     for (let i = 0; i < numColumns.length; i++) {
       for (let j = i + 1; j < numColumns.length; j++) {
         const col1 = numColumns[i];
         const col2 = numColumns[j];
-        
+
         try {
           // Find common indices where both values exist
           const commonData = data.data
-            .map((row, idx) => ({ 
-              val1: parseFloat(row[col1]), 
+            .map((row, idx) => ({
+              val1: parseFloat(row[col1]),
               val2: parseFloat(row[col2]),
-              index: idx 
+              index: idx
             }))
             .filter(item => !isNaN(item.val1) && !isNaN(item.val2) && isFinite(item.val1) && isFinite(item.val2));
-          
+
           if (commonData.length < 10) continue;
-          
+
           const values1 = commonData.map(item => item.val1);
           const values2 = commonData.map(item => item.val2);
-          
+
           const correlation = sampleCorrelation(values1, values2);
-          
+
           correlations.push({
             col1,
             col2,
@@ -577,10 +576,10 @@ Format your response in clear, actionable insights that would be valuable for da
         }
       }
     }
-    
+
     // Sort by strength
     correlations.sort((a, b) => b.strength - a.strength);
-    
+
     // Strong correlations
     const strongCorrelations = correlations.filter(corr => corr.strength > 0.7);
     strongCorrelations.slice(0, 3).forEach(corr => {
@@ -592,7 +591,7 @@ Format your response in clear, actionable insights that would be valuable for da
         columns: [corr.col1, corr.col2]
       });
     });
-    
+
     // Moderate correlations worth noting
     const moderateCorrelations = correlations.filter(corr => corr.strength > 0.4 && corr.strength <= 0.7);
     moderateCorrelations.slice(0, 2).forEach(corr => {
@@ -604,25 +603,25 @@ Format your response in clear, actionable insights that would be valuable for da
         columns: [corr.col1, corr.col2]
       });
     });
-    
+
     return insights;
   };
 
   const generateOutlierInsights = () => {
     const insights = [];
-    
+
     Object.entries(numericData).forEach(([column, values]) => {
       if (values.length < 20) return;
-      
+
       const q1 = quantile(values, 0.25);
       const q3 = quantile(values, 0.75);
       const iqr = q3 - q1;
       const lowerBound = q1 - 1.5 * iqr;
       const upperBound = q3 + 1.5 * iqr;
-      
+
       const outliers = values.filter(val => val < lowerBound || val > upperBound);
       const outlierPercentage = (outliers.length / values.length) * 100;
-      
+
       if (outlierPercentage > 5) {
         insights.push({
           type: 'warning',
@@ -633,13 +632,13 @@ Format your response in clear, actionable insights that would be valuable for da
         });
       }
     });
-    
+
     return insights;
   };
 
   const generateTrendInsights = () => {
     const insights = [];
-    
+
     // Look for time-series patterns if there's a date-like column
     const dateColumns = data.columns.filter(col => {
       const sampleValues = data.data.slice(0, 10).map(row => row[col]);
@@ -649,24 +648,24 @@ Format your response in clear, actionable insights that would be valuable for da
         return !isNaN(date.getTime()) && val.toString().length > 8;
       });
     });
-    
+
     if (dateColumns.length > 0 && Object.keys(numericData).length > 0) {
       const dateCol = dateColumns[0];
       const numCol = Object.keys(numericData)[0];
-      
+
       // Sort by date and look for trends
       const sortedData = data.data
         .filter(row => row[dateCol] && !isNaN(parseFloat(row[numCol])))
         .sort((a, b) => new Date(a[dateCol]) - new Date(b[dateCol]));
-      
+
       if (sortedData.length > 10) {
         const values = sortedData.map(row => parseFloat(row[numCol]));
         const xValues = values.map((_, i) => i); // Use indices as x values
-        
+
         try {
           const regression = linearRegression(xValues.map((x, i) => [x, values[i]]));
           const r2 = rSquared(xValues.map((x, i) => [x, values[i]]), regression);
-          
+
           if (r2 > 0.3) { // Reasonable trend
             insights.push({
               type: regression.m > 0 ? 'success' : 'warning',
@@ -681,17 +680,17 @@ Format your response in clear, actionable insights that would be valuable for da
         }
       }
     }
-    
+
     return insights;
   };
 
   const generateRecommendations = () => {
     const recommendations = [];
-    
+
     // Chart recommendations based on data characteristics
     const numericCount = Object.keys(numericData).length;
     const categoricalCount = Object.keys(categoricalData).length;
-    
+
     if (numericCount >= 2) {
       recommendations.push({
         type: 'chart',
@@ -701,7 +700,7 @@ Format your response in clear, actionable insights that would be valuable for da
         priority: 'high'
       });
     }
-    
+
     if (categoricalCount >= 1 && numericCount >= 1) {
       recommendations.push({
         type: 'chart',
@@ -711,7 +710,7 @@ Format your response in clear, actionable insights that would be valuable for da
         priority: 'medium'
       });
     }
-    
+
     if (data.data.length > 1000) {
       recommendations.push({
         type: 'performance',
@@ -721,12 +720,12 @@ Format your response in clear, actionable insights that would be valuable for da
         priority: 'medium'
       });
     }
-    
+
     // Data quality recommendations
     const highVarianceColumns = Object.entries(numericData)
       .map(([col, values]) => ({ col, variance: variance(values) }))
       .filter(item => item.variance > mean(Object.values(numericData).map(vals => variance(vals))) * 2);
-    
+
     if (highVarianceColumns.length > 0) {
       recommendations.push({
         type: 'analysis',
@@ -736,7 +735,7 @@ Format your response in clear, actionable insights that would be valuable for da
         priority: 'low'
       });
     }
-    
+
     return recommendations;
   };
 
@@ -770,33 +769,48 @@ Format your response in clear, actionable insights that would be valuable for da
 
   if (!data || !data.data) {
     return (
-      <Paper sx={{ p: 3, textAlign: 'center' }}>
-        <Psychology sx={{ fontSize: 48, color: 'text.secondary', mb: 2 }} />
-        <Typography variant="h6" color="text.secondary">
-          AI Insights
+      <Box sx={{ p: 6, textAlign: 'center', border: '2px solid black', backgroundColor: 'white' }}>
+        <Psychology sx={{ fontSize: 48, color: 'black', mb: 2 }} />
+        <Typography variant="h3" sx={{ fontWeight: 800, textTransform: 'uppercase', color: 'black', mb: 1, letterSpacing: '0.05em' }}>
+          AI_INSIGHTS_LOCKED
         </Typography>
-        <Typography variant="body2" color="text.secondary">
-          Upload data to generate automated insights and recommendations
+        <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: 'black' }}>
+          UPLOAD_DATA_TO_INITIALIZE_ANALYSIS
         </Typography>
-      </Paper>
+      </Box>
     );
   }
 
   return (
     <Box>
-      <Paper sx={{ p: 3 }}>
+      <Box sx={{ p: 4, border: '2px solid black', backgroundColor: 'white' }}>
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Psychology color="primary" />
-            <Typography variant="h6">AI-Powered Insights</Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <Box sx={{ border: '2px solid black', p: 1, display: 'flex' }}><Psychology color="inherit" /></Box>
+            <Typography variant="h4" sx={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em' }}>AI-Powered Insights</Typography>
           </Box>
           <Button
             variant={insights ? 'outlined' : 'contained'}
             startIcon={analyzing ? null : <Refresh />}
             onClick={generateInsights}
             disabled={analyzing}
+            sx={{
+              borderRadius: 0,
+              border: '2px solid black',
+              backgroundColor: insights ? 'white' : 'black',
+              color: insights ? 'black' : 'white',
+              fontWeight: 'bold',
+              textTransform: 'uppercase',
+              boxShadow: 'none',
+              '&:hover': {
+                backgroundColor: 'transparent',
+                color: 'black',
+                boxShadow: 'none',
+                border: '2px solid black'
+              }
+            }}
           >
-            {analyzing ? 'Analyzing...' : insights ? 'Refresh Insights' : 'Generate Insights'}
+            {analyzing ? 'ANALYZING...' : insights ? 'REFRESH_INSIGHTS' : 'GENERATE_INSIGHTS'}
           </Button>
         </Box>
 
@@ -816,19 +830,19 @@ Format your response in clear, actionable insights that would be valuable for da
         )}
 
         {/* AI-Powered Insights Section */}
-        <Paper elevation={0} sx={{ 
-          p: 3, 
-          mb: 3, 
-          background: 'background.paper',
-          border: '1px solid',
-          borderColor: 'divider',
-          borderRadius: 2
+        <Box sx={{
+          p: 4,
+          mb: 4,
+          mt: 4,
+          backgroundColor: '#F7F7F5',
+          border: '2px solid black',
+          borderRadius: 0
         }}>
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <Box sx={{ 
-                p: 1, 
-                borderRadius: '50%', 
+              <Box sx={{
+                p: 1,
+                borderRadius: '50%',
                 backgroundColor: 'secondary.main',
                 color: 'white'
               }}>
@@ -842,32 +856,38 @@ Format your response in clear, actionable insights that would be valuable for da
                   Advanced insights powered by Meta Llama 3.3
                 </Typography>
               </Box>
-              <Chip 
-                label="Powered by Hugging Face" 
-                size="small" 
-                color="secondary" 
+              <Chip
+                label="Powered by Hugging Face"
+                size="small"
+                color="secondary"
                 variant="filled"
                 sx={{ fontWeight: 600 }}
               />
             </Box>
             <Button
               variant="contained"
-              color="secondary"
               size="large"
               startIcon={loadingAI ? <CircularProgress size={20} color="inherit" /> : <SmartToy />}
               onClick={generateAIInsights}
               disabled={loadingAI}
-              sx={{ 
+              sx={{
                 minWidth: 180,
-                fontWeight: 600,
-                borderRadius: 2,
-                boxShadow: 3,
+                fontWeight: 800,
+                borderRadius: 0,
+                border: '2px solid black',
+                backgroundColor: 'black',
+                color: 'white',
+                textTransform: 'uppercase',
+                boxShadow: 'none',
                 '&:hover': {
-                  boxShadow: 6
+                  backgroundColor: 'white',
+                  color: 'black',
+                  boxShadow: 'none',
+                  border: '2px solid black'
                 }
               }}
             >
-              {loadingAI ? 'Analyzing...' : aiInsights ? 'Refresh Analysis' : 'Generate AI Insights'}
+              {loadingAI ? 'ANALYZING...' : aiInsights ? 'REFRESH_ANALYSIS' : 'GENERATE_AI_INSIGHTS'}
             </Button>
           </Box>
 
@@ -898,32 +918,31 @@ Format your response in clear, actionable insights that would be valuable for da
                 <Typography variant="h6" color="secondary" sx={{ fontWeight: 600 }}>
                   AI-Generated Analysis
                 </Typography>
-                <Chip 
-                  label={`${aiInsights.insights.length} Insights`} 
-                  size="small" 
-                  color="secondary" 
-                  variant="filled" 
+                <Chip
+                  label={`${aiInsights.insights.length} Insights`}
+                  size="small"
+                  color="secondary"
+                  variant="filled"
                 />
               </Stack>
-              
+
               <Stack spacing={3}>
                 {aiInsights.insights.map((insight, index) => (
-                  <Card 
-                    key={index} 
-                    sx={{ 
-                      border: '2px solid',
-                      borderColor: 'secondary.light',
-                      borderRadius: 2,
+                  <Card
+                    key={index}
+                    elevation={0}
+                    sx={{
+                      border: '2px solid black',
+                      borderRadius: 0,
                       overflow: 'hidden',
-                      transition: 'all 0.3s ease',
+                      transition: 'all 0.1s ease',
                       '&:hover': {
-                        borderColor: 'secondary.main',
-                        transform: 'translateY(-2px)',
-                        boxShadow: 4
+                        transform: 'translateY(-4px)',
+                        boxShadow: '8px 8px 0px 0px rgba(0,0,0,1)'
                       }
                     }}
                   >
-                    <Box sx={{ 
+                    <Box sx={{
                       background: '#000000',
                       color: 'white',
                       p: 2
@@ -934,19 +953,19 @@ Format your response in clear, actionable insights that would be valuable for da
                           {insight.title}
                         </Typography>
                         <Stack direction="row" spacing={1}>
-                          <Chip 
-                            label={`${(insight.confidence * 100).toFixed(0)}%`} 
-                            size="small" 
-                            sx={{ 
+                          <Chip
+                            label={`${(insight.confidence * 100).toFixed(0)}%`}
+                            size="small"
+                            sx={{
                               backgroundColor: 'rgba(41, 98, 255, 0.2)',
                               color: 'white',
                               fontWeight: 600
                             }}
                           />
-                          <Chip 
-                            label={insight.source} 
-                            size="small" 
-                            sx={{ 
+                          <Chip
+                            label={insight.source}
+                            size="small"
+                            sx={{
                               backgroundColor: 'rgba(41, 98, 255, 0.1)',
                               color: 'white'
                             }}
@@ -954,25 +973,25 @@ Format your response in clear, actionable insights that would be valuable for da
                         </Stack>
                       </Stack>
                     </Box>
-                    
+
                     <CardContent sx={{ p: 3 }}>
-                      <Box sx={{ 
-                        '& h1, & h2, & h3': { 
+                      <Box sx={{
+                        '& h1, & h2, & h3': {
                           color: 'primary.main',
                           fontWeight: 600,
                           mb: 2
                         },
-                        '& h2': { 
+                        '& h2': {
                           fontSize: '1.25rem',
                           borderBottom: '2px solid',
                           borderColor: 'divider',
                           pb: 1
                         },
-                        '& p': { 
+                        '& p': {
                           mb: 2,
                           lineHeight: 1.7
                         },
-                        '& ul, & ol': { 
+                        '& ul, & ol': {
                           mb: 2,
                           pl: 3
                         },
@@ -980,7 +999,7 @@ Format your response in clear, actionable insights that would be valuable for da
                           mb: 1,
                           lineHeight: 1.6
                         },
-                        '& strong': { 
+                        '& strong': {
                           color: 'primary.dark',
                           fontWeight: 700
                         },
@@ -1012,7 +1031,7 @@ Format your response in clear, actionable insights that would be valuable for da
                   </Card>
                 ))}
               </Stack>
-              
+
               <Box sx={{ mt: 3, p: 2, bgcolor: 'grey.50', borderRadius: 1 }}>
                 <Typography variant="caption" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                   <Info fontSize="small" />
@@ -1033,7 +1052,7 @@ Format your response in clear, actionable insights that would be valuable for da
               </Typography>
             </Box>
           )}
-        </Paper>
+        </Box>
 
         {insights && (
           <Box>
@@ -1041,10 +1060,10 @@ Format your response in clear, actionable insights that would be valuable for da
             <Accordion defaultExpanded>
               <AccordionSummary expandIcon={<ExpandMore />}>
                 <Typography variant="h6">Data Summary</Typography>
-                <Chip 
-                  label={`${insights.summary.length} insights`} 
-                  size="small" 
-                  sx={{ ml: 2 }} 
+                <Chip
+                  label={`${insights.summary.length} insights`}
+                  size="small"
+                  sx={{ ml: 2 }}
                 />
               </AccordionSummary>
               <AccordionDetails>
@@ -1059,9 +1078,9 @@ Format your response in clear, actionable insights that would be valuable for da
                         secondary={insight.description}
                       />
                       <Tooltip title={`Confidence: ${(insight.confidence * 100).toFixed(0)}%`}>
-                        <Chip 
-                          label={`${(insight.confidence * 100).toFixed(0)}%`} 
-                          size="small" 
+                        <Chip
+                          label={`${(insight.confidence * 100).toFixed(0)}%`}
+                          size="small"
                           variant="outlined"
                         />
                       </Tooltip>
@@ -1075,10 +1094,10 @@ Format your response in clear, actionable insights that would be valuable for da
             <Accordion>
               <AccordionSummary expandIcon={<ExpandMore />}>
                 <Typography variant="h6">Statistical Analysis</Typography>
-                <Chip 
-                  label={`${insights.distributions.length + insights.correlations.length + insights.outliers.length} insights`} 
-                  size="small" 
-                  sx={{ ml: 2 }} 
+                <Chip
+                  label={`${insights.distributions.length + insights.correlations.length + insights.outliers.length} insights`}
+                  size="small"
+                  sx={{ ml: 2 }}
                 />
               </AccordionSummary>
               <AccordionDetails>
@@ -1151,10 +1170,10 @@ Format your response in clear, actionable insights that would be valuable for da
               <Accordion>
                 <AccordionSummary expandIcon={<ExpandMore />}>
                   <Typography variant="h6">Trend Analysis</Typography>
-                  <Chip 
-                    label={`${insights.trends.length} trends`} 
-                    size="small" 
-                    sx={{ ml: 2 }} 
+                  <Chip
+                    label={`${insights.trends.length} trends`}
+                    size="small"
+                    sx={{ ml: 2 }}
                   />
                 </AccordionSummary>
                 <AccordionDetails>
@@ -1179,17 +1198,17 @@ Format your response in clear, actionable insights that would be valuable for da
             <Accordion>
               <AccordionSummary expandIcon={<ExpandMore />}>
                 <Typography variant="h6">Recommendations</Typography>
-                <Chip 
-                  label={`${insights.recommendations.length} recommendations`} 
-                  size="small" 
-                  sx={{ ml: 2 }} 
+                <Chip
+                  label={`${insights.recommendations.length} recommendations`}
+                  size="small"
+                  sx={{ ml: 2 }}
                 />
               </AccordionSummary>
               <AccordionDetails>
                 <Grid container spacing={2}>
                   {insights.recommendations.map((rec, index) => (
                     <Grid item xs={12} md={6} key={index}>
-                      <Card variant="outlined">
+                      <Card variant="outlined" sx={{ borderRadius: 0, border: '2px solid black' }}>
                         <CardContent>
                           <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1, mb: 1 }}>
                             {getRecommendationIcon(rec.type)}
@@ -1201,9 +1220,9 @@ Format your response in clear, actionable insights that would be valuable for da
                                 {rec.description}
                               </Typography>
                             </Box>
-                            <Chip 
-                              label={rec.priority} 
-                              size="small" 
+                            <Chip
+                              label={rec.priority}
+                              size="small"
                               color={getPriorityColor(rec.priority)}
                             />
                           </Box>
@@ -1219,7 +1238,7 @@ Format your response in clear, actionable insights that would be valuable for da
             </Accordion>
           </Box>
         )}
-      </Paper>
+      </Box>
     </Box>
   );
 };

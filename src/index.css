@@ -1,8 +1,51 @@
-/* Reset and base styles - consolidated to App.css */
-/* This file is kept minimal. Most styling is in App.css */
+/* Swiss Grid Magazine Core Variables and Resets */
 
+/* Fonts */
+@import '@fontsource/ibm-plex-mono/400.css';
+@import '@fontsource/ibm-plex-mono/500.css';
+@import '@fontsource/ibm-plex-mono/600.css';
 
-/* React Grid Layout styles */
+:root {
+  /* Core Colors */
+  --bg-page: #F7F7F5;
+  --bg-surface: #FFFFFF;
+  --border-structural: #000000;
+  --border-subtle: rgba(0, 0, 0, 0.1);
+  --text-pure: #000000;
+  --text-secondary: #555555;
+  --accent-editorial: #FF3300;
+  /* International Orange for tension */
+
+  /* Typography */
+  --font-sans: 'Helvetica Neue', 'Helvetica', Arial, sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+
+  /* Layout */
+  --grid-gap: 1px;
+  /* To create stark 1px black divisions between cells */
+  --border-sharp: 1px solid var(--border-structural);
+  --border-heavy: 2px solid var(--border-structural);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--bg-page);
+  color: var(--text-pure);
+}
+
+code,
+pre {
+  font-family: var(--font-mono);
+}
+
+/* React Grid Layout specific overrides for sharp edges */
 .react-grid-layout {
   position: relative;
 }
@@ -10,30 +53,36 @@
 .react-grid-item {
   transition: all 200ms ease;
   transition-property: left, top;
+  border: var(--border-sharp);
+  background: var(--bg-surface);
 }
 
 .react-grid-item.cssTransforms {
   transition-property: transform;
 }
 
-.react-grid-item > .react-resizable-handle {
+.react-grid-item>.react-resizable-handle {
   position: absolute;
   width: 20px;
   height: 20px;
   bottom: 0;
   right: 0;
-  background: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNiIgaGVpZ2h0PSI2IiB2aWV3Qm94PSIwIDAgNiA2IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxnIGZpbGw9IiM5OTkiIGZpbGwtcnVsZT0iZXZlbm9kZCI+PHBhdGggZD0iTTAgMGgxdjFIMHpNMiAyaDF2MUgyelptMiAyaDF2MUg0eiIvPjwvZz48L3N2Zz4=');
-  background-position: bottom right;
-  padding: 0 3px 3px 0;
+  /* Hard angled lines instead of curves for resize handle */
+  background-image: linear-gradient(135deg, transparent 50%, var(--border-structural) 50%);
+  background-size: 8px 8px;
   background-repeat: no-repeat;
-  background-origin: content-box;
-  box-sizing: border-box;
+  background-position: bottom right;
   cursor: se-resize;
+  opacity: 0.5;
+}
+
+.react-grid-item>.react-resizable-handle:hover {
+  opacity: 1;
 }
 
 .react-grid-item.react-grid-placeholder {
-  background: #e3f2fd;
-  opacity: 0.6;
+  background: rgba(0, 0, 0, 0.05);
+  border: 1px dashed var(--border-structural);
   transition-duration: 100ms;
   z-index: 2;
   -webkit-user-select: none;
@@ -41,21 +90,9 @@
   -ms-user-select: none;
   -o-user-select: none;
   user-select: none;
-  border-radius: 4px;
 }
 
-.react-grid-item > .react-resizable-handle::after {
-  content: "";
-  position: absolute;
-  right: 3px;
-  bottom: 3px;
-  width: 5px;
-  height: 5px;
-  border-right: 2px solid rgba(0, 0, 0, 0.4);
-  border-bottom: 2px solid rgba(0, 0, 0, 0.4);
-}
-
-/* Chart container styles */
+/* Base Chart Container */
 .chart-container {
   width: 100%;
   height: 100%;
@@ -63,75 +100,88 @@
   flex-direction: column;
 }
 
-/* Custom scrollbar for webkit browsers */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+/* Recharts Overrides for Swiss Grid */
+.recharts-default-tooltip {
+  background-color: var(--bg-surface) !important;
+  border: var(--border-sharp) !important;
+  border-radius: 0 !important;
+  font-family: var(--font-mono) !important;
+  box-shadow: none !important;
+  padding: 8px !important;
 }
 
-::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 4px;
+.recharts-tooltip-label {
+  color: var(--text-secondary) !important;
+  text-transform: uppercase;
+  font-size: 11px;
+  font-family: var(--font-sans) !important;
+  letter-spacing: 0.05em;
+  margin-bottom: 4px !important;
 }
 
-::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
-  border-radius: 4px;
+.recharts-tooltip-item {
+  color: var(--text-pure) !important;
+  padding: 2px 0 !important;
+  font-size: 13px !important;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: #a8a8a8;
+.recharts-cartesian-grid-horizontal line,
+.recharts-cartesian-grid-vertical line {
+  stroke: var(--border-subtle);
 }
 
-/* Ensure tables are responsive */
+.recharts-cartesian-axis-line {
+  stroke: var(--border-structural);
+}
+
+.recharts-cartesian-axis-tick-line {
+  stroke: var(--border-structural);
+}
+
+.recharts-text {
+  font-family: var(--font-mono);
+  fill: var(--text-secondary);
+  font-size: 11px;
+}
+
+/* Common Table Enhancements */
 .MuiTableContainer-root {
   overflow-x: auto !important;
+  border: var(--border-sharp);
 }
 
-/* Improve readability of data tables */
 .MuiTableCell-root {
+  font-family: var(--font-mono);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 200px;
 }
 
-.MuiTableCell-head {
-  background-color: rgba(0, 0, 0, 0.04) !important;
-  font-weight: 600 !important;
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
 }
 
-/* Loading animation */
-@keyframes pulse {
-  0% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
-  100% {
-    opacity: 1;
-  }
+::-webkit-scrollbar-track {
+  background: var(--bg-page);
+  border-left: var(--border-sharp);
 }
 
-.loading-pulse {
-  animation: pulse 2s infinite;
+::-webkit-scrollbar-thumb {
+  background: var(--border-structural);
 }
 
-/* Smooth transitions for theme changes */
-* {
-  transition: background-color 0.3s ease, color 0.3s ease;
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
 }
 
-/* Improve dropzone styling */
+/* Dropzone styling */
 .dropzone-active {
-  border-color: #1976d2 !important;
-  background-color: rgba(25, 118, 210, 0.04) !important;
-}
-
-/* Chart tooltip improvements */
-.recharts-tooltip-wrapper {
-  z-index: 1000 !important;
+  background-color: var(--bg-surface) !important;
+  border: 2px solid var(--accent-editorial) !important;
+  /* Hard snap to accent color */
 }
 
 /* Print styles */
@@ -139,12 +189,13 @@
   .no-print {
     display: none !important;
   }
-  
+
   body {
     background: white !important;
   }
-  
-  .MuiAppBar-root {
+
+  .MuiAppBar-root,
+  .MuiDrawer-root {
     display: none !important;
   }
 }

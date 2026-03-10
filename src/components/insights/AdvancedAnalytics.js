@@ -101,10 +101,10 @@ const AdvancedAnalytics = ({ data }) => {
   // Calculate statistics
   const handleCalculateStats = useCallback(async () => {
     if (!selectedColumn || !data) return;
-    
+
     setLoading(true);
     setError('');
-    
+
     try {
       const stats = await calculateStatistics(data.data, selectedColumn);
       setStatistics(stats);
@@ -118,10 +118,10 @@ const AdvancedAnalytics = ({ data }) => {
   // Calculate correlation
   const handleCalculateCorrelation = useCallback(async () => {
     if (!selectedColumn || !selectedColumn2 || !data) return;
-    
+
     setLoading(true);
     setError('');
-    
+
     try {
       const corr = await calculateCorrelation(data.data, selectedColumn, selectedColumn2);
       setCorrelation(corr);
@@ -135,10 +135,10 @@ const AdvancedAnalytics = ({ data }) => {
   // Calculate regression
   const handleCalculateRegression = useCallback(async () => {
     if (!selectedColumn || !selectedColumn2 || !data) return;
-    
+
     setLoading(true);
     setError('');
-    
+
     try {
       const reg = await linearRegression(data.data, selectedColumn, selectedColumn2);
       setRegression(reg);
@@ -152,10 +152,10 @@ const AdvancedAnalytics = ({ data }) => {
   // Detect outliers
   const handleDetectOutliers = useCallback(async () => {
     if (!selectedColumn || !data) return;
-    
+
     setLoading(true);
     setError('');
-    
+
     try {
       const detected = await detectOutliers(data.data, selectedColumn);
       setOutliers(detected);
@@ -193,23 +193,28 @@ const AdvancedAnalytics = ({ data }) => {
 
   if (!data || !data.data || data.data.length === 0) {
     return (
-      <Alert severity="info">
-        No data available for analysis. Please upload data first.
-      </Alert>
+      <Box sx={{ p: 6, textAlign: 'center', border: '2px solid black', backgroundColor: 'white' }}>
+        <Typography variant="h3" sx={{ fontWeight: 800, textTransform: 'uppercase', color: 'black', mb: 1, letterSpacing: '0.05em' }}>
+          ANALYTICS_LOCKED
+        </Typography>
+        <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: 'black' }}>
+          UPLOAD_DATA_TO_INITIALIZE_ENGINE
+        </Typography>
+      </Box>
     );
   }
 
   return (
-    <Paper sx={{ p: 3 }}>
+    <Box sx={{ p: 4, border: '2px solid black', backgroundColor: 'white' }}>
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-        <Psychology sx={{ mr: 2, fontSize: 32, color: 'primary.main' }} />
-        <Typography variant="h5" sx={{ flex: 1, fontWeight: 600 }}>
+        <Box sx={{ border: '2px solid black', p: 1, display: 'flex', mr: 2 }}><Psychology color="inherit" /></Box>
+        <Typography variant="h4" sx={{ flex: 1, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
           Advanced Analytics Engine
         </Typography>
-        <Chip 
-          label={`${data.data.length.toLocaleString()} rows`} 
-          color="primary" 
+        <Chip
+          label={`${data.data.length.toLocaleString()} ROWS`}
           variant="outlined"
+          sx={{ borderRadius: 0, border: '2px solid black', fontWeight: 'bold', color: 'black' }}
         />
       </Box>
 
@@ -254,99 +259,65 @@ const AdvancedAnalytics = ({ data }) => {
       </Grid>
 
       {/* Analysis Tabs */}
-      <Tabs value={activeTab} onChange={(e, newValue) => setActiveTab(newValue)} sx={{ mb: 3 }}>
-        <Tab icon={<Functions />} label="Statistics" />
-        <Tab icon={<ScatterPlot />} label="Correlation" />
-        <Tab icon={<AutoGraph />} label="Regression" />
-        <Tab icon={<Warning />} label="Outliers" />
+      <Tabs
+        value={activeTab}
+        onChange={(e, newValue) => setActiveTab(newValue)}
+        sx={{
+          mb: 4,
+          borderBottom: '2px solid black',
+          minHeight: 48,
+          '& .MuiTabs-indicator': { backgroundColor: 'black', height: 4 },
+          '& .MuiTab-root': { textTransform: 'uppercase', fontWeight: 'bold', color: 'text.secondary' },
+          '& .Mui-selected': { color: 'black !important', fontWeight: 800 }
+        }}
+      >
+        <Tab icon={<Functions />} label="STATISTICS" sx={{ minHeight: 48 }} />
+        <Tab icon={<ScatterPlot />} label="CORRELATION" sx={{ minHeight: 48 }} />
+        <Tab icon={<AutoGraph />} label="REGRESSION" sx={{ minHeight: 48 }} />
+        <Tab icon={<Warning />} label="OUTLIERS" sx={{ minHeight: 48 }} />
       </Tabs>
 
       {/* Statistics Tab */}
       {activeTab === 0 && statistics && (
         <Grid container spacing={3}>
-          <Grid item xs={12} sm={6} md={4}>
-            <Card>
-              <CardContent>
-                <Typography variant="caption" color="text.secondary">Count</Typography>
-                <Typography variant="h4" sx={{ fontWeight: 700 }}>
-                  {statistics.count.toLocaleString()}
+          {[
+            { label: 'COUNT', value: statistics.count.toLocaleString() },
+            { label: 'MEAN', value: statistics.mean.toFixed(2) },
+            { label: 'STD_DEV', value: statistics.std.toFixed(2) },
+            { label: 'MIN', value: statistics.min.toFixed(2) },
+            { label: 'MEDIAN', value: statistics.median.toFixed(2) },
+            { label: 'MAX', value: statistics.max.toFixed(2) }
+          ].map((stat, idx) => (
+            <Grid item xs={12} sm={6} md={4} key={idx}>
+              <Box sx={{ border: '2px solid black', p: 3, backgroundColor: '#F7F7F5' }}>
+                <Typography variant="subtitle2" sx={{ fontWeight: 'bold', letterSpacing: '0.1em' }}>{stat.label}</Typography>
+                <Typography variant="h3" sx={{ fontWeight: 800, mt: 1 }}>
+                  {stat.value}
                 </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid item xs={12} sm={6} md={4}>
-            <Card>
-              <CardContent>
-                <Typography variant="caption" color="text.secondary">Mean</Typography>
-                <Typography variant="h4" sx={{ fontWeight: 700 }}>
-                  {statistics.mean.toFixed(2)}
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid item xs={12} sm={6} md={4}>
-            <Card>
-              <CardContent>
-                <Typography variant="caption" color="text.secondary">Std Dev</Typography>
-                <Typography variant="h4" sx={{ fontWeight: 700 }}>
-                  {statistics.std.toFixed(2)}
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid item xs={12} sm={6} md={4}>
-            <Card>
-              <CardContent>
-                <Typography variant="caption" color="text.secondary">Minimum</Typography>
-                <Typography variant="h4" sx={{ fontWeight: 700 }}>
-                  {statistics.min.toFixed(2)}
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid item xs={12} sm={6} md={4}>
-            <Card>
-              <CardContent>
-                <Typography variant="caption" color="text.secondary">Median</Typography>
-                <Typography variant="h4" sx={{ fontWeight: 700 }}>
-                  {statistics.median.toFixed(2)}
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid item xs={12} sm={6} md={4}>
-            <Card>
-              <CardContent>
-                <Typography variant="caption" color="text.secondary">Maximum</Typography>
-                <Typography variant="h4" sx={{ fontWeight: 700 }}>
-                  {statistics.max.toFixed(2)}
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
+              </Box>
+            </Grid>
+          ))}
 
           {/* Box Plot Visualization */}
           <Grid item xs={12}>
-            <Card>
-              <CardContent>
-                <Typography variant="h6" gutterBottom>Distribution Analysis</Typography>
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={[
-                    { name: 'Min', value: statistics.min },
-                    { name: 'Q1', value: statistics.q1 },
-                    { name: 'Median', value: statistics.median },
-                    { name: 'Q3', value: statistics.q3 },
-                    { name: 'Max', value: statistics.max }
-                  ]}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <RechartsTooltip />
-                    <Bar dataKey="value" fill="#667eea" />
-                  </BarChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
+            <Box sx={{ border: '2px solid black', p: 3, backgroundColor: 'white' }}>
+              <Typography variant="h6" sx={{ fontWeight: 800, textTransform: 'uppercase', mb: 3 }}>DISTRIBUTION_ANALYSIS</Typography>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={[
+                  { name: 'MIN', value: statistics.min },
+                  { name: 'Q1', value: statistics.q1 },
+                  { name: 'MEDIAN', value: statistics.median },
+                  { name: 'Q3', value: statistics.q3 },
+                  { name: 'MAX', value: statistics.max }
+                ]}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#000" />
+                  <XAxis dataKey="name" tick={{ fill: '#000', fontWeight: 'bold' }} stroke="#000" />
+                  <YAxis tick={{ fill: '#000', fontWeight: 'bold' }} stroke="#000" />
+                  <RechartsTooltip contentStyle={{ borderRadius: 0, border: '2px solid black', fontWeight: 'bold' }} />
+                  <Bar dataKey="value" fill="#000" />
+                </BarChart>
+              </ResponsiveContainer>
+            </Box>
           </Grid>
         </Grid>
       )}
@@ -354,25 +325,20 @@ const AdvancedAnalytics = ({ data }) => {
       {/* Correlation Tab */}
       {activeTab === 1 && correlation !== null && (
         <Box>
-          <Card sx={{ mb: 3 }}>
-            <CardContent>
-              <Typography variant="h4" sx={{ fontWeight: 700, textAlign: 'center' }}>
-                {correlation.toFixed(4)}
-              </Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', mt: 1 }}>
-                Correlation Coefficient
-              </Typography>
-              <LinearProgress 
-                variant="determinate" 
-                value={Math.abs(correlation) * 100} 
-                sx={{ mt: 2, height: 10, borderRadius: 5 }}
-                color={Math.abs(correlation) > 0.7 ? 'success' : Math.abs(correlation) > 0.4 ? 'warning' : 'error'}
-              />
-              <Typography variant="caption" sx={{ display: 'block', mt: 1, textAlign: 'center' }}>
-                {Math.abs(correlation) > 0.7 ? 'Strong' : Math.abs(correlation) > 0.4 ? 'Moderate' : 'Weak'} {correlation > 0 ? 'positive' : 'negative'} correlation
-              </Typography>
-            </CardContent>
-          </Card>
+          <Box sx={{ border: '2px solid black', p: 4, mb: 3, backgroundColor: '#F7F7F5', textAlign: 'center' }}>
+            <Typography variant="h3" sx={{ fontWeight: 800 }}>
+              {correlation.toFixed(4)}
+            </Typography>
+            <Typography variant="subtitle1" sx={{ fontWeight: 'bold', textTransform: 'uppercase', mt: 1, letterSpacing: '0.1em' }}>
+              CORRELATION_COEFFICIENT
+            </Typography>
+            <Box sx={{ width: '100%', height: 24, border: '2px solid black', mt: 3, mb: 2, position: 'relative', overflow: 'hidden' }}>
+              <Box sx={{ width: `${Math.abs(correlation) * 100}%`, height: '100%', backgroundColor: 'black' }} />
+            </Box>
+            <Typography variant="subtitle2" sx={{ fontWeight: 'bold', textTransform: 'uppercase' }}>
+              {Math.abs(correlation) > 0.7 ? 'STRONG' : Math.abs(correlation) > 0.4 ? 'MODERATE' : 'WEAK'} {correlation > 0 ? 'POSITIVE' : 'NEGATIVE'} CORRELATION
+            </Typography>
+          </Box>
 
           <Alert severity="info" icon={<Lightbulb />}>
             <Typography variant="body2">
@@ -388,70 +354,42 @@ const AdvancedAnalytics = ({ data }) => {
       {activeTab === 2 && regression && (
         <Box>
           <Grid container spacing={3} sx={{ mb: 3 }}>
-            <Grid item xs={12} md={4}>
-              <Card>
-                <CardContent>
-                  <Typography variant="caption" color="text.secondary">Slope</Typography>
-                  <Typography variant="h5" sx={{ fontWeight: 700 }}>
-                    {regression.slope.toFixed(4)}
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <Card>
-                <CardContent>
-                  <Typography variant="caption" color="text.secondary">Intercept</Typography>
-                  <Typography variant="h5" sx={{ fontWeight: 700 }}>
-                    {regression.intercept.toFixed(4)}
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <Card>
-                <CardContent>
-                  <Typography variant="caption" color="text.secondary">R² Score</Typography>
-                  <Typography variant="h5" sx={{ fontWeight: 700 }}>
-                    {regression.r2.toFixed(4)}
-                  </Typography>
-                  <LinearProgress 
-                    variant="determinate" 
-                    value={regression.r2 * 100} 
-                    sx={{ mt: 1 }}
-                    color={regression.r2 > 0.7 ? 'success' : regression.r2 > 0.4 ? 'warning' : 'error'}
-                  />
-                </CardContent>
-              </Card>
-            </Grid>
+            {[
+              { label: 'SLOPE', value: regression.slope.toFixed(4) },
+              { label: 'INTERCEPT', value: regression.intercept.toFixed(4) },
+              { label: 'R²_SCORE', value: regression.r2.toFixed(4) }
+            ].map((stat, idx) => (
+              <Grid item xs={12} md={4} key={idx}>
+                <Box sx={{ border: '2px solid black', p: 3, backgroundColor: '#F7F7F5' }}>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 'bold', letterSpacing: '0.1em' }}>{stat.label}</Typography>
+                  <Typography variant="h4" sx={{ fontWeight: 800, mt: 1 }}>{stat.value}</Typography>
+                </Box>
+              </Grid>
+            ))}
           </Grid>
 
-          <Card sx={{ mb: 3 }}>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>Regression Equation</Typography>
-              <Typography variant="h5" sx={{ fontFamily: 'monospace', p: 2, bgcolor: 'grey.100', borderRadius: 1 }}>
-                {regression.equation}
-              </Typography>
-            </CardContent>
-          </Card>
+          <Box sx={{ border: '2px solid black', p: 3, mb: 3, backgroundColor: 'white' }}>
+            <Typography variant="subtitle1" sx={{ fontWeight: 'bold', textTransform: 'uppercase', mb: 1 }}>REGRESSION_EQUATION</Typography>
+            <Typography variant="h5" sx={{ fontFamily: '"IBM Plex Mono", monospace', fontWeight: 'bold', p: 2, border: '2px solid black', backgroundColor: '#F7F7F5' }}>
+              {regression.equation}
+            </Typography>
+          </Box>
 
           {/* Scatter plot with regression line */}
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>Regression Visualization</Typography>
-              <ResponsiveContainer width="100%" height={400}>
-                <ScatterChart>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="x" name={selectedColumn} />
-                  <YAxis dataKey="y" name={selectedColumn2} />
-                  <RechartsTooltip cursor={{ strokeDasharray: '3 3' }} />
-                  <Legend />
-                  <Scatter name="Actual Data" data={regression.predictions} fill="#667eea" />
-                  <Scatter name="Predicted" data={regression.predictions.map(p => ({ x: p.x, y: p.predicted }))} fill="#f5576c" line />
-                </ScatterChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
+          <Box sx={{ border: '2px solid black', p: 3, backgroundColor: 'white' }}>
+            <Typography variant="h6" sx={{ fontWeight: 800, textTransform: 'uppercase', mb: 3 }}>REGRESSION_VISUALIZATION</Typography>
+            <ResponsiveContainer width="100%" height={400}>
+              <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#000" />
+                <XAxis dataKey="x" name={selectedColumn} stroke="#000" tick={{ fill: '#000', fontWeight: 'bold' }} />
+                <YAxis dataKey="y" name={selectedColumn2} stroke="#000" tick={{ fill: '#000', fontWeight: 'bold' }} />
+                <RechartsTooltip cursor={{ strokeDasharray: '3 3', stroke: '#000' }} contentStyle={{ borderRadius: 0, border: '2px solid black', fontWeight: 'bold' }} />
+                <Legend iconType="square" wrapperStyle={{ fontWeight: 'bold' }} />
+                <Scatter name="ACTUAL_DATA" data={regression.predictions} fill="#000" />
+                <Scatter name="PREDICTED" data={regression.predictions.map(p => ({ x: p.x, y: p.predicted }))} fill="#000" line={{ stroke: '#000', strokeWidth: 2 }} shape={() => null} />
+              </ScatterChart>
+            </ResponsiveContainer>
+          </Box>
 
           <Alert severity="info" icon={<Lightbulb />} sx={{ mt: 3 }}>
             <Typography variant="body2">
@@ -512,7 +450,7 @@ const AdvancedAnalytics = ({ data }) => {
           )}
         </Box>
       )}
-    </Paper>
+    </Box>
   );
 };
 

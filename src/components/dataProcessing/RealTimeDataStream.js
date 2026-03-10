@@ -77,7 +77,7 @@ const RealTimeDataStream = ({ onDataUpdate, initialData = null }) => {
         try {
           const data = JSON.parse(event.data);
           const now = Date.now();
-          
+
           // Update metrics
           messageCountRef.current++;
           if (lastMessageTimeRef.current) {
@@ -120,17 +120,17 @@ const RealTimeDataStream = ({ onDataUpdate, initialData = null }) => {
   // API polling
   const startApiPolling = useCallback(() => {
     setStatus('connected');
-    
+
     const poll = async () => {
       try {
         const response = await fetch(apiUrl);
         if (!response.ok) {
           throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
-        
+
         const data = await response.json();
         const now = Date.now();
-        
+
         messageCountRef.current++;
         setMetrics(prev => ({
           messagesReceived: messageCountRef.current,
@@ -138,7 +138,7 @@ const RealTimeDataStream = ({ onDataUpdate, initialData = null }) => {
           dataRate: 1000 / refreshInterval,
           latency: 0
         }));
-        
+
         setDataPoints(prev => [...prev, { ...data, timestamp: now }]);
         if (onDataUpdate) {
           onDataUpdate(data);
@@ -156,7 +156,7 @@ const RealTimeDataStream = ({ onDataUpdate, initialData = null }) => {
   // Simulated data stream
   const startSimulation = useCallback(() => {
     setStatus('connected');
-    
+
     const simulate = () => {
       const simulatedData = {
         value: Math.random() * 100,
@@ -164,17 +164,17 @@ const RealTimeDataStream = ({ onDataUpdate, initialData = null }) => {
         trend: Math.sin(Date.now() / 1000) * 50 + 50,
         noise: Math.random() * 10
       };
-      
+
       const now = Date.now();
       messageCountRef.current++;
-      
+
       setMetrics(prev => ({
         messagesReceived: messageCountRef.current,
         lastUpdate: new Date(),
         dataRate: 1000 / refreshInterval,
         latency: 0
       }));
-      
+
       setDataPoints(prev => [...prev, { ...simulatedData, timestamp: now }]);
       if (onDataUpdate) {
         onDataUpdate(simulatedData);
@@ -222,12 +222,12 @@ const RealTimeDataStream = ({ onDataUpdate, initialData = null }) => {
   const handleStop = useCallback(() => {
     setIsStreaming(false);
     setStatus('idle');
-    
+
     if (wsRef.current) {
       wsRef.current.close();
       wsRef.current = null;
     }
-    
+
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
@@ -274,68 +274,49 @@ const RealTimeDataStream = ({ onDataUpdate, initialData = null }) => {
   }, [dataPoints]);
 
   return (
-    <Paper sx={{ p: 3 }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-        <Timeline sx={{ mr: 2, fontSize: 32, color: 'primary.main' }} />
-        <Typography variant="h5" sx={{ flex: 1, fontWeight: 600 }}>
+    <Box sx={{ p: 4, border: '2px solid black', backgroundColor: 'white' }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', mb: 4 }}>
+        <Box sx={{ border: '2px solid black', p: 1, display: 'flex', mr: 2 }}><Timeline color="inherit" /></Box>
+        <Typography variant="h4" sx={{ flex: 1, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
           Real-Time Data Streaming
         </Typography>
-        <Chip 
-          label={status.toUpperCase()} 
-          color={status === 'connected' ? 'success' : status === 'error' ? 'error' : 'default'}
+        <Chip
+          label={status.toUpperCase()}
           icon={<Notifications />}
+          sx={{
+            borderRadius: 0,
+            border: '2px solid black',
+            fontWeight: 'bold',
+            color: 'black',
+            backgroundColor: status === 'connected' ? '#E8F5E9' : status === 'error' ? '#FFEBEE' : '#F7F7F5'
+          }}
         />
       </Box>
 
       {error && (
-        <Alert severity="error" sx={{ mb: 3 }} onClose={() => setError('')}>
+        <Alert severity="error" sx={{ mb: 3, borderRadius: 0, border: '2px solid black' }} onClose={() => setError('')}>
           {error}
         </Alert>
       )}
 
       {/* Stream Metrics */}
       {isStreaming && (
-        <Grid container spacing={2} sx={{ mb: 3 }}>
-          <Grid item xs={6} sm={3}>
-            <Card>
-              <CardContent>
-                <Typography variant="caption" color="text.secondary">Messages</Typography>
-                <Typography variant="h5" sx={{ fontWeight: 700 }}>
-                  {metrics.messagesReceived.toLocaleString()}
+        <Grid container spacing={2} sx={{ mb: 4 }}>
+          {[
+            { label: 'MESSAGES', value: metrics.messagesReceived.toLocaleString() },
+            { label: 'DATA_RATE', value: `${metrics.dataRate.toFixed(1)} msg/s` },
+            { label: 'LATENCY', value: `${metrics.latency.toFixed(0)} ms` },
+            { label: 'LAST_UPDATE', value: metrics.lastUpdate ? metrics.lastUpdate.toLocaleTimeString() : 'N/A' }
+          ].map((stat, idx) => (
+            <Grid item xs={6} sm={3} key={idx}>
+              <Box sx={{ border: '2px solid black', p: 2, backgroundColor: '#F7F7F5', height: '100%' }}>
+                <Typography variant="caption" sx={{ fontWeight: 'bold', letterSpacing: '0.1em' }}>{stat.label}</Typography>
+                <Typography variant="h5" sx={{ fontWeight: 800, mt: 1 }}>
+                  {stat.value}
                 </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid item xs={6} sm={3}>
-            <Card>
-              <CardContent>
-                <Typography variant="caption" color="text.secondary">Data Rate</Typography>
-                <Typography variant="h5" sx={{ fontWeight: 700 }}>
-                  {metrics.dataRate.toFixed(1)} <small>msg/s</small>
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid item xs={6} sm={3}>
-            <Card>
-              <CardContent>
-                <Typography variant="caption" color="text.secondary">Latency</Typography>
-                <Typography variant="h5" sx={{ fontWeight: 700 }}>
-                  {metrics.latency.toFixed(0)} <small>ms</small>
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid item xs={6} sm={3}>
-            <Card>
-              <CardContent>
-                <Typography variant="caption" color="text.secondary">Last Update</Typography>
-                <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                  {metrics.lastUpdate ? metrics.lastUpdate.toLocaleTimeString() : 'N/A'}
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
+              </Box>
+            </Grid>
+          ))}
         </Grid>
       )}
 
@@ -396,28 +377,51 @@ const RealTimeDataStream = ({ onDataUpdate, initialData = null }) => {
         )}
       </Box>
 
-      <Divider sx={{ my: 3 }} />
-
       {/* Controls */}
-      <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+      <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', mb: 4, pt: 3, borderTop: '2px solid black' }}>
         {!isStreaming ? (
           <Button
             variant="contained"
             startIcon={<PlayArrow />}
             onClick={handleStart}
             size="large"
+            sx={{
+              borderRadius: 0,
+              border: '2px solid black',
+              backgroundColor: 'black',
+              color: 'white',
+              fontWeight: 800,
+              boxShadow: 'none',
+              '&:hover': {
+                backgroundColor: 'white',
+                color: 'black',
+                boxShadow: 'none'
+              }
+            }}
           >
-            Start Streaming
+            START_STREAMING
           </Button>
         ) : (
           <Button
             variant="contained"
-            color="error"
             startIcon={<Stop />}
             onClick={handleStop}
             size="large"
+            sx={{
+              borderRadius: 0,
+              border: '2px solid black',
+              backgroundColor: '#ff4444',
+              color: 'black',
+              fontWeight: 800,
+              boxShadow: 'none',
+              '&:hover': {
+                backgroundColor: 'inherit',
+                color: 'inherit',
+                boxShadow: 'none'
+              }
+            }}
           >
-            Stop Streaming
+            STOP_STREAMING
           </Button>
         )}
 
@@ -426,8 +430,9 @@ const RealTimeDataStream = ({ onDataUpdate, initialData = null }) => {
           startIcon={<Refresh />}
           onClick={handleClear}
           disabled={dataPoints.length === 0}
+          sx={{ borderRadius: 0, border: '2px solid black', fontWeight: 800, color: 'black' }}
         >
-          Clear Data
+          CLEAR_DATA
         </Button>
 
         <Button
@@ -435,32 +440,33 @@ const RealTimeDataStream = ({ onDataUpdate, initialData = null }) => {
           startIcon={<Download />}
           onClick={handleExport}
           disabled={dataPoints.length === 0}
+          sx={{ borderRadius: 0, border: '2px solid black', fontWeight: 800, color: 'black' }}
         >
-          Export Data
+          EXPORT_DATA
         </Button>
       </Box>
 
       {/* Data Preview */}
       {dataPoints.length > 0 && (
         <Box sx={{ mt: 3 }}>
-          <Typography variant="h6" gutterBottom>
-            Live Data Stream ({dataPoints.length} records)
+          <Typography variant="h6" sx={{ fontWeight: 800, textTransform: 'uppercase', mb: 2 }}>
+            LIVE_DATA_STREAM <Chip label={dataPoints.length} size="small" sx={{ ml: 1, borderRadius: 0, border: '2px solid black', fontWeight: 'bold' }} />
           </Typography>
-          <Box sx={{ 
-            maxHeight: 300, 
-            overflow: 'auto', 
-            bgcolor: 'grey.100', 
-            p: 2, 
-            borderRadius: 1,
-            fontFamily: 'monospace',
+          <Box sx={{
+            maxHeight: 300,
+            overflow: 'auto',
+            backgroundColor: '#F7F7F5',
+            border: '2px solid black',
+            p: 2,
+            fontFamily: '"IBM Plex Mono", monospace',
             fontSize: '0.875rem'
           }}>
             {dataPoints.slice(-10).reverse().map((point, index) => (
-              <Box key={index} sx={{ mb: 1, pb: 1, borderBottom: '1px solid', borderColor: 'grey.300' }}>
-                <Typography variant="caption" color="text.secondary">
+              <Box key={index} sx={{ mb: 2, pb: 2, borderBottom: index < 9 ? '2px solid black' : 'none' }}>
+                <Typography variant="caption" sx={{ fontWeight: 'bold', display: 'block', mb: 1 }}>
                   {new Date(point.timestamp).toLocaleTimeString()}
                 </Typography>
-                <pre style={{ margin: 0 }}>
+                <pre style={{ margin: 0, fontWeight: 'bold' }}>
                   {JSON.stringify(point, null, 2)}
                 </pre>
               </Box>
@@ -468,7 +474,7 @@ const RealTimeDataStream = ({ onDataUpdate, initialData = null }) => {
           </Box>
         </Box>
       )}
-    </Paper>
+    </Box>
   );
 };
 

@@ -39,8 +39,8 @@ import {
   Radar as RadarIcon
 } from '@mui/icons-material';
 
-const UnifiedChart = React.memo(({ 
-  data, 
+const UnifiedChart = React.memo(({
+  data,
   chartType = 'bar',
   xAxis = '',
   yAxis = '',
@@ -48,8 +48,8 @@ const UnifiedChart = React.memo(({
   config = {},
   colorBy = '',
   sizeBy = '',
-  onError = () => {},
-  onDataExport = () => {}
+  onError = () => { },
+  onDataExport = () => { }
 }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [showSettings, setShowSettings] = useState(false);
@@ -99,13 +99,13 @@ const UnifiedChart = React.memo(({
 
     try {
       const plotData = data.data;
-      
+
       switch (chartType) {
         case 'bar':
         case 'line':
           const labels = plotData.map(row => row[xAxis] || '');
           const values = plotData.map(row => parseFloat(row[yAxis]) || 0);
-          
+
           return {
             labels,
             datasets: [{
@@ -130,10 +130,10 @@ const UnifiedChart = React.memo(({
             const category = row[xAxis] || 'Unknown';
             categoryCount[category] = (categoryCount[category] || 0) + 1;
           });
-          
+
           const pieLabels = Object.keys(categoryCount);
           const pieValues = Object.values(categoryCount);
-          
+
           return {
             labels: pieLabels,
             datasets: [{
@@ -198,18 +198,18 @@ const UnifiedChart = React.memo(({
           const binWidth = (max - min) / bins;
           const binCounts = new Array(bins).fill(0);
           const binLabels = [];
-          
+
           for (let i = 0; i < bins; i++) {
             const binStart = min + i * binWidth;
             const binEnd = binStart + binWidth;
             binLabels.push(`${binStart.toFixed(1)}-${binEnd.toFixed(1)}`);
           }
-          
+
           histValues.forEach(value => {
             const binIndex = Math.min(Math.floor((value - min) / binWidth), bins - 1);
             binCounts[binIndex]++;
           });
-          
+
           return {
             labels: binLabels,
             datasets: [{
@@ -229,7 +229,7 @@ const UnifiedChart = React.memo(({
           const q3 = boxValues[Math.floor(boxValues.length * 0.75)];
           const minVal = Math.min(...boxValues);
           const maxVal = Math.max(...boxValues);
-          
+
           return {
             labels: [yAxis || 'Data'],
             datasets: [{
@@ -265,7 +265,7 @@ const UnifiedChart = React.memo(({
           const uniqueX = [...new Set(plotData.map(row => row[xAxis]))];
           const uniqueY = [...new Set(plotData.map(row => row[yAxis]))];
           const matrixData = [];
-          
+
           uniqueY.forEach((y, yIndex) => {
             uniqueX.forEach((x, xIndex) => {
               const dataPoint = plotData.find(row => row[xAxis] === x && row[yAxis] === y);
@@ -277,12 +277,12 @@ const UnifiedChart = React.memo(({
               });
             });
           });
-          
+
           return {
             datasets: [{
               label: 'Heatmap',
               data: matrixData,
-              backgroundColor: function(context) {
+              backgroundColor: function (context) {
                 const value = context.parsed.v;
                 const max = Math.max(...matrixData.map(d => d.v));
                 const intensity = value / max;
@@ -290,8 +290,8 @@ const UnifiedChart = React.memo(({
               },
               borderColor: '#D1D4DC',
               borderWidth: 1,
-              width: ({chart}) => (chart.chartArea || {}).width / uniqueX.length,
-              height: ({chart}) => (chart.chartArea || {}).height / uniqueY.length,
+              width: ({ chart }) => (chart.chartArea || {}).width / uniqueX.length,
+              height: ({ chart }) => (chart.chartArea || {}).height / uniqueY.length,
             }]
           };
 
@@ -301,13 +301,13 @@ const UnifiedChart = React.memo(({
             v: parseFloat(row[yAxis]) || 0,
             label: row[xAxis] || ''
           }));
-          
+
           return {
             datasets: [{
               tree: treemapData,
               key: 'v',
               groups: ['label'],
-              backgroundColor: function(context) {
+              backgroundColor: function (context) {
                 const index = context.dataIndex % gradientColors.length;
                 return gradientColors[index];
               },
@@ -325,7 +325,7 @@ const UnifiedChart = React.memo(({
             cumulative = result;
             return result;
           });
-          
+
           return {
             labels: plotData.map(row => row[xAxis] || ''),
             datasets: [{
@@ -343,7 +343,7 @@ const UnifiedChart = React.memo(({
             .map(row => ({ label: row[xAxis], value: parseFloat(row[yAxis]) || 0 }))
             .sort((a, b) => b.value - a.value)
             .slice(0, 8);
-          
+
           return {
             labels: funnelData.map(d => d.label),
             datasets: [{
@@ -358,7 +358,7 @@ const UnifiedChart = React.memo(({
           // Gauge chart - single value with max
           const gaugeValue = parseFloat(plotData[0]?.[yAxis]) || 0;
           const maxGaugeValue = Math.max(...plotData.map(row => parseFloat(row[yAxis]) || 0));
-          
+
           return {
             datasets: [{
               data: [gaugeValue, maxGaugeValue - gaugeValue],
@@ -380,7 +380,7 @@ const UnifiedChart = React.memo(({
             l: parseFloat(row['low']) || parseFloat(row[yAxis]) || 0,
             c: parseFloat(row['close']) || parseFloat(row[yAxis]) || 0
           }));
-          
+
           return {
             datasets: [{
               label: 'Price',
@@ -394,7 +394,7 @@ const UnifiedChart = React.memo(({
           // Area chart (filled line chart)
           const areaLabels = plotData.map(row => row[xAxis] || '');
           const areaValues = plotData.map(row => parseFloat(row[yAxis]) || 0);
-          
+
           return {
             labels: areaLabels,
             datasets: [{
@@ -418,7 +418,7 @@ const UnifiedChart = React.memo(({
             y: parseFloat(row[yAxis]) || 0,
             r: Math.abs(parseFloat(Object.values(row)[2]) || 5) // Third column for bubble size
           }));
-          
+
           return {
             datasets: [{
               label: 'Bubble Data',
@@ -451,22 +451,26 @@ const UnifiedChart = React.memo(({
             size: 16,
             weight: 'bold'
           },
-          color: '#D1D4DC'
+          color: '#000000'
         },
         legend: {
           display: chartConfig.showLegend,
           labels: {
-            color: '#D1D4DC',
+            color: '#000000',
             boxWidth: 12,
-            padding: 20
+            padding: 20,
+            font: { family: '"IBM Plex Mono", monospace', weight: 'bold' }
           }
         },
         tooltip: {
-          backgroundColor: 'rgba(41, 98, 255, 0.8)',
+          backgroundColor: '#000000',
           titleColor: '#ffffff',
           bodyColor: '#ffffff',
-          borderColor: '#2962FF',
-          borderWidth: 1
+          borderColor: '#000000',
+          borderWidth: 2,
+          cornerRadius: 0,
+          titleFont: { family: '"IBM Plex Mono", monospace', weight: 'bold' },
+          bodyFont: { family: '"IBM Plex Mono", monospace', weight: 'bold' }
         }
       },
       animation: {
@@ -482,13 +486,17 @@ const UnifiedChart = React.memo(({
           title: {
             display: !!xAxis,
             text: xAxis,
-            color: '#D1D4DC'
+            color: '#000000',
+            font: { family: '"IBM Plex Mono", monospace', weight: 'bold' }
           },
           grid: {
-            color: 'rgba(41, 98, 255, 0.1)'
+            color: 'rgba(0, 0, 0, 0.1)',
+            borderColor: '#000000',
+            borderWidth: 2
           },
           ticks: {
-            color: '#D1D4DC'
+            color: '#000000',
+            font: { family: '"IBM Plex Mono", monospace', weight: 'bold' }
           }
         },
         y: {
@@ -496,13 +504,17 @@ const UnifiedChart = React.memo(({
           title: {
             display: !!yAxis,
             text: yAxis,
-            color: '#D1D4DC'
+            color: '#000000',
+            font: { family: '"IBM Plex Mono", monospace', weight: 'bold' }
           },
           grid: {
-            color: 'rgba(41, 98, 255, 0.1)'
+            color: 'rgba(0, 0, 0, 0.1)',
+            borderColor: '#000000',
+            borderWidth: 2
           },
           ticks: {
-            color: '#D1D4DC'
+            color: '#000000',
+            font: { family: '"IBM Plex Mono", monospace', weight: 'bold' }
           }
         }
       };
@@ -514,16 +526,18 @@ const UnifiedChart = React.memo(({
         r: {
           beginAtZero: true,
           grid: {
-            color: 'rgba(41, 98, 255, 0.1)'
+            color: 'rgba(0, 0, 0, 0.1)'
           },
           angleLines: {
-            color: 'rgba(41, 98, 255, 0.1)'
+            color: 'rgba(0, 0, 0, 0.1)'
           },
           pointLabels: {
-            color: '#D1D4DC'
+            color: '#000000',
+            font: { family: '"IBM Plex Mono", monospace', weight: 'bold' }
           },
           ticks: {
-            color: '#D1D4DC'
+            color: '#000000',
+            font: { family: '"IBM Plex Mono", monospace', weight: 'bold' }
           }
         }
       };
@@ -553,40 +567,43 @@ const UnifiedChart = React.memo(({
 
   if (!ChartComponent) {
     return (
-      <Paper elevation={0} sx={{ p: 3, textAlign: 'center', height: '100%', background: 'background.paper', border: '1px solid', borderColor: 'divider' }}>
-        <Typography variant="h6" color="error">
-          Unsupported chart type: {chartType}
+      <Box sx={{ p: 3, textAlign: 'center', height: '100%', backgroundColor: 'white', border: '2px solid black' }}>
+        <Typography variant="h6" sx={{ color: 'red', fontWeight: 800, textTransform: 'uppercase' }}>
+          UNSUPPORTED_CHART_TYPE: {chartType}
         </Typography>
-      </Paper>
+      </Box>
     );
   }
 
   return (
-    <Paper elevation={0} sx={{ p: 2, height: '100%', background: 'background.paper', border: '1px solid', borderColor: 'divider' }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-        <Typography variant="h6" component="h3" sx={{ fontWeight: 600, color: 'text.primary' }}>
-          {title || `${chartType.charAt(0).toUpperCase() + chartType.slice(1)} Chart`}
+    <Box sx={{ p: 2, height: '100%', backgroundColor: 'white', border: '2px solid black' }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, pb: 2, borderBottom: '2px solid black' }}>
+        <Typography variant="h6" component="h3" sx={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+          {title || `${chartType} CHART`}
         </Typography>
         <Box>
-          <IconButton 
+          <IconButton
             onClick={() => setShowSettings(!showSettings)}
-            sx={{ 
-              backgroundColor: '#f5f5f5', 
-              '&:hover': { backgroundColor: '#e0e0e0' },
-              mr: 1 
+            sx={{
+              borderRadius: 0,
+              border: '2px solid black',
+              backgroundColor: showSettings ? 'black' : 'white',
+              color: showSettings ? 'white' : 'black',
+              '&:hover': { backgroundColor: showSettings ? 'black' : '#F7F7F5' },
+              mr: 1
             }}
           >
             <Settings />
           </IconButton>
-          <IconButton onClick={handleMenuOpen}>
+          <IconButton onClick={handleMenuOpen} sx={{ borderRadius: 0, border: '2px solid black' }}>
             <MoreVert />
           </IconButton>
         </Box>
       </Box>
 
       {showSettings && (
-        <Box sx={{ mb: 2, p: 2, backgroundColor: 'background.default', borderRadius: 1 }}>
-          <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600 }}>Chart Settings</Typography>
+        <Box sx={{ mb: 3, p: 3, backgroundColor: '#F7F7F5', border: '2px solid black' }}>
+          <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 800, textTransform: 'uppercase' }}>CHART_SETTINGS</Typography>
           <Grid container spacing={2}>
             <Grid item xs={6}>
               <FormControlLabel
@@ -661,13 +678,16 @@ const UnifiedChart = React.memo(({
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
         onClose={handleMenuClose}
+        PaperProps={{
+          sx: { borderRadius: 0, border: '2px solid black', boxShadow: '4px 4px 0px 0px rgba(0,0,0,1)' }
+        }}
       >
-        <MenuItem onClick={handleExport}>
+        <MenuItem onClick={handleExport} sx={{ fontWeight: 'bold', textTransform: 'uppercase' }}>
           <Download sx={{ mr: 1 }} />
-          Export Data
+          EXPORT_DATA
         </MenuItem>
       </Menu>
-    </Paper>
+    </Box>
   );
 });
 
@@ -701,8 +721,8 @@ UnifiedChart.defaultProps = {
   config: {},
   colorBy: '',
   sizeBy: '',
-  onError: () => {},
-  onDataExport: () => {}
+  onError: () => { },
+  onDataExport: () => { }
 };
 
 export default UnifiedChart;

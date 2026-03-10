@@ -2,18 +2,19 @@ import React, { useState, useCallback } from 'react';
 import {
   ThemeProvider,
   CssBaseline,
-  AppBar,
-  Toolbar,
   Typography,
   Container,
   Box,
-  Tabs,
-  Tab,
   IconButton,
   Tooltip,
   Alert,
   Snackbar,
-  Paper
+  Drawer,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText
 } from '@mui/material';
 import appTheme from './theme/appTheme';
 import {
@@ -38,6 +39,8 @@ import AdvancedAnalytics from './components/insights/AdvancedAnalytics';
 import RealTimeDataStream from './components/dataProcessing/RealTimeDataStream';
 import ErrorBoundary from './components/common/ErrorBoundary';
 
+const DRAWER_WIDTH = 280;
+
 // Memoize TabPanel to prevent unnecessary re-renders
 const TabPanel = React.memo(({ children, value, index, ...other }) => {
   return (
@@ -46,9 +49,14 @@ const TabPanel = React.memo(({ children, value, index, ...other }) => {
       hidden={value !== index}
       id={`tabpanel-${index}`}
       aria-labelledby={`tab-${index}`}
+      style={{ height: '100%', display: value === index ? 'block' : 'none' }}
       {...other}
     >
-      {value === index && <Box sx={{ py: 3 }}>{children}</Box>}
+      {value === index && (
+        <Box sx={{ p: { xs: 3, md: 5 }, height: '100%' }} className="animate-reveal">
+          {children}
+        </Box>
+      )}
     </div>
   );
 });
@@ -65,9 +73,7 @@ function App() {
     setData(newData);
     setTransformedData(null); // Reset transformed data when new data is loaded
     setSuccess(`Successfully loaded ${newData.fileName} with ${newData.rowCount} rows`);
-    
-    // Auto-switch to data preview tab
-    setCurrentTab(1);
+    setCurrentTab(1); // Auto-switch to data preview tab
   }, []);
 
   const handleDataTransformed = useCallback((newTransformedData) => {
@@ -79,441 +85,264 @@ function App() {
     setError(errorMessage);
   }, []);
 
-  const handleTabChange = useCallback((event, newValue) => {
-    setCurrentTab(newValue);
+  const handleTabChange = useCallback((index) => {
+    setCurrentTab(index);
   }, []);
 
   const getCurrentData = () => {
     return transformedData || data;
   };
 
-  const tabs = [
-    { label: 'Upload Data', icon: <Upload />, disabled: false },
-    { label: 'Preview Data', icon: <TableView />, disabled: !data },
-    { label: 'Transform Data', icon: <Transform />, disabled: !data },
-    { label: 'Charts & Dashboard', icon: <DashboardIcon />, disabled: !data },
-    { label: 'AI Insights', icon: <AutoAwesome />, disabled: !data },
-    { label: 'Advanced Analytics', icon: <Assessment />, disabled: !data },
-    { label: 'Real-Time Stream', icon: <Timeline />, disabled: false },
+  const navItems = [
+    { label: 'Ingest.Data', icon: <Upload fontSize="small" />, disabled: false, id: '01' },
+    { label: 'View.Matrix', icon: <TableView fontSize="small" />, disabled: !data, id: '02' },
+    { label: 'Transform.Sets', icon: <Transform fontSize="small" />, disabled: !data, id: '03' },
+    { label: 'Render.Charts', icon: <DashboardIcon fontSize="small" />, disabled: !data, id: '04' },
+    { label: 'Neural.Insights', icon: <AutoAwesome fontSize="small" />, disabled: !data, id: '05' },
+    { label: 'Deep.Analytics', icon: <Assessment fontSize="small" />, disabled: !data, id: '06' },
+    { label: 'Live.Stream', icon: <Timeline fontSize="small" />, disabled: false, id: '07' },
   ];
 
   return (
     <ThemeProvider theme={appTheme}>
       <CssBaseline />
-      <div className="App">
-        <Box className="app-content">
-        {/* TradingView-style App Bar */}
-        <AppBar 
-          position="sticky" 
-          elevation={0}
-          role="banner"
-        >
-          <Toolbar sx={{ justifyContent: 'space-between', py: 1.5, minHeight: 56 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <Box 
-                sx={{ 
-                  p: 1, 
-                  borderRadius: '4px', 
-                  background: '#2962FF',
-                  color: 'white',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}
-                aria-label="DataViz Pro Logo"
-              >
-                <Assessment sx={{ fontSize: 24 }} />
-              </Box>
-              <Box>
-                <Typography 
-                  variant="h6" 
-                  component="h1"
-                  sx={{ 
-                    fontWeight: 500, 
-                    color: 'text.primary',
-                    fontSize: '16px',
-                    lineHeight: 1.2
-                  }}
-                >
-                  DataViz Pro
-                </Typography>
-                <Typography 
-                  variant="caption" 
-                  color="text.secondary" 
-                  sx={{ fontWeight: 400, fontSize: '11px' }}
-                  component="p"
-                >
-                  Advanced Analytics Platform
-                </Typography>
-              </Box>
-            </Box>
-            
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <Tooltip title="View on GitHub">
-                <IconButton 
-                  component="a" 
-                  href="https://github.com/Chronos778/advanced-data-visualization-playground" 
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="View source code on GitHub"
-                >
-                  <GitHub />
-                </IconButton>
-              </Tooltip>
-            </Box>
-          </Toolbar>
-          
-          {/* TradingView-style Tabs */}
-          <Box sx={{ 
-            borderTop: '1px solid',
-            borderColor: 'divider'
-          }}
-          role="navigation"
-          aria-label="Main navigation tabs"
-          >
-            <Tabs
-              value={currentTab}
-              onChange={handleTabChange}
-              variant="scrollable"
-              scrollButtons="auto"
-              sx={{
-                minHeight: 48,
-                '& .MuiTab-root': {
-                  minHeight: 48,
-                  fontWeight: 400,
-                  textTransform: 'none',
-                  fontSize: '13px',
-                  px: 3,
-                  transition: 'color 0.2s ease',
-                  color: 'text.secondary',
-                  '&.Mui-selected': {
-                    color: 'text.primary',
-                    fontWeight: 500
-                  },
-                  '&:hover:not(.Mui-selected)': {
-                    color: 'text.primary'
-                  }
-                }
-              }}
-            >
-              {tabs.map((tab, index) => (
-                <Tab
-                  key={index}
-                  label={
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      {tab.icon}
-                      <Typography variant="body2" sx={{ fontWeight: 'inherit' }}>
-                        {tab.label}
-                      </Typography>
-                    </Box>
-                  }
-                  disabled={tab.disabled}
-                  sx={{ 
-                    opacity: tab.disabled ? 0.5 : 1,
-                    minWidth: 160
-                  }}
-                />
-              ))}
-            </Tabs>
-          </Box>
-        </AppBar>
+      <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: 'background.default' }}>
 
-          {/* Tab Content */}
-          <Container maxWidth="xl" sx={{ mt: 2, mb: 4 }}>
-            <TabPanel value={currentTab} index={0}>
-              <ErrorBoundary>
-                <Paper elevation={0}>
-                  <FileUploader
-                    onDataLoaded={handleDataLoaded}
-                    onError={handleError}
-                  />
-                </Paper>
-              </ErrorBoundary>
-            </TabPanel>
+        {/* Swiss Grid Command Rail (Sidebar) */}
+        <Drawer
+          variant="permanent"
+          sx={{
+            width: DRAWER_WIDTH,
+            flexShrink: 0,
+            '& .MuiDrawer-paper': {
+              width: DRAWER_WIDTH,
+              boxSizing: 'border-box',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+              p: 3
+            },
+          }}
+        >
+          <Box>
+            {/* Massive Typographic Header */}
+            <Box sx={{ mb: 6 }}>
+              <Typography variant="h2" sx={{ mb: 1 }}>
+                DATAVIZ
+                <br />
+                PRO.
+              </Typography>
+              <Typography variant="caption" sx={{ display: 'block', mb: 4, letterSpacing: '0.1em' }}>
+                {'//'} ANALYTICS_TERMINAL_V2
+              </Typography>
+              <Box sx={{ height: '2px', width: '40px', bgcolor: 'primary.main', mb: 4 }} />
+            </Box>
+
+            {/* Navigation Rail */}
+            <List sx={{ p: 0, gap: 1, display: 'flex', flexDirection: 'column' }}>
+              {navItems.map((item, index) => {
+                const isSelected = currentTab === index;
+                return (
+                  <ListItem key={item.id} disablePadding>
+                    <ListItemButton
+                      onClick={() => handleTabChange(index)}
+                      disabled={item.disabled}
+                      sx={{
+                        py: 1.5,
+                        px: 2,
+                        border: '1px solid',
+                        borderColor: isSelected ? 'primary.main' : 'transparent',
+                        bgcolor: isSelected ? 'background.default' : 'transparent',
+                        opacity: item.disabled ? 0.3 : 1,
+                        '&:hover': {
+                          bgcolor: 'background.default',
+                          borderColor: !item.disabled && !isSelected ? 'text.secondary' : isSelected ? 'primary.main' : 'transparent',
+                        }
+                      }}
+                    >
+                      <ListItemIcon sx={{ minWidth: 36, color: isSelected ? 'primary.main' : 'text.secondary' }}>
+                        {item.icon}
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={item.label}
+                        primaryTypographyProps={{
+                          variant: 'button',
+                          color: isSelected ? 'primary.main' : 'text.secondary'
+                        }}
+                      />
+                      <Typography variant="caption" sx={{ opacity: 0.5 }}>{item.id}</Typography>
+                    </ListItemButton>
+                  </ListItem>
+                );
+              })}
+            </List>
+          </Box>
+
+          {/* Footer Metadata */}
+          <Box sx={{ borderTop: '1px solid black', pt: 3 }}>
+            <Tooltip title="Source Repository">
+              <IconButton
+                component="a"
+                href="https://github.com/Chronos778/advanced-data-visualization-playground"
+                target="_blank"
+                rel="noopener noreferrer"
+                sx={{ border: '1px solid black', p: 1 }}
+              >
+                <GitHub fontSize="small" />
+              </IconButton>
+            </Tooltip>
+            <Typography variant="caption" sx={{ display: 'block', mt: 2 }}>
+              STATUS: {data ? 'ONLINE' : 'AWAITING_DATA'}
+            </Typography>
+          </Box>
+        </Drawer>
+
+        {/* Main Content Area */}
+        <Box component="main" sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
+
+          {/* Header Strip for current context context */}
+          <Box sx={{
+            borderBottom: '1px solid black',
+            bgcolor: 'background.paper',
+            py: 2,
+            px: { xs: 3, md: 5 },
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between'
+          }}>
+            <Typography variant="h6" sx={{ letterSpacing: '0.2em' }}>
+              {navItems[currentTab].label}
+            </Typography>
+            {data && (
+              <Typography variant="caption" sx={{ bgcolor: 'black', color: 'white', px: 1, py: 0.5 }}>
+                {data.rowCount} ROWS LOADED
+              </Typography>
+            )}
+          </Box>
+
+          {/* Scrollable Content Container */}
+          <Box sx={{ flexGrow: 1, overflowY: 'auto', bgcolor: 'background.default' }}>
+
+            {/* Welcome Screen (Empty State) */}
+            {!data && currentTab === 0 && (
+              <Container maxWidth="md" sx={{ mt: { xs: 5, md: 10 } }} className="animate-reveal stagger-1">
+                <Box sx={{ border: '2px solid black', bgcolor: 'background.paper', p: { xs: 4, md: 8 } }}>
+                  <Typography variant="h1" sx={{ mb: 2, borderBottom: '2px solid black', pb: 2 }}>
+                    THE FORGE.
+                  </Typography>
+                  <Typography variant="h5" sx={{ mb: 6, color: 'text.secondary' }}>
+                    A precision instrument for structural data analysis.
+                  </Typography>
+
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mb: 6 }}>
+                    <Box sx={{ display: 'grid', gridTemplateColumns: 'min-content 1fr', gap: 3, borderBottom: '1px solid', borderColor: 'divider', pb: 2 }}>
+                      <Typography variant="h6">01.</Typography>
+                      <Box>
+                        <Typography variant="h6" sx={{ mb: 1 }}>INGEST VOLUME</Typography>
+                        <Typography variant="body1">Upload dimensional datasets via CSV, JSON, or XLS. Strict validation protocols enforced.</Typography>
+                      </Box>
+                    </Box>
+                    <Box sx={{ display: 'grid', gridTemplateColumns: 'min-content 1fr', gap: 3, borderBottom: '1px solid', borderColor: 'divider', pb: 2 }}>
+                      <Typography variant="h6">02.</Typography>
+                      <Box>
+                        <Typography variant="h6" sx={{ mb: 1 }}>APPLY TRANSFORMATIONS</Typography>
+                        <Typography variant="body1">Filter, aggregate, and compute new dimensions. Maintain absolute data integrity.</Typography>
+                      </Box>
+                    </Box>
+                    <Box sx={{ display: 'grid', gridTemplateColumns: 'min-content 1fr', gap: 3, borderBottom: '1px solid', borderColor: 'divider', pb: 2 }}>
+                      <Typography variant="h6">03.</Typography>
+                      <Box>
+                        <Typography variant="h6" sx={{ mb: 1 }}>SYNTHESIZE MODELS</Typography>
+                        <Typography variant="body1">Generate rigid, precise visual matrices using Plotly and Recharts engines.</Typography>
+                      </Box>
+                    </Box>
+                  </Box>
+
+                  <Box sx={{ p: 4, bgcolor: 'background.default', border: '2px solid black' }}>
+                    <Typography variant="caption" sx={{ display: 'block', mb: 2, textAlign: 'center', fontWeight: 'bold' }}>
+                      [ ACTION_REQUIRED : UPLOAD_DATASET ]
+                    </Typography>
+                    <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                      <FileUploader onDataLoaded={handleDataLoaded} onError={handleError} />
+                    </Box>
+                  </Box>
+                </Box>
+              </Container>
+            )}
+
+            {/* Active Component Views */}
+            {data && currentTab === 0 && (
+              <TabPanel value={currentTab} index={0}>
+                <Typography variant="h3" sx={{ mb: 4 }}>DATA_INGESTION</Typography>
+                <FileUploader onDataLoaded={handleDataLoaded} onError={handleError} />
+              </TabPanel>
+            )}
 
             <TabPanel value={currentTab} index={1}>
               <ErrorBoundary>
-                <Paper elevation={0}>
-                  <DataPreview
-                    data={getCurrentData()}
-                    title={transformedData ? "Transformed Data Preview" : "Data Preview"}
-                  />
-                </Paper>
+                <DataPreview data={getCurrentData()} title={transformedData ? "DATA_MATRIX [TRANSFORMED]" : "DATA_MATRIX [RAW]"} />
               </ErrorBoundary>
             </TabPanel>
 
             <TabPanel value={currentTab} index={2}>
               <ErrorBoundary>
-                <Paper elevation={0}>
-                  <DataTransformer
-                    data={data}
-                    onTransformedData={handleDataTransformed}
-                  />
-                </Paper>
+                <DataTransformer data={data} onTransformedData={handleDataTransformed} />
               </ErrorBoundary>
             </TabPanel>
 
             <TabPanel value={currentTab} index={3}>
               <ErrorBoundary>
-                <Paper elevation={0} sx={{ p: 0 }}>
-                  <Dashboard
-                    data={getCurrentData()}
-                    onExport={(widgetId, format) => {
-                      setSuccess(`Exporting widget ${widgetId} as ${format}`);
-                    }}
-                  />
-                </Paper>
+                <Box sx={{ border: '2px solid black', bgcolor: 'background.paper', height: '100%', minHeight: '800px' }}>
+                  <Dashboard data={getCurrentData()} onExport={(wId, fmt) => setSuccess(`Export initialized: [${wId}] as ${fmt}`)} />
+                </Box>
               </ErrorBoundary>
             </TabPanel>
 
             <TabPanel value={currentTab} index={4}>
               <ErrorBoundary>
-                <Paper elevation={0}>
-                  <AIInsights data={getCurrentData()} />
-                </Paper>
+                <AIInsights data={getCurrentData()} />
               </ErrorBoundary>
             </TabPanel>
 
             <TabPanel value={currentTab} index={5}>
               <ErrorBoundary>
-                <Paper elevation={0}>
-                  <AdvancedAnalytics data={getCurrentData()} />
-                </Paper>
+                <AdvancedAnalytics data={getCurrentData()} />
               </ErrorBoundary>
             </TabPanel>
 
             <TabPanel value={currentTab} index={6}>
               <ErrorBoundary>
-                <Paper elevation={0}>
-                  <RealTimeDataStream 
-                    onDataUpdate={(newData) => {
-                      // Merge real-time data with existing data
-                      if (data) {
-                        const updatedData = {
-                          ...data,
-                          data: [...data.data, newData],
-                          rowCount: data.rowCount + 1
-                        };
-                        setData(updatedData);
-                      }
-                    }}
-                  />
-                </Paper>
+                <RealTimeDataStream
+                  onDataUpdate={(newData) => {
+                    if (data) {
+                      setData({
+                        ...data,
+                        data: [...data.data, newData],
+                        rowCount: data.rowCount + 1
+                      });
+                    }
+                  }}
+                />
               </ErrorBoundary>
             </TabPanel>
 
-            {/* Welcome Message */}
-            {!data && currentTab === 0 && (
-              <Box sx={{ mt: 8, textAlign: 'center' }}>
-                <Box sx={{ mb: 4, display: 'flex', justifyContent: 'center' }}>
-                  <Box sx={{ 
-                    p: 3,
-                    borderRadius: '8px',
-                    background: '#2962FF',
-                    display: 'inline-flex'
-                  }}>
-                    <AutoAwesome sx={{ fontSize: 48, color: 'white' }} />
-                  </Box>
-                </Box>
-                
-                <Typography 
-                  variant="h3" 
-                  sx={{ 
-                    mb: 2,
-                    fontWeight: 500,
-                    color: 'text.primary'
-                  }}
-                >
-                  Welcome to DataViz Pro
-                </Typography>
-                
-                <Typography 
-                  variant="body1" 
-                  sx={{ 
-                    mb: 4, 
-                    maxWidth: 600, 
-                    mx: 'auto',
-                    color: 'text.secondary',
-                    lineHeight: 1.6
-                  }}
-                >
-                  Transform your data into stunning visualizations with AI-powered insights and advanced analytics
-                </Typography>
-                
-                <Paper 
-                  elevation={0}
-                  sx={{ 
-                    p: 4, 
-                    maxWidth: 900, 
-                    mx: 'auto',
-                    mt: 4
-                  }}
-                >
-                  <Typography 
-                    variant="h6" 
-                    sx={{ 
-                      mb: 3,
-                      fontWeight: 500,
-                      color: 'text.primary',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: 1
-                    }}
-                  >
-                    <AutoAwesome sx={{ color: 'primary.main' }} />
-                    Platform Features
-                  </Typography>
-                  
-                  <Box sx={{ 
-                    display: 'grid', 
-                    gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, 
-                    gap: 2,
-                    textAlign: 'left'
-                  }}>
-                    <Box sx={{ 
-                      p: 3, 
-                      border: '1px solid',
-                      borderColor: 'divider',
-                      borderRadius: '4px',
-                      background: 'background.paper'
-                    }}>
-                      <Typography variant="subtitle1" sx={{ fontWeight: 500, mb: 1, display: 'flex', alignItems: 'center', gap: 1, color: 'text.primary' }}>
-                        <Assessment sx={{ fontSize: 20 }} />
-                        Advanced Visualizations
-                      </Typography>
-                      <Typography variant="body2" sx={{ lineHeight: 1.6, color: 'text.secondary' }}>
-                        Create stunning charts with Plotly.js and Recharts in one unified dashboard with drag-and-drop functionality
-                      </Typography>
-                    </Box>
-                    
-                    <Box sx={{ 
-                      p: 3, 
-                      border: '1px solid',
-                      borderColor: 'divider',
-                      borderRadius: '4px',
-                      background: 'background.paper'
-                    }}>
-                      <Typography variant="subtitle1" sx={{ fontWeight: 500, mb: 1, display: 'flex', alignItems: 'center', gap: 1, color: 'text.primary' }}>
-                        <AutoAwesome sx={{ fontSize: 20 }} />
-                        AI-Powered Insights
-                      </Typography>
-                      <Typography variant="body2" sx={{ lineHeight: 1.6, color: 'text.secondary' }}>
-                        Discover patterns and correlations automatically with Google's Gemini AI integration
-                      </Typography>
-                    </Box>
-                    
-                    <Box sx={{ 
-                      p: 3, 
-                      border: '1px solid',
-                      borderColor: 'divider',
-                      borderRadius: '4px',
-                      background: 'background.paper'
-                    }}>
-                      <Typography variant="subtitle1" sx={{ fontWeight: 500, mb: 1, display: 'flex', alignItems: 'center', gap: 1, color: 'text.primary' }}>
-                        <Timeline sx={{ fontSize: 20 }} />
-                        Interactive Dashboard
-                      </Typography>
-                      <Typography variant="body2" sx={{ lineHeight: 1.6, color: 'text.secondary' }}>
-                        Drag, drop, and resize charts in a flexible grid layout with real-time data transformations
-                      </Typography>
-                    </Box>
-                    
-                    <Box sx={{ 
-                      p: 3, 
-                      border: '1px solid',
-                      borderColor: 'divider',
-                      borderRadius: '4px',
-                      background: 'background.paper'
-                    }}>
-                      <Typography variant="subtitle1" sx={{ fontWeight: 500, mb: 1, display: 'flex', alignItems: 'center', gap: 1, color: 'text.primary' }}>
-                        <Upload sx={{ fontSize: 20 }} />
-                        Multiple Formats
-                      </Typography>
-                      <Typography variant="body2" sx={{ lineHeight: 1.6, color: 'text.secondary' }}>
-                        Support for CSV, JSON, Excel files and more with advanced data processing capabilities
-                      </Typography>
-                    </Box>
-                  </Box>
-                  
-                  <Box sx={{ mt: 4, textAlign: 'center' }}>
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                      Ready to start? Upload your data file to begin exploring!
-                    </Typography>
-                    <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, flexWrap: 'wrap' }}>
-                      <Box sx={{ 
-                        px: 2,
-                        py: 0.5,
-                        border: '1px solid',
-                        borderColor: 'divider',
-                        borderRadius: '4px',
-                        background: 'background.paper'
-                      }}>
-                        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                          📊 CSV Files
-                        </Typography>
-                      </Box>
-                      <Box sx={{ 
-                        px: 2,
-                        py: 0.5,
-                        border: '1px solid',
-                        borderColor: 'divider',
-                        borderRadius: '4px',
-                        background: 'background.paper'
-                      }}>
-                        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                          📋 Excel Files
-                        </Typography>
-                      </Box>
-                      <Box sx={{ 
-                        px: 2,
-                        py: 0.5,
-                        border: '1px solid',
-                        borderColor: 'divider',
-                        borderRadius: '4px',
-                        background: 'background.paper'
-                      }}>
-                        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                          🔗 JSON Data
-                        </Typography>
-                      </Box>
-                    </Box>
-                  </Box>
-                </Paper>
-              </Box>
-            )}
-          </Container>
-
-          {/* Notifications */}
-          <Snackbar
-            open={!!success}
-            autoHideDuration={4000}
-            onClose={() => setSuccess('')}
-            anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-          >
-            <Alert 
-              onClose={() => setSuccess('')} 
-              severity="success"
-            >
-              {success}
-            </Alert>
-          </Snackbar>
-
-          <Snackbar
-            open={!!error}
-            autoHideDuration={5000}
-            onClose={() => setError('')}
-            anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-          >
-            <Alert 
-              onClose={() => setError('')} 
-              severity="error"
-            >
-              {error}
-            </Alert>
-          </Snackbar>
+          </Box>
         </Box>
-      </div>
+
+        {/* Notifications */}
+        <Snackbar open={!!success} autoHideDuration={4000} onClose={() => setSuccess('')} anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}>
+          <Alert onClose={() => setSuccess('')} severity="success" variant="filled" sx={{ bgcolor: 'black', color: 'white', borderRadius: 0, '& .MuiAlert-icon': { color: '#00CC44 !important' } }}>
+            {success}
+          </Alert>
+        </Snackbar>
+
+        <Snackbar open={!!error} autoHideDuration={5000} onClose={() => setError('')} anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}>
+          <Alert onClose={() => setError('')} severity="error" variant="filled" sx={{ borderRadius: 0 }}>
+            {error}
+          </Alert>
+        </Snackbar>
+
+      </Box>
     </ThemeProvider>
   );
 }

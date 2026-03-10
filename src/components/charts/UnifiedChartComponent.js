@@ -64,8 +64,8 @@ const COLORS = [
   '#74b9ff', '#a29bfe', '#fd79a8', '#fdcb6e', '#e17055'
 ];
 
-const UnifiedChartComponent = React.memo(({ 
-  data, 
+const UnifiedChartComponent = React.memo(({
+  data,
   chartType = 'line',
   title = 'Chart',
   xAxis = '',
@@ -96,10 +96,10 @@ const UnifiedChartComponent = React.memo(({
   // Process data for Chart.js format
   const processedData = useMemo(() => {
     if (!data || !data.data || data.data.length === 0) return null;
-    
+
     const chartData = data.data;
     const optimal = getOptimalChartConfig(chartType, chartData.length);
-    
+
     // Different processing for different chart types
     switch (chartType) {
       case 'pie':
@@ -130,7 +130,7 @@ const UnifiedChartComponent = React.memo(({
 
       case 'radar':
         // For radar charts, we need multiple metrics
-        const radarLabels = Object.keys(chartData[0]).filter(key => 
+        const radarLabels = Object.keys(chartData[0]).filter(key =>
           !isNaN(parseFloat(chartData[0][key])) && key !== xAxis
         );
         return {
@@ -164,7 +164,7 @@ const UnifiedChartComponent = React.memo(({
         };
 
       case 'bubble':
-        const sizeColumn = Object.keys(chartData[0]).find(key => 
+        const sizeColumn = Object.keys(chartData[0]).find(key =>
           key !== xAxis && key !== yAxis && !isNaN(parseFloat(chartData[0][key]))
         );
         return {
@@ -187,8 +187,8 @@ const UnifiedChartComponent = React.memo(({
           datasets: [{
             label: yAxis,
             data: chartData.map(item => parseFloat(item[yAxis]) || 0),
-            backgroundColor: chartType === 'line' ? 
-              'transparent' : 
+            backgroundColor: chartType === 'line' ?
+              'transparent' :
               COLORS[0] + Math.floor(config.opacity * 255).toString(16),
             borderColor: COLORS[0],
             borderWidth: config.borderWidth,
@@ -204,7 +204,7 @@ const UnifiedChartComponent = React.memo(({
   // Chart options
   const chartOptions = useMemo(() => {
     const optimal = getOptimalChartConfig(chartType, data?.data?.length || 0);
-    
+
     const baseOptions = {
       responsive: true,
       maintainAspectRatio: false,
@@ -212,16 +212,28 @@ const UnifiedChartComponent = React.memo(({
       plugins: {
         legend: {
           display: config.showLegend,
-          position: 'top'
+          position: 'top',
+          labels: {
+            font: { family: '"IBM Plex Mono", monospace', weight: 'bold' },
+            color: '#000000'
+          }
         },
         tooltip: {
           enabled: config.showTooltip,
           intersect: false,
-          mode: 'index'
+          mode: 'index',
+          backgroundColor: '#000000',
+          titleFont: { family: '"IBM Plex Mono", monospace', weight: 'bold' },
+          bodyFont: { family: '"IBM Plex Mono", monospace', weight: 'bold' },
+          cornerRadius: 0,
+          borderColor: '#000000',
+          borderWidth: 2
         },
         title: {
           display: true,
-          text: title
+          text: title,
+          color: '#000000',
+          font: { family: '"IBM Plex Mono", monospace', weight: 'bold', size: 16 }
         }
       },
       ...optimal
@@ -349,12 +361,12 @@ const UnifiedChartComponent = React.memo(({
     switch (type) {
       case 'line': return <TrendingUp />;
       case 'bar': return <BarChartIcon />;
-      case 'scatter': 
+      case 'scatter':
       case 'bubble': return <ScatterPlot />;
       case 'pie': return <PieChartIcon />;
       case 'doughnut': return <DonutLarge />;
       case 'area': return <ShowChart />;
-      case 'radar': 
+      case 'radar':
       case 'polarArea': return <RadarIcon />;
       default: return <TrendingUp />;
     }
@@ -363,11 +375,11 @@ const UnifiedChartComponent = React.memo(({
   const renderChart = () => {
     if (isLoading) {
       return (
-        <Box sx={{ 
-          height: 400, 
-          display: 'flex', 
-          alignItems: 'center', 
-          justifyContent: 'center' 
+        <Box sx={{
+          height: 400,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
         }}>
           <CircularProgress />
         </Box>
@@ -384,10 +396,10 @@ const UnifiedChartComponent = React.memo(({
 
     if (!processedData) {
       return (
-        <Box sx={{ 
-          height: 400, 
-          display: 'flex', 
-          alignItems: 'center', 
+        <Box sx={{
+          height: 400,
+          display: 'flex',
+          alignItems: 'center',
           justifyContent: 'center',
           flexDirection: 'column',
           color: 'text.secondary'
@@ -419,56 +431,56 @@ const UnifiedChartComponent = React.memo(({
             <Line ref={chartRef} data={processedData} options={chartOptions} />
           </ChartWrapper>
         );
-      
+
       case 'bar':
         return (
           <ChartWrapper>
             <Bar ref={chartRef} data={processedData} options={chartOptions} />
           </ChartWrapper>
         );
-      
+
       case 'scatter':
         return (
           <ChartWrapper>
             <Scatter ref={chartRef} data={processedData} options={chartOptions} />
           </ChartWrapper>
         );
-      
+
       case 'bubble':
         return (
           <ChartWrapper>
             <Scatter ref={chartRef} data={processedData} options={chartOptions} />
           </ChartWrapper>
         );
-      
+
       case 'pie':
         return (
           <ChartWrapper>
             <Pie ref={chartRef} data={processedData} options={chartOptions} />
           </ChartWrapper>
         );
-      
+
       case 'doughnut':
         return (
           <ChartWrapper>
             <Doughnut ref={chartRef} data={processedData} options={chartOptions} />
           </ChartWrapper>
         );
-      
+
       case 'polarArea':
         return (
           <ChartWrapper>
             <PolarArea ref={chartRef} data={processedData} options={chartOptions} />
           </ChartWrapper>
         );
-      
+
       case 'radar':
         return (
           <ChartWrapper>
             <Radar ref={chartRef} data={processedData} options={chartOptions} />
           </ChartWrapper>
         );
-      
+
       default:
         return (
           <Alert severity="warning">
@@ -479,28 +491,28 @@ const UnifiedChartComponent = React.memo(({
   };
 
   return (
-    <Paper sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', backgroundColor: 'white', border: '2px solid black' }}>
       {/* Header */}
-      <Box sx={{ display: 'flex', alignItems: 'center', p: 2, pb: 1 }}>
-        {getChartIcon(chartType)}
-        <Typography variant="h6" sx={{ ml: 1, flex: 1 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', p: 2, pb: 2, borderBottom: '2px solid black', backgroundColor: '#F7F7F5' }}>
+        <Box sx={{ border: '2px solid black', p: 0.5, display: 'flex' }}>{getChartIcon(chartType)}</Box>
+        <Typography variant="h6" sx={{ ml: 2, flex: 1, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
           {title}
         </Typography>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <Chip 
-            label={chartType.toUpperCase()} 
-            size="small" 
-            variant="outlined" 
-            color="primary"
+          <Chip
+            label={chartType.toUpperCase()}
+            size="small"
+            variant="outlined"
+            sx={{ borderRadius: 0, border: '2px solid black', fontWeight: 'bold', color: 'black' }}
           />
-          <IconButton size="small" onClick={handleMenuClick}>
+          <IconButton size="small" onClick={handleMenuClick} sx={{ borderRadius: 0, border: '2px solid black', backgroundColor: 'white' }}>
             <MoreVert />
           </IconButton>
         </Box>
       </Box>
 
       {/* Chart Content */}
-      <Box sx={{ flex: 1, p: 2, pt: 0 }}>
+      <Box sx={{ flex: 1, p: 2, pt: 2 }}>
         {renderChart()}
       </Box>
 
@@ -509,20 +521,23 @@ const UnifiedChartComponent = React.memo(({
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
         onClose={handleMenuClose}
+        PaperProps={{
+          sx: { borderRadius: 0, border: '2px solid black', boxShadow: '4px 4px 0px 0px rgba(0,0,0,1)' }
+        }}
       >
-        <MenuItem onClick={handleExport}>
+        <MenuItem onClick={handleExport} sx={{ fontWeight: 'bold', textTransform: 'uppercase' }}>
           <Download sx={{ mr: 1 }} />
-          Export as PNG
+          EXPORT_AS_PNG
         </MenuItem>
         <MenuItem onClick={() => {
           handleConfigChange('animated', !config.animated);
           handleMenuClose();
-        }}>
+        }} sx={{ fontWeight: 'bold', textTransform: 'uppercase' }}>
           <Settings sx={{ mr: 1 }} />
-          {config.animated ? 'Disable' : 'Enable'} Animation
+          {config.animated ? 'DISABLE' : 'ENABLE'}_ANIMATION
         </MenuItem>
       </Menu>
-    </Paper>
+    </Box>
   );
 });
 

@@ -39,13 +39,13 @@ import {
 } from '@mui/icons-material';
 import { useChartConfig } from '../../hooks/useDashboard';
 
-const EnhancedChartHeader = memo(({ 
-  title, 
-  chartType, 
-  onEdit, 
-  onDelete, 
-  onDuplicate, 
-  onExport, 
+const EnhancedChartHeader = memo(({
+  title,
+  chartType,
+  onEdit,
+  onDelete,
+  onDuplicate,
+  onExport,
   onFullscreen,
   status = 'ready' // ready, loading, error
 }) => {
@@ -68,35 +68,35 @@ const EnhancedChartHeader = memo(({
   }, [status]);
 
   return (
-    <Box sx={{ 
-      display: 'flex', 
-      alignItems: 'center', 
+    <Box sx={{
+      display: 'flex',
+      alignItems: 'center',
       justifyContent: 'space-between',
-      p: 1,
-      borderBottom: '1px solid',
-      borderColor: 'divider',
-      minHeight: 48
+      p: 1.5,
+      borderBottom: '2px solid black',
+      minHeight: 48,
+      backgroundColor: 'white'
     }}>
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-        <Box 
-          sx={{ 
-            width: 8, 
-            height: 8, 
-            borderRadius: '50%', 
-            bgcolor: `${statusColor}.main` 
-          }} 
+        <Box
+          sx={{
+            width: 8,
+            height: 8,
+            borderRadius: '50%',
+            bgcolor: `${statusColor}.main`
+          }}
         />
-        <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+        <Typography variant="subtitle2" sx={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'black' }}>
           {title}
         </Typography>
-        <Chip 
-          label={chartType.toUpperCase()} 
-          size="small" 
+        <Chip
+          label={chartType.toUpperCase()}
+          size="small"
           variant="outlined"
-          sx={{ height: 20, fontSize: '0.7rem' }}
+          sx={{ height: 20, fontSize: '0.7rem', borderRadius: 0, border: '2px solid black', fontWeight: 'bold', color: 'black' }}
         />
       </Box>
-      
+
       <Box>
         <Tooltip title="Fullscreen">
           <IconButton size="small" onClick={onFullscreen}>
@@ -108,7 +108,7 @@ const EnhancedChartHeader = memo(({
             <MoreVert fontSize="small" />
           </IconButton>
         </Tooltip>
-        
+
         <Menu
           anchorEl={anchorEl}
           open={Boolean(anchorEl)}
@@ -142,12 +142,12 @@ const EnhancedChartHeader = memo(({
   );
 });
 
-const ChartConfigDialog = memo(({ 
-  open, 
-  onClose, 
-  config, 
-  onConfigChange, 
-  chartType 
+const ChartConfigDialog = memo(({
+  open,
+  onClose,
+  config,
+  onConfigChange,
+  chartType
 }) => {
   const [localConfig, setLocalConfig] = useState(config);
 
@@ -161,10 +161,10 @@ const ChartConfigDialog = memo(({
   }, [config]);
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
-      <DialogTitle>Chart Configuration</DialogTitle>
+    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth PaperProps={{ sx: { borderRadius: 0, border: '2px solid black', boxShadow: 'none' } }}>
+      <DialogTitle sx={{ fontWeight: 800, textTransform: 'uppercase', borderBottom: '2px solid black', pb: 2 }}>CHART_CONFIGURATION</DialogTitle>
       <DialogContent>
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, mt: 2 }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, mt: 3 }}>
           {/* Visual Settings */}
           <Box>
             <Typography variant="h6" gutterBottom>Visual Settings</Typography>
@@ -304,8 +304,8 @@ const ChartConfigDialog = memo(({
   );
 });
 
-const ChartContainer = memo(({ 
-  children, 
+const ChartContainer = memo(({
+  children,
   title,
   chartType,
   status = 'ready',
@@ -315,7 +315,7 @@ const ChartContainer = memo(({
   onDuplicate,
   onExport,
   config,
-  onConfigChange 
+  onConfigChange
 }) => {
   const [configDialogOpen, setConfigDialogOpen] = useState(false);
   const [fullscreen, setFullscreen] = useState(false);
@@ -331,10 +331,10 @@ const ChartContainer = memo(({
   const chartContent = useMemo(() => {
     if (status === 'error') {
       return (
-        <Box sx={{ 
-          display: 'flex', 
-          alignItems: 'center', 
-          justifyContent: 'center', 
+        <Box sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
           height: 300,
           flexDirection: 'column',
           gap: 2
@@ -350,11 +350,11 @@ const ChartContainer = memo(({
 
     if (status === 'loading') {
       return (
-        <Box sx={{ 
-          display: 'flex', 
-          alignItems: 'center', 
-          justifyContent: 'center', 
-          height: 300 
+        <Box sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          height: 300
         }}>
           <Typography variant="body2" color="text.secondary">
             Loading chart data...
@@ -368,16 +368,16 @@ const ChartContainer = memo(({
 
   return (
     <>
-      <Paper 
-        sx={{ 
-          height: '100%', 
-          display: 'flex', 
+      <Paper
+        sx={{
+          height: '100%',
+          display: 'flex',
           flexDirection: 'column',
           position: 'relative',
           overflow: 'hidden',
-          background: 'background.paper',
-          border: '1px solid',
-          borderColor: 'divider'
+          backgroundColor: 'white',
+          border: '2px solid black',
+          borderRadius: 0
         }}
         elevation={0}
       >
@@ -391,7 +391,7 @@ const ChartContainer = memo(({
           onExport={onExport}
           onFullscreen={handleFullscreen}
         />
-        
+
         <Box sx={{ flex: 1, p: 2 }}>
           {chartContent}
         </Box>
@@ -411,11 +411,11 @@ const ChartContainer = memo(({
         onClose={() => setFullscreen(false)}
         maxWidth="xl"
         fullWidth
-        PaperProps={{ sx: { height: '90vh' } }}
+        PaperProps={{ sx: { height: '90vh', borderRadius: 0, border: '2px solid black', boxShadow: 'none' } }}
       >
-        <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Typography variant="h6">{title}</Typography>
-          <IconButton onClick={() => setFullscreen(false)}>
+        <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px solid black', pb: 2 }}>
+          <Typography variant="h6" sx={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'black' }}>{title}</Typography>
+          <IconButton onClick={() => setFullscreen(false)} sx={{ borderRadius: 0, border: '2px solid black', color: 'black' }}>
             <Fullscreen />
           </IconButton>
         </DialogTitle>

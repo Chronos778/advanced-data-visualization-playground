@@ -2,7 +2,6 @@ import React, { useState, useMemo, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import {
   Box,
-  Paper,
   Typography,
   Table,
   TableBody,
@@ -16,8 +15,6 @@ import {
   Tooltip,
   TextField,
   InputAdornment,
-  Card,
-  CardContent,
   Grid
 } from '@mui/material';
 import {
@@ -33,16 +30,14 @@ import _ from 'lodash';
 
 const DataPreview = React.memo(({ data, title = "Data Preview" }) => {
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(25); // Increased from 10 for better performance
+  const [rowsPerPage, setRowsPerPage] = useState(25);
   const [searchTerm, setSearchTerm] = useState('');
 
-  // Limit data processing for very large datasets to improve performance
   const processedData = useMemo(() => {
     if (!data || !data.data || data.data.length === 0) {
       return { data: [], columns: [] };
     }
 
-    // For large datasets, limit initial processing
     const isLargeDataset = data.data.length > 1000;
     const sampleSize = isLargeDataset ? 1000 : data.data.length;
     const sampleData = data.data.slice(0, sampleSize);
@@ -60,7 +55,6 @@ const DataPreview = React.memo(({ data, title = "Data Preview" }) => {
       return { filteredData: [], stats: {} };
     }
 
-    // Filter data based on search term
     let filtered = processedData.data;
     if (searchTerm.trim()) {
       filtered = processedData.data.filter(row =>
@@ -70,20 +64,19 @@ const DataPreview = React.memo(({ data, title = "Data Preview" }) => {
       );
     }
 
-    // Calculate statistics using the processed data
     const columns = processedData.columns;
     const statistics = {};
 
     columns.forEach(column => {
       const values = processedData.data.map(row => row[column]).filter(val => val !== null && val !== undefined && val !== '');
       const numericValues = values.map(val => parseFloat(val)).filter(val => !isNaN(val));
-      
+
       statistics[column] = {
         totalCount: processedData.data.length,
         nonNullCount: values.length,
         nullCount: processedData.data.length - values.length,
         uniqueCount: new Set(values).size,
-        isNumeric: numericValues.length > values.length * 0.8, // Consider numeric if 80%+ are numbers
+        isNumeric: numericValues.length > values.length * 0.8,
         ...(numericValues.length > 0 && {
           min: _.min(numericValues),
           max: _.max(numericValues),
@@ -111,14 +104,13 @@ const DataPreview = React.memo(({ data, title = "Data Preview" }) => {
 
   const formatCellValue = useCallback((value, column) => {
     if (value === null || value === undefined) {
-      return <Chip label="NULL" size="small" variant="outlined" color="default" />;
-    }
-    
-    if (value === '') {
-      return <Chip label="EMPTY" size="small" variant="outlined" color="warning" />;
+      return <Chip label="NULL" size="small" variant="outlined" sx={{ borderRadius: 0, borderColor: 'black' }} />;
     }
 
-    // Format numbers with appropriate precision
+    if (value === '') {
+      return <Chip label="EMPTY" size="small" variant="outlined" sx={{ borderRadius: 0, borderColor: 'black' }} />;
+    }
+
     if (stats[column]?.isNumeric && !isNaN(parseFloat(value))) {
       const num = parseFloat(value);
       if (Number.isInteger(num)) {
@@ -128,7 +120,6 @@ const DataPreview = React.memo(({ data, title = "Data Preview" }) => {
       }
     }
 
-    // Truncate long strings
     const stringValue = String(value);
     if (stringValue.length > 50) {
       return (
@@ -143,63 +134,49 @@ const DataPreview = React.memo(({ data, title = "Data Preview" }) => {
 
   const getColumnIcon = useCallback((column) => {
     if (stats[column]?.isNumeric) {
-      return <Assessment sx={{ fontSize: 16, color: 'primary.main' }} />;
+      return <Assessment sx={{ fontSize: 16, color: 'black' }} />;
     }
-    return <TableChart sx={{ fontSize: 16, color: 'secondary.main' }} />;
+    return <TableChart sx={{ fontSize: 16, color: 'black' }} />;
   }, [stats]);
 
   const getTrendIcon = useCallback((column) => {
     if (!stats[column]?.isNumeric) return null;
-    
+
     const values = processedData.data.slice(-10).map(row => parseFloat(row[column])).filter(v => !isNaN(v));
     if (values.length < 2) return null;
-    
+
     const trend = values[values.length - 1] - values[0];
-    if (Math.abs(trend) < 0.01) return <Remove sx={{ fontSize: 14, color: 'grey.500' }} />;
-    return trend > 0 
-      ? <TrendingUp sx={{ fontSize: 14, color: 'success.main' }} />
-      : <TrendingDown sx={{ fontSize: 14, color: 'error.main' }} />;
+    if (Math.abs(trend) < 0.01) return <Remove sx={{ fontSize: 14, color: 'black' }} />;
+    return trend > 0
+      ? <TrendingUp sx={{ fontSize: 14, color: 'black' }} />
+      : <TrendingDown sx={{ fontSize: 14, color: 'black' }} />;
   }, [processedData, stats]);
 
   if (!data || !data.data) {
     return (
-      <Paper elevation={0} sx={{ p: 6, textAlign: 'center', border: '1px solid', borderColor: 'divider' }}>
+      <Box sx={{ p: 6, textAlign: 'center', border: '2px solid black', backgroundColor: 'white' }}>
         <Box sx={{
           width: 80,
           height: 80,
-          borderRadius: '50%',
-          background: 'background.paper',
+          border: '2px solid black',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           mx: 'auto',
           mb: 3
         }}>
-          <TableChart sx={{ fontSize: 40, color: 'text.primary' }} />
+          <TableChart sx={{ fontSize: 40, color: 'black' }} />
         </Box>
-        <Typography variant="h5" sx={{ 
-          fontWeight: 700, 
-          color: 'primary.main',
-          mb: 2
+        <Typography variant="h3" sx={{
+          mb: 2,
+          letterSpacing: '0.05em'
         }}>
-          No Data Available
+          NO_DATA_AVAILABLE
         </Typography>
-        <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-          Upload a data file to see its detailed preview and analysis
+        <Typography variant="subtitle1" sx={{ mb: 3 }}>
+          Upload a data file to generate matrices.
         </Typography>
-        <Box sx={{
-          px: 3,
-          py: 1.5,
-          borderRadius: 2,
-          background: 'background.paper',
-          border: '1px solid', borderColor: 'divider',
-          display: 'inline-block'
-        }}>
-          <Typography variant="body2" sx={{ fontWeight: 600, color: 'primary.main' }}>
-            Ready to analyze your data
-          </Typography>
-        </Box>
-      </Paper>
+      </Box>
     );
   }
 
@@ -208,354 +185,165 @@ const DataPreview = React.memo(({ data, title = "Data Preview" }) => {
 
   return (
     <Box>
-      {/* Enhanced Performance Warning for Large Datasets */}
       {processedData.isLimited && (
-        <Box sx={{ mb: 3 }}>
-          <Paper elevation={0} sx={{
-            border: '1px solid',
-            borderColor: 'divider', 
-            p: 3,
-            background: 'background.paper',
-            border: '1px solid', borderColor: 'divider'
-          }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <Box sx={{
-                width: 40,
-                height: 40,
-                borderRadius: '50%',
-                background: 'background.paper',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}>
-                <Info sx={{ color: 'white', fontSize: 20 }} />
-              </Box>
-              <Box>
-                <Typography variant="h6" sx={{ fontWeight: 700, color: 'text.primary', mb: 0.5 }}>
-                  Performance Optimization Active
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Showing first {processedData.data.length.toLocaleString()} of {processedData.totalRows.toLocaleString()} rows for optimal performance
-                </Typography>
-              </Box>
-            </Box>
-          </Paper>
+        <Box sx={{ mb: 3, p: 2, border: '2px solid black', backgroundColor: 'black', color: 'white', display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Info sx={{ color: 'white' }} />
+          <Box>
+            <Typography variant="subtitle2" sx={{ letterSpacing: '0.1em' }}>
+              PERFORMANCE_OPTIMIZATION_ACTIVE
+            </Typography>
+            <Typography variant="caption" sx={{ opacity: 0.8 }}>
+              Showing first {processedData.data.length.toLocaleString()} of {processedData.totalRows.toLocaleString()} rows to maintain strict real-time rendering limits.
+            </Typography>
+          </Box>
         </Box>
       )}
-      
-      {/* Enhanced Data Summary Cards */}
-      <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card elevation={0} sx={{ 
-            background: 'background.paper',
-            border: '1px solid', borderColor: 'divider',
-            transition: 'transform 0.2s ease',
-            '&:hover': { 
-              transform: 'translateY(-4px)',
-              boxShadow: '0 8px 32px rgba(41, 98, 255, 0.2)'
-            }
-          }}>
-            <CardContent sx={{ textAlign: 'center', p: 3 }}>
-              <Box sx={{
-                width: 56,
-                height: 56,
-                borderRadius: '50%',
-                background: 'background.paper',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                mx: 'auto',
-                mb: 2
-              }}>
-                <TableChart sx={{ color: 'white', fontSize: 28 }} />
-              </Box>
-              <Typography variant="h3" sx={{ 
-                fontWeight: 800,
-                color: 'text.primary',
-                mb: 1
-              }}>
-                {processedData.totalRows.toLocaleString()}
+
+      {/* Swiss Grid Stat Cards */}
+      <Grid container spacing={0} sx={{ mb: 4, borderTop: '2px solid black', borderLeft: '2px solid black' }}>
+        <Grid item xs={12} sm={6} md={3} sx={{ borderRight: '2px solid black', borderBottom: '2px solid black', p: 3, backgroundColor: 'white' }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+              <Typography variant="caption" sx={{ letterSpacing: '0.1em' }}>01 / TOTAL_ROWS</Typography>
+              <TableChart fontSize="small" />
+            </Box>
+            <Typography variant="h2" sx={{ letterSpacing: '-0.02em' }}>
+              {processedData.totalRows.toLocaleString()}
+            </Typography>
+            {processedData.isLimited && (
+              <Typography variant="caption" sx={{ mt: 1 }}>
+                ({processedData.data.length.toLocaleString()} SHOWN)
               </Typography>
-              <Typography variant="body1" sx={{ fontWeight: 600, color: 'text.primary' }}>
-                Total Rows
-              </Typography>
-              {processedData.isLimited && (
-                <Typography variant="caption" color="text.secondary">
-                  ({processedData.data.length.toLocaleString()} shown)
-                </Typography>
-              )}
-            </CardContent>
-          </Card>
+            )}
+          </Box>
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card elevation={0} sx={{ 
-            background: 'background.paper',
-            border: '1px solid', borderColor: 'divider',
-            transition: 'transform 0.2s ease',
-            '&:hover': { 
-              transform: 'translateY(-4px)',
-              boxShadow: '0 8px 32px rgba(41, 98, 255, 0.2)'
-            }
-          }}>
-            <CardContent sx={{ textAlign: 'center', p: 3 }}>
-              <Box sx={{
-                width: 56,
-                height: 56,
-                borderRadius: '50%',
-                background: 'background.paper',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                mx: 'auto',
-                mb: 2
-              }}>
-                <Assessment sx={{ color: 'white', fontSize: 28 }} />
-              </Box>
-              <Typography variant="h3" sx={{ 
-                fontWeight: 800,
-                color: 'text.primary',
-                mb: 1
-              }}>
-                {columns.length}
-              </Typography>
-              <Typography variant="body1" sx={{ fontWeight: 600, color: 'text.primary' }}>
-                Columns
-              </Typography>
-            </CardContent>
-          </Card>
+        <Grid item xs={12} sm={6} md={3} sx={{ borderRight: '2px solid black', borderBottom: '2px solid black', p: 3, backgroundColor: 'white' }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+              <Typography variant="caption" sx={{ letterSpacing: '0.1em' }}>02 / COLUMNS</Typography>
+              <Assessment fontSize="small" />
+            </Box>
+            <Typography variant="h2" sx={{ letterSpacing: '-0.02em' }}>
+              {columns.length}
+            </Typography>
+          </Box>
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card elevation={0} sx={{ 
-            background: 'background.paper',
-            border: '1px solid', borderColor: 'divider',
-            transition: 'transform 0.2s ease',
-            '&:hover': { 
-              transform: 'translateY(-4px)',
-              boxShadow: '0 8px 32px rgba(41, 98, 255, 0.2)'
-            }
-          }}>
-            <CardContent sx={{ textAlign: 'center', p: 3 }}>
-              <Box sx={{
-                width: 56,
-                height: 56,
-                borderRadius: '50%',
-                background: 'background.paper',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                mx: 'auto',
-                mb: 2
-              }}>
-                <TrendingUp sx={{ color: 'white', fontSize: 28 }} />
-              </Box>
-              <Typography variant="h3" sx={{ 
-                fontWeight: 800,
-                color: 'text.primary',
-                mb: 1
-              }}>
-                {columns.filter(col => stats[col]?.isNumeric).length}
-              </Typography>
-              <Typography variant="body1" sx={{ fontWeight: 600, color: 'text.primary' }}>
-                Numeric Columns
-              </Typography>
-            </CardContent>
-          </Card>
+        <Grid item xs={12} sm={6} md={3} sx={{ borderRight: '2px solid black', borderBottom: '2px solid black', p: 3, backgroundColor: 'white' }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+              <Typography variant="caption" sx={{ letterSpacing: '0.1em' }}>03 / NUMERIC_COLS</Typography>
+              <TrendingUp fontSize="small" />
+            </Box>
+            <Typography variant="h2" sx={{ letterSpacing: '-0.02em' }}>
+              {columns.filter(col => stats[col]?.isNumeric).length}
+            </Typography>
+          </Box>
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card elevation={0} sx={{ 
-            background: 'background.paper',
-            border: '1px solid', borderColor: 'divider',
-            transition: 'transform 0.2s ease',
-            '&:hover': { 
-              transform: 'translateY(-4px)',
-              boxShadow: '0 8px 32px rgba(41, 98, 255, 0.2)'
-            }
-          }}>
-            <CardContent sx={{ textAlign: 'center', p: 3 }}>
-              <Box sx={{
-                width: 56,
-                height: 56,
-                borderRadius: '50%',
-                background: 'background.paper',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                mx: 'auto',
-                mb: 2
-              }}>
-                <Search sx={{ color: 'white', fontSize: 28 }} />
-              </Box>
-              <Typography variant="h3" sx={{ 
-                fontWeight: 800,
-                color: 'text.primary',
-                mb: 1
-              }}>
-                {Math.round((filteredData.length / data.data.length) * 100)}%
-              </Typography>
-              <Typography variant="body1" sx={{ fontWeight: 600, color: 'text.primary' }}>
-                Visible Data
-              </Typography>
-            </CardContent>
-          </Card>
+        <Grid item xs={12} sm={6} md={3} sx={{ borderRight: '2px solid black', borderBottom: '2px solid black', p: 3, backgroundColor: 'white' }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+              <Typography variant="caption" sx={{ letterSpacing: '0.1em' }}>04 / VISIBLE_DATA</Typography>
+              <Search fontSize="small" />
+            </Box>
+            <Typography variant="h2" sx={{ letterSpacing: '-0.02em' }}>
+              {Math.round((filteredData.length / data.data.length) * 100)}%
+            </Typography>
+          </Box>
         </Grid>
       </Grid>
 
-      <Paper elevation={0} sx={{ overflow: 'hidden', border: '1px solid', borderColor: 'divider' }}>
-        {/* Enhanced Header */}
-        <Box sx={{ 
-          p: 4, 
-          borderBottom: '1px solid', 
-          borderColor: 'divider',
-          background: 'background.paper'
-        }}>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-            <Box>
-              <Typography variant="h4" sx={{ 
-                fontWeight: 800,
-                color: 'text.primary',
-                mb: 1
-              }}>
-                {title}
-              </Typography>
-              <Typography variant="body1" color="text.secondary">
-                Explore and analyze your data in detail
-              </Typography>
-            </Box>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <Chip 
-                label={`${filteredData.length} of ${data.data.length} rows`}
-                sx={{
-                  background: 'background.paper',
-                  color: 'white',
-                  fontWeight: 600
-                }}
-              />
-              {data.fileName && (
-                <Chip 
-                  label={data.fileName}
-                  sx={{
-                    background: 'background.paper',
-                    border: '1px solid', borderColor: 'divider',
-                    fontWeight: 600
-                  }}
-                />
-              )}
-            </Box>
+      <Box sx={{ border: '2px solid black', backgroundColor: 'white' }}>
+        {/* Header Banner */}
+        <Box sx={{ p: 3, borderBottom: '2px solid black', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Box>
+            <Typography variant="h3" sx={{ textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              {title}
+            </Typography>
           </Box>
-          
-          <TextField
-            fullWidth
-            placeholder="Search across all columns and data..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            sx={{
-              '& .MuiOutlinedInput-root': {
-                borderRadius: 3,
-                background: 'background.default',
-                transition: 'all 0.2s ease',
-                '&:hover': {
-                  boxShadow: '0 4px 16px rgba(41, 98, 255, 0.2)'
-                },
-                '&.Mui-focused': {
-                  boxShadow: '0 4px 20px rgba(41, 98, 255, 0.3)',
+          <Box sx={{ width: '40%' }}>
+            <TextField
+              fullWidth
+              variant="outlined"
+              size="small"
+              placeholder="SEARCH_MATRIX"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: 0,
                   '& fieldset': {
-                    bordercolor: 'text.primary'
+                    border: '1px solid black',
+                  },
+                  '&:hover fieldset': {
+                    borderColor: 'black',
+                    borderWidth: '2px'
+                  },
+                  '&.Mui-focused fieldset': {
+                    borderColor: 'black',
+                    borderWidth: '2px'
                   }
                 }
-              }
-            }}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <Search sx={{ color: 'text.primary' }} />
-                </InputAdornment>
-              ),
-            }}
-          />
+              }}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Search sx={{ color: 'black' }} />
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </Box>
         </Box>
 
-        {/* Enhanced Table */}
+        {/* The Matrix Table */}
         <TableContainer sx={{ maxHeight: 600 }}>
           <Table stickyHeader>
             <TableHead>
               <TableRow>
-                <TableCell sx={{ 
-                  background: 'background.paper',
-                  fontWeight: 'bold', 
-                  minWidth: 60,
-                  borderBottom: '2px solid', borderColor: 'divider'
-                }}>
-                  <Typography variant="subtitle2" sx={{ fontWeight: 700, color: 'primary.main' }}>
-                    #
-                  </Typography>
+                <TableCell sx={{ minWidth: 60, borderBottom: '2px solid black', backgroundColor: 'white' }}>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>#</Typography>
                 </TableCell>
                 {columns.map((column) => (
                   <TableCell
                     key={column}
                     sx={{
-                      background: 'background.paper',
-                      fontWeight: 'bold',
                       minWidth: 140,
                       maxWidth: 220,
-                      borderBottom: '2px solid', borderColor: 'divider'
+                      borderBottom: '2px solid black',
+                      backgroundColor: 'white'
                     }}
                   >
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                      <Box sx={{
-                        width: 32,
-                        height: 32,
-                        borderRadius: 2,
-                        background: stats[column]?.isNumeric 
-                          ? '#ffffff'
-                          : '#ffffff',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center'
-                      }}>
-                        {getColumnIcon(column)}
-                      </Box>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, justifyContent: 'space-between' }}>
                       <Box sx={{ flex: 1, minWidth: 0 }}>
-                        <Typography variant="subtitle1" sx={{ fontWeight: 700, color: 'primary.main' }} noWrap>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 700 }} noWrap>
                           {column}
                         </Typography>
-                        <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>
-                          {stats[column]?.isNumeric ? 'Numeric' : 'Text'} • 
-                          {stats[column]?.uniqueCount} unique
-                        </Typography>
+                        <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+                          {getColumnIcon(column)}
+                          <Typography variant="caption" sx={{ letterSpacing: '0.1em' }}>
+                            {stats[column]?.isNumeric ? 'NUM' : 'STR'} [{stats[column]?.uniqueCount}]
+                          </Typography>
+                        </Box>
                       </Box>
                       {getTrendIcon(column)}
                       <Tooltip title={
-                        <Box>
-                          <Typography variant="body2" sx={{ fontWeight: 600, mb: 1 }}>
-                            Column Statistics:
-                          </Typography>
-                          <Typography variant="caption">
-                            • Total: {stats[column]?.totalCount}<br/>
-                            • Non-null: {stats[column]?.nonNullCount}<br/>
-                            • Unique: {stats[column]?.uniqueCount}<br/>
-                            {stats[column]?.isNumeric && (
-                              <>
-                                • Min: {stats[column]?.min?.toFixed(2)}<br/>
-                                • Max: {stats[column]?.max?.toFixed(2)}<br/>
-                                • Mean: {stats[column]?.mean?.toFixed(2)}<br/>
-                                • Std: {stats[column]?.std?.toFixed(2)}
-                              </>
-                            )}
-                          </Typography>
+                        <Box sx={{ p: 1 }}>
+                          <Typography variant="caption" sx={{ display: 'block', mb: 1, fontWeight: 'bold' }}>STATS_BLOCK:</Typography>
+                          <Typography variant="caption" sx={{ display: 'block' }}>• TOT: {stats[column]?.totalCount}</Typography>
+                          <Typography variant="caption" sx={{ display: 'block' }}>• N/N: {stats[column]?.nonNullCount}</Typography>
+                          <Typography variant="caption" sx={{ display: 'block' }}>• UNQ: {stats[column]?.uniqueCount}</Typography>
+                          {stats[column]?.isNumeric && (
+                            <>
+                              <Typography variant="caption" sx={{ display: 'block' }}>• MIN: {stats[column]?.min?.toFixed(2)}</Typography>
+                              <Typography variant="caption" sx={{ display: 'block' }}>• MAX: {stats[column]?.max?.toFixed(2)}</Typography>
+                              <Typography variant="caption" sx={{ display: 'block' }}>• AVG: {stats[column]?.mean?.toFixed(2)}</Typography>
+                              <Typography variant="caption" sx={{ display: 'block' }}>• STD: {stats[column]?.std?.toFixed(2)}</Typography>
+                            </>
+                          )}
                         </Box>
                       }>
-                        <IconButton 
-                          size="small"
-                          sx={{
-                            background: 'background.paper',
-                            '&:hover': {
-                              background: 'background.paper',
-                              transform: 'scale(1.1)'
-                            },
-                            transition: 'all 0.2s ease'
-                          }}
-                        >
-                          <Info sx={{ fontSize: 16, color: 'text.primary' }} />
+                        <IconButton size="small" sx={{ borderRadius: 0, border: '1px solid black', '&:hover': { backgroundColor: 'black', color: 'white' } }}>
+                          <Info sx={{ fontSize: 16 }} />
                         </IconButton>
                       </Tooltip>
                     </Box>
@@ -565,28 +353,23 @@ const DataPreview = React.memo(({ data, title = "Data Preview" }) => {
             </TableHead>
             <TableBody>
               {paginatedData.map((row, index) => (
-                <TableRow 
-                  key={page * rowsPerPage + index} 
+                <TableRow
+                  key={page * rowsPerPage + index}
                   hover
                   sx={{
                     '&:hover': {
-                      background: 'background.paper'
-                    },
-                    '&:nth-of-type(even)': {
-                      backgroundcolor: 'text.primary'
+                      backgroundColor: 'rgba(0,0,0,0.05)'
                     }
                   }}
                 >
-                  <TableCell sx={{ 
-                    fontWeight: 'bold', 
-                    color: 'primary.main',
-                    background: 'background.paper'
-                  }}>
-                    {page * rowsPerPage + index + 1}
+                  <TableCell sx={{ borderBottom: '1px solid black' }}>
+                    <Typography variant="caption">{page * rowsPerPage + index + 1}</Typography>
                   </TableCell>
                   {columns.map((column) => (
-                    <TableCell key={column} sx={{ maxWidth: 220 }}>
-                      {formatCellValue(row[column], column)}
+                    <TableCell key={column} sx={{ maxWidth: 220, borderBottom: '1px solid black' }}>
+                      <Typography variant="body2" sx={{ fontFamily: stats[column]?.isNumeric ? '"IBM Plex Mono", monospace' : 'inherit' }}>
+                        {formatCellValue(row[column], column)}
+                      </Typography>
                     </TableCell>
                   ))}
                 </TableRow>
@@ -595,14 +378,10 @@ const DataPreview = React.memo(({ data, title = "Data Preview" }) => {
           </Table>
         </TableContainer>
 
-        {/* Enhanced Pagination */}
-        <Box sx={{ 
-          p: 3, 
-          borderTop: '1px solid', borderColor: 'divider',
-          background: 'background.paper'
-        }}>
+        {/* Pagination Strip */}
+        <Box sx={{ borderTop: '2px solid black', backgroundColor: 'white' }}>
           <TablePagination
-            rowsPerPageOptions={[5, 10, 25, 50, 100]}
+            rowsPerPageOptions={[25, 50, 100]}
             component="div"
             count={filteredData.length}
             rowsPerPage={rowsPerPage}
@@ -610,27 +389,23 @@ const DataPreview = React.memo(({ data, title = "Data Preview" }) => {
             onPageChange={handleChangePage}
             onRowsPerPageChange={handleChangeRowsPerPage}
             sx={{
-              '& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows': {
-                fontWeight: 600,
-                color: 'primary.main'
-              },
               '& .MuiTablePagination-select': {
-                borderRadius: 2,
-                border: '1px solid', borderColor: 'divider',
-                '&:focus': {
-                  bordercolor: 'text.primary'
-                }
+                borderRadius: 0,
+                border: '1px solid black',
               },
               '& .MuiIconButton-root': {
-                borderRadius: 2,
+                borderRadius: 0,
+                border: '1px solid black',
+                ml: 1,
                 '&:hover': {
-                  background: 'background.paper'
+                  backgroundColor: 'black',
+                  color: 'white'
                 }
               }
             }}
           />
         </Box>
-      </Paper>
+      </Box>
     </Box>
   );
 });
@@ -646,7 +421,7 @@ DataPreview.propTypes = {
 };
 
 DataPreview.defaultProps = {
-  title: "Data Preview"
+  title: "DATA_MATRIX"
 };
 
 export default DataPreview;

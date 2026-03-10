@@ -1,12 +1,10 @@
-import React, { useState, useCallback, useMemo, useRef } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import PropTypes from 'prop-types';
 import RGL, { WidthProvider } from 'react-grid-layout';
 import {
   Box,
-  Paper,
   Typography,
   Button,
-  IconButton,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -18,20 +16,13 @@ import {
   TextField,
   Alert,
   Chip,
-  Fab,
   SpeedDial,
   SpeedDialAction,
   SpeedDialIcon,
-  Tooltip,
-  Snackbar,
-  Card,
-  CardContent,
-  LinearProgress
+  Snackbar
 } from '@mui/material';
 import {
   Add,
-  Delete,
-  Edit,
   Download,
   DragIndicator,
   BarChart,
@@ -40,15 +31,8 @@ import {
   ScatterPlot,
   Insights,
   Assessment,
-  Timeline,
   Save,
-  Refresh,
-  DeleteSweep,
-  Upload,
-  GetApp,
-  ViewModule,
-  TrendingUp,
-  Dashboard as DashboardIcon
+  DeleteSweep
 } from '@mui/icons-material';
 import ChartComponent from '../charts/ChartComponent';
 import UnifiedChart from '../charts/UnifiedChart';
@@ -77,7 +61,7 @@ const Dashboard = ({ data, onExport }) => {
   const [notification, setNotification] = useState({ open: false, message: '', severity: 'success' });
   const [isLayoutLocked, setIsLayoutLocked] = useState(false);
   const dashboardRef = useRef(null);
-  
+
   const [newWidget, setNewWidget] = useState({
     type: 'chart',
     chartType: 'line',
@@ -131,10 +115,10 @@ const Dashboard = ({ data, onExport }) => {
 
   const handleAddWidget = useCallback(() => {
     if (!newWidget.title || !newWidget.xAxis || !newWidget.yAxis) {
-      setNotification({ 
-        open: true, 
-        message: 'Please fill in all required fields', 
-        severity: 'warning' 
+      setNotification({
+        open: true,
+        message: 'Please fill in all required fields',
+        severity: 'warning'
       });
       return;
     }
@@ -157,28 +141,28 @@ const Dashboard = ({ data, onExport }) => {
       sizeBy: ''
     });
     setAddWidgetOpen(false);
-    setNotification({ 
-      open: true, 
-      message: 'Chart added successfully!', 
-      severity: 'success' 
+    setNotification({
+      open: true,
+      message: 'Chart added successfully!',
+      severity: 'success'
     });
   }, [newWidget, addWidget]);
 
   const handleDeleteWidget = useCallback((widgetId) => {
     deleteWidget(widgetId);
-    setNotification({ 
-      open: true, 
-      message: 'Chart deleted', 
-      severity: 'info' 
+    setNotification({
+      open: true,
+      message: 'Chart deleted',
+      severity: 'info'
     });
   }, [deleteWidget]);
 
   const handleDuplicateWidget = useCallback((widgetId) => {
     duplicateWidget(widgetId);
-    setNotification({ 
-      open: true, 
-      message: 'Chart duplicated', 
-      severity: 'success' 
+    setNotification({
+      open: true,
+      message: 'Chart duplicated',
+      severity: 'success'
     });
   }, [duplicateWidget]);
 
@@ -213,7 +197,7 @@ const Dashboard = ({ data, onExport }) => {
 
   const renderWidget = useCallback((widget) => {
     const widgetData = data;
-    
+
     // Safety: Block 3D charts at the dashboard level
     const safeWidget = {
       ...widget,
@@ -241,10 +225,10 @@ const Dashboard = ({ data, onExport }) => {
                 sizeBy={safeWidget.sizeBy}
                 config={safeWidget.config}
                 onError={(error) => {
-                  setNotification({ 
-                    open: true, 
-                    message: `Chart error: ${error.message || 'Unknown error'}`, 
-                    severity: 'error' 
+                  setNotification({
+                    open: true,
+                    message: `Chart error: ${error.message || 'Unknown error'}`,
+                    severity: 'error'
                   });
                 }}
               />
@@ -289,45 +273,45 @@ const Dashboard = ({ data, onExport }) => {
 
   if (!data || !data.data) {
     return (
-      <Box sx={{ p: 3, textAlign: 'center' }}>
-        <Typography variant="h5" color="text.secondary" gutterBottom>
-          Dashboard
+      <Box sx={{ p: 6, textAlign: 'center', border: '2px solid black', backgroundColor: 'white' }}>
+        <Typography variant="h3" sx={{ textTransform: 'uppercase', letterSpacing: '0.05em', mb: 2 }}>
+          DASHBOARD_LOCKED
         </Typography>
-        <Alert severity="info" sx={{ mb: 2 }}>
-          Upload data to start creating visualizations in your dashboard
-        </Alert>
-        <Typography variant="body2" color="text.secondary">
-          Once you upload a CSV, JSON, or Excel file, you'll be able to:
-        </Typography>
-        <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center', gap: 2, flexWrap: 'wrap' }}>
-          <Chip icon={<Add />} label="Add Charts" variant="outlined" />
-          <Chip icon={<DragIndicator />} label="Drag & Drop" variant="outlined" />
-          <Chip icon={<Download />} label="Export" variant="outlined" />
+        <Box sx={{ p: 2, border: '2px solid black', display: 'inline-block', mb: 3 }}>
+          <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
+            UPLOAD_DATA_TO_INITIALIZE
+          </Typography>
+        </Box>
+        <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, flexWrap: 'wrap' }}>
+          <Chip icon={<Add />} label="ADD_CHARTS" sx={{ borderRadius: 0, border: '2px solid black', backgroundColor: 'transparent', fontWeight: 'bold' }} />
+          <Chip icon={<DragIndicator />} label="DRAG_AND_DROP" sx={{ borderRadius: 0, border: '2px solid black', backgroundColor: 'transparent', fontWeight: 'bold' }} />
+          <Chip icon={<Download />} label="EXPORT_DASHBOARD" sx={{ borderRadius: 0, border: '2px solid black', backgroundColor: 'transparent', fontWeight: 'bold' }} />
         </Box>
       </Box>
     );
   }
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ p: 0, backgroundColor: 'transparent' }}>
       {/* Enhanced Dashboard Header */}
-      <Paper elevation={0} sx={{ 
-        p: 4, 
+      <Box sx={{
+        p: 4,
         mb: 4,
-        background: 'background.paper',
-        border: '1px solid',
-        borderColor: 'divider'
+        backgroundColor: 'white',
+        border: '2px solid black'
       }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
           <Box>
-            <Typography variant="h3" sx={{ 
+            <Typography variant="h3" sx={{
               fontWeight: 800,
-              color: 'text.primary',
+              color: 'black',
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
               mb: 1
             }}>
               Visualization Dashboard
             </Typography>
-            <Typography variant="h6" color="text.secondary" sx={{ fontWeight: 400 }}>
+            <Typography variant="subtitle1" color="black" sx={{ fontWeight: 'bold' }}>
               Create and customize visual insights from your data
             </Typography>
           </Box>
@@ -340,17 +324,19 @@ const Dashboard = ({ data, onExport }) => {
               sx={{
                 px: 3,
                 py: 1.5,
-                borderRadius: 2,
-                border: '1px solid',
-                borderColor: 'divider',
-                fontWeight: 600,
-                textTransform: 'none',
+                borderRadius: 0,
+                border: '2px solid black',
+                fontWeight: 'bold',
+                textTransform: 'uppercase',
+                color: 'black',
                 '&:hover': {
-                  borderColor: 'primary.main',
-                  transform: 'translateY(-2px)'
+                  backgroundColor: 'black',
+                  color: 'white',
+                  border: '2px solid black',
                 },
                 '&:disabled': {
-                  borderColor: 'divider'
+                  borderColor: 'rgba(0,0,0,0.3)',
+                  color: 'rgba(0,0,0,0.3)'
                 }
               }}
             >
@@ -363,12 +349,18 @@ const Dashboard = ({ data, onExport }) => {
               sx={{
                 px: 3,
                 py: 1.5,
-                borderRadius: 2,
-                fontSize: '1rem',
-                fontWeight: 600,
-                textTransform: 'none',
+                borderRadius: 0,
+                border: '2px solid black',
+                backgroundColor: 'black',
+                color: 'white',
+                fontWeight: 'bold',
+                textTransform: 'uppercase',
+                boxShadow: 'none',
                 '&:hover': {
-                  transform: 'translateY(-2px)'
+                  backgroundColor: 'transparent',
+                  color: 'black',
+                  boxShadow: 'none',
+                  border: '2px solid black'
                 }
               }}
             >
@@ -376,76 +368,40 @@ const Dashboard = ({ data, onExport }) => {
             </Button>
           </Box>
         </Box>
-        
+
         {/* Dashboard Stats */}
-        <Box sx={{ display: 'flex', gap: 3 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-            <Box sx={{
-              width: 40,
-              height: 40,
-              borderRadius: 2,
-              background: '#ffffff',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}>
-              <BarChart sx={{ color: 'white', fontSize: 20 }} />
+        <Box sx={{ display: 'flex', gap: 0, borderTop: '2px solid black', mx: -4, mb: -4, borderBottom: '0' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, p: 3, borderRight: '2px solid black', flex: 1 }}>
+            <Box sx={{ border: '2px solid black', p: 1, display: 'flex' }}>
+              <BarChart sx={{ color: 'black', fontSize: 24 }} />
             </Box>
             <Box>
-              <Typography variant="h6" sx={{ fontWeight: 700, color: 'primary.main' }}>
-                {widgets.length}
-              </Typography>
-              <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
-                Widgets
-              </Typography>
+              <Typography variant="subtitle2" sx={{ letterSpacing: '0.1em', fontWeight: 'bold' }}>WIDGETS</Typography>
+              <Typography variant="h4" sx={{ fontWeight: 800 }}>{widgets.length}</Typography>
             </Box>
           </Box>
           {data.fileName && (
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-              <Box sx={{
-                width: 40,
-                height: 40,
-                borderRadius: 2,
-                background: 'success.main',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}>
-                <Insights sx={{ color: 'white', fontSize: 20 }} />
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, p: 3, borderRight: '2px solid black', flex: 1, minWidth: 0 }}>
+              <Box sx={{ border: '2px solid black', p: 1, display: 'flex' }}>
+                <Insights sx={{ color: 'black', fontSize: 24 }} />
               </Box>
-              <Box>
-                <Typography variant="h6" sx={{ fontWeight: 700, color: 'success.main' }}>
-                  {data.fileName}
-                </Typography>
-                <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
-                  Data Source
-                </Typography>
+              <Box sx={{ minWidth: 0 }}>
+                <Typography variant="subtitle2" sx={{ letterSpacing: '0.1em', fontWeight: 'bold' }}>DATA_SOURCE</Typography>
+                <Typography variant="h6" sx={{ fontWeight: 800, textTransform: 'uppercase' }} noWrap>{data.fileName}</Typography>
               </Box>
             </Box>
           )}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-            <Box sx={{
-              width: 40,
-              height: 40,
-              borderRadius: 2,
-              background: 'info.main',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}>
-              <ShowChart sx={{ color: 'white', fontSize: 20 }} />
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, p: 3, flex: 1 }}>
+            <Box sx={{ border: '2px solid black', p: 1, display: 'flex' }}>
+              <ShowChart sx={{ color: 'black', fontSize: 24 }} />
             </Box>
             <Box>
-              <Typography variant="h6" sx={{ fontWeight: 700, color: 'info.main' }}>
-                {data.data.length.toLocaleString()}
-              </Typography>
-              <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
-                Data Points
-              </Typography>
+              <Typography variant="subtitle2" sx={{ letterSpacing: '0.1em', fontWeight: 'bold' }}>DATA_POINTS</Typography>
+              <Typography variant="h4" sx={{ fontWeight: 800 }}>{data.data.length.toLocaleString()}</Typography>
             </Box>
           </Box>
         </Box>
-      </Paper>
+      </Box>
 
       {/* Dashboard Grid */}
       {widgets.length > 0 ? (
@@ -469,29 +425,30 @@ const Dashboard = ({ data, onExport }) => {
           ))}
         </ResponsiveGridLayout>
       ) : (
-        <Paper elevation={0} sx={{ p: 8, textAlign: 'center', mt: 4, border: '1px solid', borderColor: 'divider' }}>
+        <Box sx={{ p: 8, textAlign: 'center', mt: 4, border: '2px solid black', backgroundColor: 'white' }}>
           <Box sx={{
             width: 120,
             height: 120,
-            borderRadius: '50%',
-            background: 'primary.main',
+            border: '4px solid black',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             mx: 'auto',
             mb: 4
           }}>
-            <BarChart sx={{ fontSize: 60, color: 'white' }} />
+            <BarChart sx={{ fontSize: 60, color: 'black' }} />
           </Box>
-          <Typography variant="h3" sx={{ 
+          <Typography variant="h2" sx={{
             fontWeight: 800,
-            color: 'text.primary',
-            mb: 2
+            textTransform: 'uppercase',
+            color: 'black',
+            mb: 2,
+            letterSpacing: '0.02em'
           }}>
-            Create Your First Dashboard
+            SYSTEM_INITIALIZED
           </Typography>
-          <Typography variant="h6" color="text.secondary" sx={{ mb: 4, maxWidth: 500, mx: 'auto' }}>
-            Transform your data into beautiful, interactive visualizations. Start by adding your first chart to see insights come to life.
+          <Typography variant="h6" color="black" sx={{ mb: 4, maxWidth: 500, mx: 'auto', fontFamily: '"IBM Plex Mono", monospace' }}>
+            Transform your data into structural insight. Add your first grid element.
           </Typography>
           <Button
             variant="contained"
@@ -501,29 +458,37 @@ const Dashboard = ({ data, onExport }) => {
             sx={{
               px: 4,
               py: 2,
-              borderRadius: 3,
+              borderRadius: 0,
+              border: '2px solid black',
+              backgroundColor: 'black',
+              color: 'white',
               fontSize: '1.1rem',
               fontWeight: 700,
-              textTransform: 'none',
+              textTransform: 'uppercase',
+              boxShadow: 'none',
               '&:hover': {
-                transform: 'translateY(-4px)'
+                backgroundColor: 'transparent',
+                color: 'black',
+                boxShadow: 'none',
+                border: '2px solid black'
               }
             }}
           >
-            Create First Chart
+            Create Chart Block
           </Button>
-        </Paper>
+        </Box>
       )}
 
       {/* Add Widget Dialog */}
-      <Dialog 
-        open={addWidgetOpen} 
+      <Dialog
+        open={addWidgetOpen}
         onClose={() => setAddWidgetOpen(false)}
         maxWidth="md"
         fullWidth
+        PaperProps={{ sx: { borderRadius: 0, border: '2px solid black', boxShadow: '8px 8px 0px 0px rgba(0,0,0,1)' } }}
       >
-        <DialogTitle>Add New Chart</DialogTitle>
-        <DialogContent>
+        <DialogTitle sx={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: '2px solid black', pb: 2 }}>ADD_NEW_CHART</DialogTitle>
+        <DialogContent sx={{ pt: 3 }}>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
             <TextField
               fullWidth
@@ -532,16 +497,16 @@ const Dashboard = ({ data, onExport }) => {
               onChange={(e) => setNewWidget(prev => ({ ...prev, title: e.target.value }))}
               placeholder="Enter a descriptive title for your chart"
             />
-            
+
             <FormControl fullWidth>
               <InputLabel>Chart Library</InputLabel>
               <Select
                 value={newWidget.library}
                 label="Chart Library"
-                onChange={(e) => setNewWidget(prev => ({ 
-                  ...prev, 
+                onChange={(e) => setNewWidget(prev => ({
+                  ...prev,
                   library: e.target.value,
-                  chartType: chartTypes[e.target.value][0].value 
+                  chartType: chartTypes[e.target.value][0].value
                 }))}
               >
                 <MenuItem value="recharts">Recharts (Basic Charts)</MenuItem>
@@ -630,27 +595,46 @@ const Dashboard = ({ data, onExport }) => {
             </Box>
           </Box>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setAddWidgetOpen(false)}>Cancel</Button>
-          <Button 
-            onClick={handleAddWidget} 
+        <DialogActions sx={{ borderTop: '2px solid black', p: 2 }}>
+          <Button
+            onClick={() => setAddWidgetOpen(false)}
+            sx={{ borderRadius: 0, color: 'black', fontWeight: 'bold' }}
+          >
+            CANCEL
+          </Button>
+          <Button
+            onClick={handleAddWidget}
             variant="contained"
             disabled={!newWidget.title || !newWidget.xAxis || !newWidget.yAxis}
+            sx={{
+              borderRadius: 0,
+              backgroundColor: 'black',
+              color: 'white',
+              fontWeight: 'bold',
+              border: '2px solid black',
+              boxShadow: 'none',
+              '&:hover': {
+                backgroundColor: 'transparent',
+                color: 'black',
+                boxShadow: 'none'
+              }
+            }}
           >
-            Add Chart
+            ADD_CHART
           </Button>
         </DialogActions>
       </Dialog>
 
       {/* Edit Widget Dialog */}
-      <Dialog 
-        open={Boolean(editWidget)} 
+      <Dialog
+        open={Boolean(editWidget)}
         onClose={() => setEditWidget(null)}
         maxWidth="md"
         fullWidth
+        PaperProps={{ sx: { borderRadius: 0, border: '2px solid black', boxShadow: '8px 8px 0px 0px rgba(0,0,0,1)' } }}
       >
-        <DialogTitle>Edit Chart</DialogTitle>
-        <DialogContent>
+        <DialogTitle sx={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: '2px solid black', pb: 2 }}>EDIT_CHART</DialogTitle>
+        <DialogContent sx={{ pt: 3 }}>
           {editWidget && (
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
               <TextField
@@ -659,7 +643,7 @@ const Dashboard = ({ data, onExport }) => {
                 value={editWidget.title}
                 onChange={(e) => setEditWidget(prev => ({ ...prev, title: e.target.value }))}
               />
-              
+
               <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
                 <FormControl fullWidth>
                   <InputLabel>X-Axis</InputLabel>
@@ -692,16 +676,34 @@ const Dashboard = ({ data, onExport }) => {
             </Box>
           )}
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setEditWidget(null)}>Cancel</Button>
-          <Button 
+        <DialogActions sx={{ borderTop: '2px solid black', p: 2 }}>
+          <Button
+            onClick={() => setEditWidget(null)}
+            sx={{ borderRadius: 0, color: 'black', fontWeight: 'bold' }}
+          >
+            CANCEL
+          </Button>
+          <Button
             onClick={() => {
               updateWidget(editWidget.id, editWidget);
               setEditWidget(null);
             }}
             variant="contained"
+            sx={{
+              borderRadius: 0,
+              backgroundColor: 'black',
+              color: 'white',
+              fontWeight: 'bold',
+              border: '2px solid black',
+              boxShadow: 'none',
+              '&:hover': {
+                backgroundColor: 'transparent',
+                color: 'black',
+                boxShadow: 'none'
+              }
+            }}
           >
-            Save Changes
+            SAVE_CHANGES
           </Button>
         </DialogActions>
       </Dialog>
@@ -790,7 +792,7 @@ Dashboard.propTypes = {
 };
 
 Dashboard.defaultProps = {
-  onExport: () => {}
+  onExport: () => { }
 };
 
 export default React.memo(Dashboard);

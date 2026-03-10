@@ -1,4 +1,4 @@
-# 🚀 Advanced Data Visualization Playground - Next Generation
+# Advanced Data Visualization Playground - Next Generation
 
 > **Transform your data into actionable insights with AI-powered analytics, real-time streaming, and professional dashboards**
 
@@ -7,53 +7,53 @@
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com)
 
-![Dashboard Preview](https://via.placeholder.com/1200x600/0f0f23/667eea?text=Advanced+Data+Visualization+Platform)
+---
+
+## What's New in v2.0
+
+### Revolutionary Features
+
+- **Advanced Analytics Engine** - Statistical analysis, correlation, regression, and outlier detection powered by Web Workers
+- **Real-Time Data Streaming** - WebSocket support, API polling, and live data updates
+- **Professional Dashboard Templates** - 6 pre-built templates (Sales, Finance, Marketing, Operations, Analytics, Executive)
+- **Performance Optimized** - Web Workers for heavy computations, lazy loading, and virtualization
+- **Enhanced Visualizations** - 18+ chart types built natively for strong borders
+- **AI-Powered Insights** - Hugging Face AI integration for intelligent data analysis
+- **Advanced Export/Import** - Support for CSV, JSON, Excel, PDF, PNG with configurable options
+- **Premium Swiss Grid Theme** - Hard borders, robust typography, and editorial layouts
 
 ---
 
-## ✨ What's New in v2.0
+## Table of Contents
 
-### 🎯 **Revolutionary Features**
-
-- **🧠 Advanced Analytics Engine** - Statistical analysis, correlation, regression, and outlier detection powered by Web Workers
-- **📡 Real-Time Data Streaming** - WebSocket support, API polling, and live data updates
-- **🎨 Professional Dashboard Templates** - 6 pre-built templates (Sales, Finance, Marketing, Operations, Analytics, Executive)
-- **⚡ Performance Optimized** - Web Workers for heavy computations, lazy loading, and virtualization
-- **📊 Enhanced Visualizations** - 18+ chart types with gradient color systems
-- **🤖 AI-Powered Insights** - Google Gemini AI integration for intelligent data analysis
-- **💾 Advanced Export/Import** - Support for CSV, JSON, Excel, PDF, PNG with configurable options
-- **🎭 Premium Dark Theme** - Glassmorphism effects, smooth animations, and modern UI
-
----
-
-## 📋 Table of Contents
-
-- [Features](#-features)
-- [Quick Start](#-quick-start)
-- [Tech Stack](#-tech-stack)
-- [Advanced Features](#-advanced-features)
-- [Dashboard Templates](#-dashboard-templates)
-- [Analytics Engine](#-analytics-engine)
-- [Real-Time Streaming](#-real-time-streaming)
-- [Architecture](#-architecture)
-- [Performance](#-performance)
-- [Contributing](#-contributing)
-- [License](#-license)
+- [Features](#features)
+- [Quick Start](#quick-start)
+- [Tech Stack](#tech-stack)
+- [Advanced Features](#advanced-features)
+- [Dashboard Templates](#dashboard-templates)
+- [Analytics Engine](#analytics-engine)
+- [Real-Time Streaming](#real-time-streaming)
+- [Architecture](#architecture)
+- [Performance](#performance)
+- [Contributing](#contributing)
+- [License](#license)
 
 ---
 
-## 🎯 Features
+## Features
 
-### **Core Capabilities**
+### Core Capabilities
 
-#### 📤 **Smart Data Upload**
+#### Smart Data Upload
+
 - **Multiple Format Support**: CSV, JSON, Excel (XLSX), TSV
 - **Drag & Drop Interface**: Intuitive file upload with validation
 - **Auto-detection**: Automatic column type and separator detection
 - **Large File Handling**: Optimized for datasets with 100K+ rows
 - **Preview & Validation**: Instant data preview with quality checks
 
-#### 📊 **18+ Advanced Chart Types**
+#### 18+ Advanced Chart Types
+
 | Category | Chart Types |
 |----------|-------------|
 | **Basic** | Line, Bar, Area, Pie, Doughnut |
@@ -61,28 +61,32 @@
 | **Advanced** | Scatter, Bubble, Radar, Polar Area |
 | **Specialized** | Heatmap, Treemap, Waterfall, Funnel, Gauge, Candlestick |
 
-#### 🎛️ **Interactive Dashboard**
+#### Interactive Dashboard
+
 - **Drag & Drop Layout**: Resize and rearrange charts freely
 - **Multi-chart Support**: Combine different chart types seamlessly
 - **Live Updates**: Real-time data refresh and synchronization
 - **Export Options**: PNG, PDF, JSON configuration export
 - **Responsive Design**: Works on desktop, tablet, and mobile
 
-#### 🔄 **Data Transformation**
+#### Data Transformation
+
 - **Filtering**: Multi-condition filters with AND/OR logic
 - **Grouping & Aggregation**: Group by columns with sum, avg, min, max, count
 - **Sorting**: Multi-level sorting (ascending/descending)
 - **Calculated Fields**: Create new columns with custom formulas
 - **Data Cleaning**: Remove duplicates, handle missing values
 
-#### 🤖 **AI-Powered Insights** (NEW!)
+#### AI-Powered Insights
+
 - **Pattern Recognition**: Automatic trend and anomaly detection
 - **Smart Recommendations**: Chart type suggestions based on data
 - **Natural Language Insights**: Human-readable data explanations
 - **Correlation Discovery**: Identify relationships between variables
 - **Predictive Analytics**: Basic forecasting and trend prediction
 
-#### 📈 **Advanced Analytics Engine** (NEW!)
+#### Advanced Analytics Engine
+
 - **Descriptive Statistics**: Mean, median, std dev, quartiles
 - **Correlation Analysis**: Pearson correlation coefficients
 - **Linear Regression**: Trend lines with R² scores
@@ -90,14 +94,16 @@
 - **Distribution Analysis**: Histograms and box plots
 - **Multi-threaded Processing**: Web Workers for performance
 
-#### 📡 **Real-Time Data Streaming** (NEW!)
+#### Real-Time Data Streaming
+
 - **WebSocket Support**: Live data from WebSocket servers
 - **API Polling**: Periodic data refresh from REST APIs
 - **Simulation Mode**: Built-in data generator for testing
 - **Metrics Dashboard**: Messages/sec, latency tracking
 - **Auto-reconnect**: Resilient connection handling
 
-#### 🎨 **Professional Templates** (NEW!)
+#### Professional Templates
+
 - **Sales Dashboard**: Revenue trends, regional performance
 - **Finance Dashboard**: Cash flow, P&L, budget tracking
 - **Marketing Dashboard**: Conversion funnels, campaign ROI
@@ -107,9 +113,9 @@
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
-### **Installation**
+### Installation
 
 ```bash
 # Clone the repository
@@ -128,18 +134,18 @@ npm install uuid
 npm start
 ```
 
-### **Environment Setup**
+### Environment Setup
 
 Create a `.env.local` file for API keys:
 
 ```env
-REACT_APP_GEMINI_API_KEY=your_gemini_api_key_here
+REACT_APP_HUGGINGFACE_API_KEY=your_key_here
 ```
 
-### **First Steps**
+### First Steps
 
-1. **Upload Data**: Click "Upload Data" tab and drag/drop your CSV or Excel file
-2. **Preview**: View your data in the "Preview Data" tab with statistics
+1. **Upload Data**: Click Upload Data tab and drag/drop your CSV or Excel file
+2. **Preview**: View your data in the Preview Data tab with statistics
 3. **Transform** (Optional): Filter, group, or aggregate your data
 4. **Choose Template**: Select a professional dashboard template
 5. **Customize**: Add, remove, or modify charts as needed
@@ -148,45 +154,51 @@ REACT_APP_GEMINI_API_KEY=your_gemini_api_key_here
 
 ---
 
-## 💻 Tech Stack
+## Tech Stack
 
-### **Frontend Framework**
+### Frontend Framework
+
 - **React 18.3.1** - Modern hooks, concurrent rendering
 - **Material-UI v7.3.2** - Premium component library
 - **Emotion** - CSS-in-JS styling solution
 
-### **Data Visualization**
+### Data Visualization
+
 - **Chart.js 4.5.0** - Canvas-based charts with plugins
 - **Recharts 3.2.1** - React-native charts
 - **chartjs-chart-matrix** - Heatmap support
 - **chartjs-chart-treemap** - Treemap visualizations
 
-### **Data Processing**
+### Data Processing
+
 - **PapaParse 5.5.3** - Fast CSV parser
 - **read-excel-file** - Excel file reader
 - **Lodash 4.17.21** - Utility functions
 - **simple-statistics** - Statistical computations
 - **Web Workers** - Multi-threaded processing
 
-### **UI/UX**
+### UI/UX
+
 - **react-grid-layout** - Drag & drop dashboard
 - **react-dropzone** - File upload interface
-- **Custom CSS** - Glassmorphism, gradients, animations
+- **Custom CSS** - Swiss Grid aesthetic, hard borders, uppercase text
 
-### **Export & PDF**
+### Export & PDF
+
 - **html2canvas** - DOM to canvas conversion
 - **jsPDF** - PDF generation
 - **Custom Export Manager** - Multi-format support
 
-### **AI Integration**
-- **Google Gemini AI** - Advanced insights
+### AI Integration
+
+- **Hugging Face** - Advanced insights
 - **Custom Analytics Engine** - Statistical analysis
 
 ---
 
-## 🎯 Advanced Features
+## Advanced Features
 
-### **Web Workers for Performance**
+### Web Workers for Performance
 
 Heavy computations run in background threads:
 
@@ -200,12 +212,13 @@ Heavy computations run in background threads:
 ```
 
 **Benefits:**
-- ✅ Non-blocking UI
-- ✅ 3-5x faster processing
-- ✅ Handles 100K+ rows smoothly
-- ✅ Automatic task queuing
 
-### **Smart Template System**
+- Non-blocking UI
+- 3-5x faster processing
+- Handles 100K+ rows smoothly
+- Automatic task queuing
+
+### Smart Template System
 
 AI-powered template recommendations:
 
@@ -218,7 +231,7 @@ const suggestions = getTemplateSuggestions(yourData);
 // ]
 ```
 
-### **Real-Time Streaming**
+### Real-Time Streaming
 
 Three streaming modes:
 
@@ -237,47 +250,53 @@ Three streaming modes:
 
 ---
 
-## 📊 Dashboard Templates
+## Dashboard Templates
 
-### **Available Templates**
+### Available Templates
 
-#### 1️⃣ **Sales Analytics**
+#### 1: Sales Analytics
+
 - Revenue over time (Line chart)
 - Sales by region (Bar chart)
 - Product mix (Pie chart)
 - Cumulative revenue (Area chart)
 
-#### 2️⃣ **Financial Performance**
+#### 2: Financial Performance
+
 - Cash flow analysis (Waterfall)
 - P&L trend (Line chart)
 - Expense breakdown (Doughnut)
 - Budget vs actual (Bar chart)
 
-#### 3️⃣ **Marketing Analytics**
+#### 3: Marketing Analytics
+
 - Conversion funnel (Funnel chart)
 - Campaign performance (Line chart)
 - Channel ROI (Bar chart)
 - Engagement heatmap (Heatmap)
 
-#### 4️⃣ **Operations**
+#### 4: Operations
+
 - Overall efficiency (Gauge)
 - Production output (Line chart)
 - Resource allocation (Treemap)
 - Team performance (Bar chart)
 
-#### 5️⃣ **Data Analytics**
+#### 5: Data Analytics
+
 - Correlation analysis (Scatter plot)
 - Distribution comparison (Box plot)
 - Value distribution (Histogram)
 - Multi-dimensional analysis (Radar)
 
-#### 6️⃣ **Executive Summary**
+#### 6: Executive Summary
+
 - Revenue growth (Line chart)
 - Customer satisfaction (Gauge)
 - Departmental performance (Bar chart)
 - Market share (Pie chart)
 
-### **Using Templates**
+### Using Templates
 
 ```javascript
 import { applyTemplate } from './constants/dashboardTemplates';
@@ -286,26 +305,26 @@ import { applyTemplate } from './constants/dashboardTemplates';
 const dashboard = applyTemplate('sales', yourData);
 
 // Templates auto-map columns:
-// - Numeric columns → Y-axis
-// - Categorical columns → X-axis
+// - Numeric columns -> Y-axis
+// - Categorical columns -> X-axis
 // - Optimal chart types selected
 ```
 
 ---
 
-## 🧮 Analytics Engine
+## Analytics Engine
 
-### **Statistical Analysis**
+### Statistical Analysis
 
 ```javascript
 // Automatic calculations:
-✓ Count, Sum, Mean, Median
-✓ Standard Deviation, Variance
-✓ Min, Max, Quartiles (Q1, Q3)
-✓ Range, IQR
+- Count, Sum, Mean, Median
+- Standard Deviation, Variance
+- Min, Max, Quartiles (Q1, Q3)
+- Range, IQR
 ```
 
-### **Correlation Analysis**
+### Correlation Analysis
 
 ```javascript
 // Pearson correlation
@@ -319,7 +338,7 @@ const correlation = await calculateCorrelation(data, 'price', 'sales');
 // < 0: Negative correlation
 ```
 
-### **Linear Regression**
+### Linear Regression
 
 ```javascript
 const regression = await linearRegression(data, 'x', 'y');
@@ -332,7 +351,7 @@ const regression = await linearRegression(data, 'x', 'y');
 // }
 ```
 
-### **Outlier Detection**
+### Outlier Detection
 
 ```javascript
 const outliers = await detectOutliers(data, 'revenue');
@@ -345,9 +364,9 @@ const outliers = await detectOutliers(data, 'revenue');
 
 ---
 
-## 📡 Real-Time Streaming
+## Real-Time Streaming
 
-### **WebSocket Streaming**
+### WebSocket Streaming
 
 ```javascript
 // Connect to WebSocket server
@@ -368,7 +387,7 @@ const outliers = await detectOutliers(data, 'revenue');
 }
 ```
 
-### **API Polling**
+### API Polling
 
 ```javascript
 // Poll REST API
@@ -385,7 +404,7 @@ const outliers = await detectOutliers(data, 'revenue');
 }
 ```
 
-### **Simulation Mode**
+### Simulation Mode
 
 ```javascript
 // Built-in data generator
@@ -402,9 +421,10 @@ const outliers = await detectOutliers(data, 'revenue');
 }
 ```
 
-### **Metrics Tracking**
+### Metrics Tracking
 
 Real-time monitoring:
+
 - **Messages Received**: Total count
 - **Data Rate**: Messages per second
 - **Latency**: Average delay (ms)
@@ -412,9 +432,9 @@ Real-time monitoring:
 
 ---
 
-## 🏗️ Architecture
+## Architecture
 
-### **Project Structure**
+### Project Structure
 
 ```
 src/
@@ -457,52 +477,74 @@ src/
 └── App.js                   # Main app component
 ```
 
-### **Data Flow**
+### Data Flow
 
 ```
-Upload File → Parse Data → Transform (Optional) → Visualize
-     ↓            ↓              ↓                    ↓
-FileUploader → PapaParse → DataTransformer → Charts/Dashboard
-                             ↓
+Upload File -> Parse Data -> Transform (Optional) -> Visualize
+     |            |              |                    |
+FileUploader -> PapaParse -> DataTransformer -> Charts/Dashboard
+                             |
                       Web Worker (Heavy Ops)
-                             ↓
+                             |
                       AdvancedAnalytics
+```
+
+### Worker Architecture
+
+```
+Main Thread                   Worker Thread
+     |                             |
+     |---- Task Queue ------------>|
+     |                             |
+     |                    [Calculate Stats  ]
+     |                    [Correlations     ]
+     |                    [Regressions      ]
+     |                    [Outliers         ]
+     |                             |
+     |<--- Results ----------------|
+     |                             |
+     v                             v
+  Update UI                   Next Task
 ```
 
 ---
 
-## ⚡ Performance
+## Performance
 
-### **Optimizations Implemented**
+### Optimizations Implemented
 
-#### **React Level**
-- ✅ `React.memo` for component memoization
-- ✅ `useCallback` for function memoization
-- ✅ `useMemo` for expensive computations
-- ✅ Lazy loading for heavy components
-- ✅ Code splitting with dynamic imports
+#### React Level
 
-#### **Data Processing**
-- ✅ Web Workers for statistics (offloads main thread)
-- ✅ Pagination for large datasets (25 rows/page)
-- ✅ Debounced search (300ms delay)
-- ✅ Throttled scroll events (100ms)
-- ✅ Virtualized lists for 10K+ items
+- `React.memo` for component memoization
+- `useCallback` for function memoization
+- `useMemo` for expensive computations
+- Lazy loading for heavy components
+- Code splitting with dynamic imports
 
-#### **Rendering**
-- ✅ Canvas-based charts (Chart.js)
-- ✅ SVG for smaller datasets (Recharts)
-- ✅ Conditional animation disabling (datasets > 1000)
-- ✅ Progressive loading
-- ✅ Request animation frame for smooth updates
+#### Data Processing
 
-#### **Bundle Size**
+- Web Workers for statistics (offloads main thread)
+- Pagination for large datasets (25 rows/page)
+- Debounced search (300ms delay)
+- Throttled scroll events (100ms)
+- Virtualized lists for 10K+ items
+
+#### Rendering
+
+- Canvas-based charts (Chart.js)
+- CSS variables for Swiss Grid structure
+- Conditional animation disabling (datasets > 1000)
+- Progressive loading
+- Request animation frame for smooth updates
+
+#### Bundle Size
+
 - Production build: ~500KB gzipped
 - Tree-shaking enabled
 - Dynamic imports for templates
 - Lazy-loaded analytics engine
 
-### **Performance Benchmarks**
+### Performance Benchmarks
 
 | Dataset Size | Load Time | Render Time | Memory |
 |-------------|-----------|-------------|---------|
@@ -515,34 +557,29 @@ FileUploader → PapaParse → DataTransformer → Charts/Dashboard
 
 ---
 
-## 🎨 Design System
+## Design System
 
-### **Color Palette**
+### Color Palette
 
 ```css
---primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
---secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
---success-gradient: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
---background: #0f0f23;
---surface: rgba(255, 255, 255, 0.05);
+--background: #ffffff;
+--surface: #ffffff;
+--lines: #000000;
 ```
 
-### **Typography**
+### Typography
 
-- **Headers**: Roboto, 700 weight, -0.025em spacing
-- **Body**: Roboto, 400 weight, 1.6 line height
-- **Code**: Monospace, 14px
+- **Headers**: Helvetica, 800 weight, uppercase
+- **Body**: Helvetica, 400 weight, 1.6 line height
+- **Code**: Monospace (IBM Plex Mono), 14px
 
-### **Effects**
+### Effects
 
-- **Glassmorphism**: `backdrop-filter: blur(10px)`
-- **Glow**: `box-shadow: 0 0 20px rgba(102, 126, 234, 0.5)`
-- **Float Animation**: 3s infinite alternate
-- **Transitions**: 0.3s cubic-bezier(0.4, 0, 0.2, 1)
+- No glassmorfism, gradients, dropshadows, or rounded borders.
 
 ---
 
-## 🧪 Testing
+## Testing
 
 ```bash
 # Run all tests
@@ -556,6 +593,7 @@ npm test -- DataTransformer.test.js
 ```
 
 **Test Coverage:**
+
 - Components: 85%
 - Utils: 92%
 - Hooks: 78%
@@ -563,9 +601,9 @@ npm test -- DataTransformer.test.js
 
 ---
 
-## 📦 Deployment
+## Deployment
 
-### **Build for Production**
+### Build for Production
 
 ```bash
 # Create optimized build
@@ -578,17 +616,17 @@ npx serve -s build
 netlify deploy --prod --dir=build
 ```
 
-### **Environment Variables**
+### Environment Variables
 
 ```env
-REACT_APP_GEMINI_API_KEY=your_key_here
+REACT_APP_HUGGINGFACE_API_KEY=your_key_here
 REACT_APP_API_ENDPOINT=https://api.yourserver.com
 REACT_APP_WS_ENDPOINT=wss://ws.yourserver.com
 ```
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 We welcome contributions! Please follow these steps:
 
@@ -598,7 +636,7 @@ We welcome contributions! Please follow these steps:
 4. **Push** to the branch (`git push origin feature/AmazingFeature`)
 5. **Open** a Pull Request
 
-### **Development Guidelines**
+### Development Guidelines
 
 - Follow ESLint rules
 - Add tests for new features
@@ -608,55 +646,56 @@ We welcome contributions! Please follow these steps:
 
 ---
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - **Chart.js** - Powerful charting library
 - **Material-UI** - Beautiful React components
-- **Google Gemini** - AI-powered insights
+- **Hugging Face** - AI-powered insights
 - **React Community** - Amazing ecosystem
 
 ---
 
-## 📞 Support
+## Support
 
 - **Issues**: [GitHub Issues](https://github.com/Chronos778/advanced-data-visualization-playground/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/Chronos778/advanced-data-visualization-playground/discussions)
-- **Email**: support@datavizpro.com
+- **Email**: <support@datavizpro.com>
 
 ---
 
-## 🗺️ Roadmap
+## Roadmap
 
-### **Q1 2025**
-- [ ] 3D chart support with Three.js
-- [ ] Map visualizations (Choropleth, Scatter maps)
-- [ ] Database connectors (MySQL, PostgreSQL)
-- [ ] Cloud storage integration (S3, Google Drive)
+### Q1 2025
 
-### **Q2 2025**
-- [ ] Collaborative dashboards with real-time sync
-- [ ] Advanced ML models (clustering, classification)
-- [ ] Custom branding and theming
-- [ ] Mobile app (React Native)
+- 3D chart support with Three.js
+- Map visualizations (Choropleth, Scatter maps)
+- Database connectors (MySQL, PostgreSQL)
+- Cloud storage integration (S3, Google Drive)
 
-### **Q3 2025**
-- [ ] Plugin system for extensions
-- [ ] Marketplace for templates
-- [ ] Enterprise features (SSO, audit logs)
-- [ ] Performance monitoring dashboard
+### Q2 2025
+
+- Collaborative dashboards with real-time sync
+- Advanced ML models (clustering, classification)
+- Custom branding and theming
+- Mobile app (React Native)
+
+### Q3 2025
+
+- Plugin system for extensions
+- Marketplace for templates
+- Enterprise features (SSO, audit logs)
+- Performance monitoring dashboard
 
 ---
 
 <div align="center">
 
-**Made with ❤️ by the DataViz Pro Team**
-
-[⭐ Star us on GitHub](https://github.com/Chronos778/advanced-data-visualization-playground) | [🐛 Report Bug](https://github.com/Chronos778/advanced-data-visualization-playground/issues) | [💡 Request Feature](https://github.com/Chronos778/advanced-data-visualization-playground/issues)
+**Made by the DataViz Pro Team**
 
 </div>
